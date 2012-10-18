@@ -8,9 +8,7 @@
 #' @author Jonathan A. Greenberg and Robert Hijimans (\email{spatial.tools@@estarcion.net})
 #' @seealso \code{\link{dataType}} \code{\link{hdr}}
 #' @examples
-#' myfilename="my.file.gri"
-#' remove_file_extension(myfilename,".")
-#' remove_file_extension(myfilename,".file.gri")
+#' # TODO 
 #' @export
 
 build_raster_header <- function(x_filename,reference_raster,out_nlayers,
