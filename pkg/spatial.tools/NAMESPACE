@@ -1,3 +1,4 @@
+export(add_leading_zeroes)
 export(build_raster_header)
 export(calc_hpc)
 export(fix_extent)
