@@ -1,2 +1,4 @@
+export(build_raster_header)
+export(calc_hpc)
 export(remove_file_extension)
 export(spatial_sync_vector)

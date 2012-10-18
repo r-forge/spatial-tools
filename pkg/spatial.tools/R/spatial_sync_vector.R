@@ -4,7 +4,7 @@
 #' @param reference A raster or vector object who's projection the unsynced will be matched to.
 #' @param verbose Logical. Verbose logging?
 #' @name spatial_sync_vector
-#' @author Jonathan A. Greenberg \email{spatial.tools@@estarcion.net}
+#' @author Jonathan A. Greenberg (\email{spatial.tools@@estarcion.net})
 #' @examples
 #' tahoe_highrez_training_points_utm <- readOGR(dsn=system.file("external", package="spatial.tools"),layer="tahoe_highrez_training_points_utm")
 #' print(projection(tahoe_highrez_training_points_utm))

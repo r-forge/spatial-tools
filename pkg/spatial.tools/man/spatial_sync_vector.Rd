@@ -25,6 +25,7 @@ tahoe_highrez_training_points_utm_synced <- spatial_sync_vector(tahoe_highrez_tr
 print(projection(tahoe_highrez_training_points_utm_synced))
 }
 \author{
-  Jonathan A. Greenberg \email{spatial.tools@estarcion.net}
+  Jonathan A. Greenberg
+  (\email{spatial.tools@estarcion.net})
 }
 
