@@ -6,7 +6,7 @@
 #' @param dataType Character. The dataType of the flat binary file.  See ?dataType for available datatypes.  Default is 'FLT8S'.
 #' @param format Character. The format of the header.  See ?hdr for valid entries.  Default is 'raster'.
 #' @author Jonathan A. Greenberg and Robert Hijimans (\email{spatial.tools@@estarcion.net})
-#' @seealso \code{\link{dataType}} \code{\link{hdr}}
+#' @seealso \code{\link{hdr}},\code{\link{dataType}}
 #' @examples
 #' # TODO 
 #' @export

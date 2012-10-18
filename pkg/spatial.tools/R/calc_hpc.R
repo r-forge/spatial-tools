@@ -10,7 +10,7 @@
 #' @param overwrite logical. Allow files to be overwritten? Default is FALSE.
 #' @param verbose logical. Enable verbose execution? Default is FALSE.  
 #' @author Jonathan A. Greenberg, Pritam Sukumar, and Robert Hijimans (\email{spatial.tools@@estarcion.net})
-#' @seealso \code{\link{dataType}} \code{\link{hdr}} \code{\link{mmap}} \code{\link{clusterMap}}
+#' @seealso \code{\link{clusterMap}},\code{\link{mmap}},\code{\link{dataType}},\code{\link{hdr}} 
 #' @details calc_hpc is designed to execute a function on a Raster* object using a snowfall cluster 
 #' to achieve parallel reads, executions and writes. Parallel random writes are achieved through the use of
 #' mmap, so individual image chunks can finish and write their outputs without having to wait for

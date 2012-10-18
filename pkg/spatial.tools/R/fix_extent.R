@@ -3,7 +3,7 @@
 #' @param extent_reference Raster*. A Raster* object that will provide the extent to all the other Raster*s.  If unassigned, will assume it is the first Raster* in the broken_extents list. 
 #' @param broken_extents list of Raster* objects. Raster* objects that will be coerced to the extent_reference's extent.
 #' @author Jonathan A. Greenberg (\email{spatial.tools@@estarcion.net})
-#' @seealso \code{\link{extent}} \code{\link{stack}}
+#' @seealso \code{\link{extent}},\code{\link{stack}}
 #' @examples
 #' # TODO 
 #' @export
