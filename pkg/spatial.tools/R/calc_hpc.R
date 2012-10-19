@@ -149,15 +149,15 @@ calc_hpc <- function(x, fun, args=NULL, filename='', cl=NULL, disable_cl=FALSE,
 			fun_args$x=r
 			r_out <- do.call(fun, fun_args)
 		}	
-		print(class(r_out))
-		print(dim(r_out))
+#		print(class(r_out))
+#		print(dim(r_out))
 		cellStart=((cellFromRowCol(x,rownr=tr$row[i],colnr=1))-1)*outbands+1
 		cellEnd=((cellFromRowCol(x,rownr=tr$row2[i],colnr=ncol(x))))*outbands
 
 		parallel_write <- function(filename,r_out,cellStart,cellEnd)
 		{
 			out <- mmap(filename, mode=real64())
-			out[cellStart:cellEnd] <- as.vector(r_out)
+			out[cellStart:cellEnd] <- as.vector(t(r_out))
 			munmap(out)
 		}
 		
@@ -209,7 +209,7 @@ calc_hpc <- function(x, fun, args=NULL, filename='', cl=NULL, disable_cl=FALSE,
 	
 	if(verbose) { print("Building header.") }
 	outraster <- build_raster_header(x_filename=filename,reference_raster=reference_raster,
-			out_nlayers=outbands,dataType='FLT8S',format=outformat)
+			out_nlayers=outbands,dataType='FLT8S',format=outformat,bandorder='BIP')
 	
 	if(verbose) { print("calc_hpc complete.") }
 	return(outraster)

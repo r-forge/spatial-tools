@@ -3,7 +3,8 @@
 \title{build_raster_header}
 \usage{
   build_raster_header(x_filename, reference_raster,
-    out_nlayers, dataType = "FLT8S", format = "raster")
+    out_nlayers, dataType = "FLT8S", format = "raster",
+    bandorder = "BIP")
 }
 \arguments{
   \item{x_filename}{Character. The filename of the input
@@ -19,6 +20,9 @@
   \item{dataType}{Character. The dataType of the flat
   binary file.  See ?dataType for available datatypes.
   Default is 'FLT8S'.}
+
+  \item{bandorder}{Character. The bandorder
+  ('BIP','BIL','BSQ') of the file. Default is 'BIP'.}
 
   \item{format}{Character. The format of the header.  See
   ?hdr for valid entries.  Default is 'raster'.}
