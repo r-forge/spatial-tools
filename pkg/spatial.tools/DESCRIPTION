@@ -6,14 +6,15 @@ Type: Package
 LazyLoad: yes
 Author: Jonathan Asher Greenberg
 Description: R functions for working with spatial data.
-Version: 0.4
-Date: 2012-10-19
+Version: 0.4-02
+Date: 2012-10-24
 Depends:
     raster,
     rgdal,
     sp,
     snowfall,
-    mmap
+    mmap,
+    R (>= 2.14.0)
 Collate:
     'spatial_sync_vector.R'
     'tahoe_highrez_data.R'
