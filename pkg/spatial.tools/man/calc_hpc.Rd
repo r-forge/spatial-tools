@@ -72,18 +72,20 @@
 sfInit(parallel=TRUE,cpus=1)
 tahoe_highrez <- brick(system.file("external/tahoe_highrez.tif", package="spatial.tools"))
 ndvi_function <- function(x,red_band,NIR_band) {
+# This is how to work with individual bands from a stack/brick in a function:
 	red=x[,red_band]
 	NIR=x[,NIR_band]
 	ndvi = (NIR-red)/(NIR+red)
 	return(ndvi)
 }
+# Arguments should be in a list, just like mapply requires.
 ndvi_args=list(red_band=2,NIR_band=3)
 # Sequential execution.
 system.time(calc_hpc(x=tahoe_highrez,fun=ndvi_function,args=ndvi_args,
-	overwrite=TRUE,filename="testndvi3",disable_cl=TRUE,verbose=FALSE))
+	overwrite=TRUE,filename="testndvi_seq",disable_cl=TRUE,verbose=FALSE))
 # Parallel execution.
 system.time(calc_hpc(x=tahoe_highrez,fun=ndvi_function,args=ndvi_args,
-	overwrite=TRUE,filename="testndvi3",disable_cl=FALSE,verbose=FALSE))
+	overwrite=TRUE,filename="testndvi3_par",disable_cl=FALSE,verbose=FALSE))
 sfStop()
 }
 \author{
@@ -91,6 +93,7 @@ sfStop()
   Hijimans (\email{spatial.tools@estarcion.net})
 }
 \seealso{
-  \code{\link{clusterMap}},\code{\link{mmap}},\code{\link{dataType}},\code{\link{hdr}}
+  \code{\link{clusterMap}}, \code{\link{mmap}},
+  \code{\link{dataType}}, \code{\link{hdr}}
 }
 

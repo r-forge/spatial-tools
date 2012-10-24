@@ -10,7 +10,7 @@
 #' @param overwrite logical. Allow files to be overwritten? Default is FALSE.
 #' @param verbose logical. Enable verbose execution? Default is FALSE.  
 #' @author Jonathan A. Greenberg, Pritam Sukumar, and Robert Hijimans (\email{spatial.tools@@estarcion.net})
-#' @seealso \code{\link{clusterMap}},\code{\link{mmap}},\code{\link{dataType}},\code{\link{hdr}} 
+#' @seealso \code{\link{clusterMap}}, \code{\link{mmap}}, \code{\link{dataType}}, \code{\link{hdr}} 
 #' @details calc_hpc is designed to execute a function on a Raster* object using a snowfall cluster 
 #' to achieve parallel reads, executions and writes. Parallel random writes are achieved through the use of
 #' mmap, so individual image chunks can finish and write their outputs without having to wait for
@@ -33,18 +33,20 @@
 #' sfInit(parallel=TRUE,cpus=1)
 #' tahoe_highrez <- brick(system.file("external/tahoe_highrez.tif", package="spatial.tools"))
 #' ndvi_function <- function(x,red_band,NIR_band) { 
+#' # This is how to work with individual bands from a stack/brick in a function:
 #' 	red=x[,red_band]
 #' 	NIR=x[,NIR_band]
 #' 	ndvi = (NIR-red)/(NIR+red)
 #' 	return(ndvi)
 #' }
+#' # Arguments should be in a list, just like mapply requires.
 #' ndvi_args=list(red_band=2,NIR_band=3)
 #' # Sequential execution.
 #' system.time(calc_hpc(x=tahoe_highrez,fun=ndvi_function,args=ndvi_args,
-#' 	overwrite=TRUE,filename="testndvi3",disable_cl=TRUE,verbose=FALSE))
+#' 	overwrite=TRUE,filename="testndvi_seq",disable_cl=TRUE,verbose=FALSE))
 #' # Parallel execution.
 #' system.time(calc_hpc(x=tahoe_highrez,fun=ndvi_function,args=ndvi_args,
-#' 	overwrite=TRUE,filename="testndvi3",disable_cl=FALSE,verbose=FALSE))
+#' 	overwrite=TRUE,filename="testndvi3_par",disable_cl=FALSE,verbose=FALSE))
 #' sfStop()
 #' @export
 
