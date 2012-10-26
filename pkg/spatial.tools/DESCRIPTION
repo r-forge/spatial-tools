@@ -26,3 +26,4 @@ Collate:
     'calc_hpc.R'
     'fix_extent.R'
     'add_leading_zeroes.R'
+    'spatial_sync_raster.R'
