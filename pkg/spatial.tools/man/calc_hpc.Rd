@@ -27,7 +27,8 @@
   Default is FALSE.}
 
   \item{outformat}{character. Outformat of the raster. Must
-  be a format usable by hdr(). Default is 'raster'.}
+  be a format usable by hdr(). Default is 'raster'.
+  CURRENTLY UNSUPPORTED.}
 
   \item{overwrite}{logical. Allow files to be overwritten?
   Default is FALSE.}

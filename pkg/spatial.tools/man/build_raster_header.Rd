@@ -25,7 +25,8 @@
   ('BIP','BIL','BSQ') of the file. Default is 'BIP'.}
 
   \item{format}{Character. The format of the header.  See
-  ?hdr for valid entries.  Default is 'raster'.}
+  ?hdr for valid entries.  Default is 'raster'.  CURRENTLY
+  UNSUPPORTED.}
 }
 \description{
   Builds a raster header for a flat binary file.

@@ -6,7 +6,7 @@
 #' @param filename character. Filename of the output raster.
 #' @param cl cluster. A cluster object. calc_hpc will attempt to determine this if missing.
 #' @param disable_cl logical. Disable parallel computing? Default is FALSE. 
-#' @param outformat character. Outformat of the raster. Must be a format usable by hdr(). Default is 'raster'.
+#' @param outformat character. Outformat of the raster. Must be a format usable by hdr(). Default is 'raster'. CURRENTLY UNSUPPORTED.
 #' @param overwrite logical. Allow files to be overwritten? Default is FALSE.
 #' @param verbose logical. Enable verbose execution? Default is FALSE.  
 #' @author Jonathan A. Greenberg, Pritam Sukumar, and Robert Hijimans (\email{spatial.tools@@estarcion.net})
@@ -216,6 +216,6 @@ calc_hpc <- function(x, fun, args=NULL, filename='', cl=NULL, disable_cl=FALSE,
 			out_nlayers=outbands,dataType='FLT8S',format=outformat,bandorder='BIP')
 	
 	if(verbose) { print("calc_hpc complete.") }
-	return(outraster)
+	return(brick(outraster))
 }
 
