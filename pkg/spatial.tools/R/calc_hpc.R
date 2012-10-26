@@ -94,7 +94,8 @@ calc_hpc <- function(x, fun, args=NULL, filename='', cl=NULL, disable_cl=FALSE,
 	} else
 	{
 #		r_check_function <- getValues(fun(r_check))
-		r_check_function <- fun(r_check)
+		r_check_args=list(x=r_check)
+		r_check_function <- do.call(fun, r_check_args)
 	}
 	
 	if(class(r_check_function)=="numeric")
@@ -144,7 +145,8 @@ calc_hpc <- function(x, fun, args=NULL, filename='', cl=NULL, disable_cl=FALSE,
 #		sfCat(print(i))
 		r <- getValues(crop(x, extent(x, r1=tr$row[i], r2=tr$row2[i], c1=1, c2=ncol(x))))
 		if(is.null(args)) {
-			r <- fun(r) 
+			fun_args=list(x=r)
+			r_out <- do.call(fun, fun_args)
 		} else
 		{
 			fun_args=args
