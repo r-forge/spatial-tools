@@ -38,8 +38,8 @@
   raster to the extent and projection of a reference raster
   and match the resolution of the reference raster.  This
   is helpful in preparing multiple files of different
-  projections, resolutions, and extents for performing map
-  algebra or change detection.
+  projections, resolutions, extents, and rotations for
+  performing map algebra or change detection.
 }
 \author{
   Jonathan A. Greenberg

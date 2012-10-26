@@ -5,8 +5,8 @@
 #' Uses bilinear or nearest neighbor resampling to align a raster to the extent
 #' and projection of a reference raster and match the resolution of the
 #' reference raster.  This is helpful in preparing multiple files of different
-#' projections, resolutions, and extents for performing map algebra or change 
-#' detection.
+#' projections, resolutions, extents, and rotations for performing map algebra or 
+#' change detection.
 #' @name spatial_sync_raster
 #' @title spatial_sync_raster
 #' @param unsynced A Raster object to be aligned to the reference raster.
