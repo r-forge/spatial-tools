@@ -6,8 +6,8 @@ Type: Package
 LazyLoad: yes
 Author: Jonathan Asher Greenberg
 Description: R functions for working with spatial data.
-Version: 0.4-03
-Date: 2012-10-24
+Version: 0.4-04
+Date: 2012-10-26
 Depends:
     raster,
     rgdal,
