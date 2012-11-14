@@ -6,14 +6,15 @@ Type: Package
 LazyLoad: yes
 Author: Jonathan Asher Greenberg
 Description: R functions for working with spatial data.
-Version: 0.4-05
-Date: 2012-10-26
+Version: 0.5-01
+Date: 2012-11-14
 Depends:
     raster,
     rgdal,
     sp,
     snowfall,
     mmap,
+    abind,
     R (>= 2.14.0)
 Collate:
     'spatial_sync_vector.R'
@@ -27,3 +28,6 @@ Collate:
     'fix_extent.R'
     'add_leading_zeroes.R'
     'spatial_sync_raster.R'
+    'binary_image_write.R'
+    'focal_hpc.R'
+    'getValuesBlock_enhanced.R'

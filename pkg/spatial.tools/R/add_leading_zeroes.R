@@ -10,7 +10,6 @@
 #' @param max_number A number to base the length of the output string on.
 #' @return A character vector.
 #' @author Jonathan A. Greenberg
-#' @seealso \code{\link[climstats]{brickstack_to_saved_rasters}}
 #' @keywords format
 #' @examples
 #' 

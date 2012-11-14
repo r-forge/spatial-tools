@@ -144,6 +144,12 @@ calc_hpc <- function(x, fun, args=NULL, filename='', cl=NULL, disable_cl=FALSE,
 	{
 #		sfCat(print(i))
 		r <- getValues(crop(x, extent(x, r1=tr$row[i], r2=tr$row2[i], c1=1, c2=ncol(x))))
+		if(verbose){
+			print("Input chunk dimensions:")
+			print(dim(r))
+			print("Input chunk class:")
+			print(class(r))
+		}
 		if(is.null(args)) {
 			fun_args=list(x=r)
 			r_out <- do.call(fun, fun_args)
@@ -153,6 +159,23 @@ calc_hpc <- function(x, fun, args=NULL, filename='', cl=NULL, disable_cl=FALSE,
 			fun_args$x=r
 			r_out <- do.call(fun, fun_args)
 		}	
+		
+		if(verbose){
+			if(class(r_out)=="numeric")
+			{
+				print("Output chunk dimensions:")
+				print(length(r_out))
+				print("Output chunk class:")
+				print(class(r_out))
+			} else
+			{
+				print("Output chunk dimensions:")
+				print(dim(r_out))
+				print("Output chunk class:")
+				print(class(r_out))
+			}
+		}
+		
 #		print(class(r_out))
 #		print(dim(r_out))
 		cellStart=((cellFromRowCol(x,rownr=tr$row[i],colnr=1))-1)*outbands+1
@@ -216,6 +239,6 @@ calc_hpc <- function(x, fun, args=NULL, filename='', cl=NULL, disable_cl=FALSE,
 			out_nlayers=outbands,dataType='FLT8S',format=outformat,bandorder='BIP')
 	
 	if(verbose) { print("calc_hpc complete.") }
-	return(brick(outraster))
+	return(outraster)
 }
 

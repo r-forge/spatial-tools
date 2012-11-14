@@ -32,12 +32,12 @@ build_raster_header <- function(x_filename,reference_raster,out_nlayers,
 	outraster@file@datanotation <- dataType
 	outraster@file@bandorder <- bandorder
 	try(outhdr <- hdr(outraster, format=format),silent=TRUE)
-	if(format=="raster")
-	{
+#	if(format=="raster")
+#	{
 		outraster=brick(paste(remove_file_extension(x_filename,".gri"),".grd",sep=""))
-	} else
-	{
-		### 
-	}
+#	} else
+#	{
+#		### 
+#	}
 	return(outraster)
 }
