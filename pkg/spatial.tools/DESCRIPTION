@@ -6,7 +6,7 @@ Type: Package
 LazyLoad: yes
 Author: Jonathan Asher Greenberg
 Description: R functions for working with spatial data.
-Version: 0.5-01
+Version: 0.5-02
 Date: 2012-11-14
 Depends:
     raster,

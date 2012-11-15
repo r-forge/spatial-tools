@@ -36,14 +36,18 @@
 #'  # TODO
 #' @export
 
-focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename='', cl=NULL, disable_cl=FALSE,
-		overwrite=FALSE,outformat='raster',verbose=FALSE, processing_unit="window") {
+# TODO args should include useful input parameters
+focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename='', 
+		overwrite=FALSE,outformat='raster',verbose=FALSE, processing_unit="window",
+		cl=NULL, disable_cl=FALSE) {
 	require("raster")
 	require("snowfall")
 	require("rgdal")
 	require("mmap")
 	require("abind")
 
+	if(verbose) { total_start_time = proc.time() }
+	
 	# Do some file checks up here.
 	
 #	if(verbose)
@@ -66,8 +70,10 @@ focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename=''
 			sfLibrary("rgdal",character.only=TRUE)
 			sfLibrary("raster",character.only=TRUE)
 			sfLibrary("mmap",character.only=TRUE)
+			sfLibrary("spatial.tools",character.only=TRUE)
 		}
 		nodes <- sfNodes()
+		if(verbose) { print(paste("Executing on ",nodes," nodes.",sep="")) }
 	}
 	
 	# Set up initial parameters
@@ -93,26 +99,6 @@ focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename=''
 	
 	startrow_offset=-(window_center[1]-1)
 	endrow_offset=window_rows-window_center[1]
-	
-	tr=blockSize(x,minrows=window_rows)
-	if (tr$n < nodes) {
-		nodes <- tr$n
-	}
-	tr$row2 <- tr$row + tr$nrows - 1
-	
-	tr$focal_row=tr$row+startrow_offset
-	tr$focal_row2=tr$row2+endrow_offset
-	
-	tr$focal_row[tr$focal_row<1]=1
-	tr$focal_row2[tr$focal_row2>nrow(x)]=nrow(x)
-	
-#	i=1:tr$n
-	
-	texture_tr=list(rowcenters=((tr$row[1]:tr$row2[1])-startrow_offset))
-	texture_tr$row=texture_tr$rowcenters+startrow_offset
-	texture_tr$row2=texture_tr$rowcenters+endrow_offset
-	
-	# We should test a single chunk here to see the size of the output...
 	
 	# We are going to pull out the first row and first two pixels to check the function...
 	if(verbose) { print("Checking the function on a small chunk of data.") }
@@ -147,8 +133,30 @@ focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename=''
 	}
 	
 #	outbands=dim(r_check_function)[1]
-
+	
 	if(verbose) { print(paste("Number of output bands determined to be:",outbands,sep=" ")) }
+	
+	tr=blockSize(x,minrows=window_rows,n=nodes*outbands)
+	if (tr$n < nodes) {
+		nodes <- tr$n
+	}
+	tr$row2 <- tr$row + tr$nrows - 1
+	
+	tr$focal_row=tr$row+startrow_offset
+	tr$focal_row2=tr$row2+endrow_offset
+	
+	tr$focal_row[tr$focal_row<1]=1
+	tr$focal_row2[tr$focal_row2>nrow(x)]=nrow(x)
+	
+#	i=1:tr$n
+	
+	texture_tr=list(rowcenters=((tr$row[1]:tr$row2[1])-startrow_offset))
+	texture_tr$row=texture_tr$rowcenters+startrow_offset
+	texture_tr$row2=texture_tr$rowcenters+endrow_offset
+	
+	# We should test a single chunk here to see the size of the output...
+	
+	
 	
 	# Without the as.numeric some big files will have an integer overflow
 	outdata_ncells=as.numeric(nrow(x))*as.numeric(ncol(x))*as.numeric(outbands)
@@ -212,20 +220,6 @@ focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename=''
 				r_out <- do.call(fun, fun_args)
 			}	
 		}
-		
-#		print(class(r_out))
-#		print(dim(r_out))
-		
-#		cellStart=((cellFromRowCol(x,rownr=chunk$row_center,colnr=1))-1)*outbands+1
-#		cellEnd=((cellFromRowCol(x,rownr=chunk$row_center,colnr=x_ncol)))*outbands
-#		
-#		parallel_write <- function(filename,r_out,cellStart,cellEnd)
-#		{
-#			out <- mmap(filename, mode=real64())
-#			out[cellStart:cellEnd] <- as.vector(t(as.numeric(r_out)))
-##			out[cellStart:cellEnd] <- as.vector(r_out)
-#			munmap(out)
-#		}
 
 		image_dims=dim(x)
 		chunk_position=list(
@@ -240,9 +234,6 @@ focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename=''
 				interleave="BSQ",data=r_out,data_position=chunk_position)
 		}
 		
-#		print(chunk_position)
-#		parallel_write(filename,r_out,image_dims,chunk_position)
-		
 		writeSuccess=FALSE
 		while(!writeSuccess)
 		{
@@ -255,7 +246,7 @@ focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename=''
 	# Begin the loop
 	for(i in 1:tr$n)
 	{
-		if(verbose) { print(i) }
+		if(verbose) { print(paste("Iteration: ",i," of ",tr$n,sep="")) }
 		
 		if(i==1)
 		{
@@ -265,9 +256,9 @@ focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename=''
 			r <- getValuesBlock_enhanced(x, r1=(tr$focal_row2[(i-1)]+1), r2=tr$focal_row2[i], c1=1, c2=ncol(x))
 		}
 		
+		
 		if(i==1)
 		{
-			if(verbose) { print("Adding top cap...") }
 			# Add top cap
 			if((1-(tr$row[1]+startrow_offset))>0)
 			{
@@ -281,11 +272,7 @@ focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename=''
 		if(i==tr$n)
 		{
 			# Add bottom cap
-			if(verbose) { print("Adding bottom cap...") }
 			if(nrow(x)-tr$row2[tr$n]+endrow_offset>0)
-#				r=rbind(r,
-#						matrix(data=NA,nrow=nrow(x)-tr$row2[tr$n]+endrow_offset,ncol=ncol(x)))
-#			
 				r=abind(r,
 					array(data=NA,dim=c(ncol(x),(nrow(x)-tr$row2[tr$n]+endrow_offset),nlayers(x))),
 					along=2)
@@ -298,19 +285,16 @@ focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename=''
 		if(left_cap>0)
 		{
 			# Add left cap.
-			if(verbose) { print("Adding left cap...") }
+#			if(verbose) { print("Adding left cap...") }
 			r=abind(
 					array(data=NA,dim=c(left_cap,dim(r)[2],dim(r)[3])),
 					r,
 					along=1)
 		}
 		
-		print(paste("Inital r dims:",dim(r)))
-		
 		if(right_cap>0)
 		{
 			# Add right cap.
-			if(verbose) { print("Adding right cap...") }
 			r=abind(
 					r,
 					array(data=NA,dim=c(right_cap,dim(r)[2],dim(r)[3])),
@@ -336,24 +320,22 @@ focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename=''
 			}
 			,j,MoreArgs=list(r=r,texture_tr=texture_tr,row_centers=row_centers),
 			SIMPLIFY=FALSE)
-		
-#		names(chunkList)=row_centers
-	
+			
 		# Parallel processing here.
 		if(disable_cl)
 		{
-			if(verbose) { print("Sequential computation started.") }
-			if(verbose) { start_time = proc.time() }
+#			if(verbose) { print("Sequential computation started.") }
+#			if(verbose) { start_time = proc.time() }
 			mapply(focalChunkFunction,chunkList,MoreArgs=chunkArgs)
-			if(verbose) { print("Sequential computation finished.  Timing:") }
-			if(verbose) { print(proc.time()-start_time) }
+#			if(verbose) { print("Sequential computation finished.  Timing:") }
+#			if(verbose) { print(proc.time()-start_time) }
 		} else
 		{
-			if(verbose) { print("Parallel computation started.") }
-			if(verbose) { start_time = proc.time() }
+#			if(verbose) { print("Parallel computation started.") }
+#			if(verbose) { start_time = proc.time() }
 			clusterMap(cl,focalChunkFunction,chunkList,MoreArgs=chunkArgs)
-			if(verbose) { print("Parallel computation finished.  Timing:") }
-			if(verbose) { print(proc.time()-start_time) }
+#			if(verbose) { print("Parallel computation finished.  Timing:") }
+#			if(verbose) { print(proc.time()-start_time) }
 		}
 
 		# Preserve the read data needed for the next iteration.
@@ -394,6 +376,10 @@ focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename=''
 #	}
 	
 	if(verbose) { print("focal_hpc complete.") }
+	
+	if(verbose) { print("Computation finished.  Timing:") }
+	if(verbose) { print(proc.time()-total_start_time) }
+	
 	return(outraster)
 }
 
