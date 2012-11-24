@@ -36,8 +36,8 @@ binary_image_write=function(filename,mode=real64(),image_dims,interleave="BSQ",
 	# Some error checking up here.
 	
 	
-	image_x=image_dims[1]
-	image_y=image_dims[2]
+	image_x=image_dims[2]
+	image_y=image_dims[1]
 	if(length(image_dims)==3)
 	{
 		image_z=image_dims[3]
@@ -54,7 +54,7 @@ binary_image_write=function(filename,mode=real64(),image_dims,interleave="BSQ",
 			((data_position[3,]-1)*(image_x*image_y))
 			)
 	}
-
+	
 	out = mmap(filename, mode=mode)
 	out[cell_position] <- t(data)
 	munmap(out)	

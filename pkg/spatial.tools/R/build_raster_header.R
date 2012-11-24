@@ -13,13 +13,15 @@
 #' @export
 
 build_raster_header <- function(x_filename,reference_raster,out_nlayers,
-		dataType='FLT8S',format='raster',bandorder="BIP")
+		dataType='FLT8S',format='raster',bandorder="BIP",verbose=FALSE)
 {
 	require("raster")
 	if(missing(out_nlayers))
 	{
 		out_nlayers=nlayers(reference_raster)
 	}
+#	print(out_nlayers)
+	
 	if(out_nlayers==1)
 	{
 		outraster <- raster(reference_raster)
@@ -34,7 +36,15 @@ build_raster_header <- function(x_filename,reference_raster,out_nlayers,
 	try(outhdr <- hdr(outraster, format=format),silent=TRUE)
 #	if(format=="raster")
 #	{
+	if(out_nlayers==1)
+	{
+		outraster=raster(paste(remove_file_extension(x_filename,".gri"),".grd",sep=""))
+	} else
+	{
 		outraster=brick(paste(remove_file_extension(x_filename,".gri"),".grd",sep=""))
+	}
+	
+	
 #	} else
 #	{
 #		### 

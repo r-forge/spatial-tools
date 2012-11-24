@@ -9,6 +9,7 @@
 #' @param filename character. Filename of the output raster.
 #' @param cl cluster. A cluster object. calc_hpc will attempt to determine this if missing.
 #' @param disable_cl logical. Disable parallel computing? Default is FALSE. 
+#' @param chunk_nrows Integer. Computing tuning parameter.  The higher the number, the faster the process, but the more memory will be used.  Defaults to 20.
 #' @param outformat character. Outformat of the raster. Must be a format usable by hdr(). Default is 'raster'. CURRENTLY UNSUPPORTED.
 #' @param overwrite logical. Allow files to be overwritten? Default is FALSE.
 #' @param verbose logical. Enable verbose execution? Default is FALSE.  
@@ -39,7 +40,7 @@
 # TODO args should include useful input parameters
 focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename='', 
 		overwrite=FALSE,outformat='raster',verbose=FALSE, processing_unit="window",
-		cl=NULL, disable_cl=FALSE) {
+		cl=NULL, disable_cl=FALSE, chunk_nrows=20) {
 	require("raster")
 	require("snowfall")
 	require("rgdal")
@@ -94,11 +95,26 @@ focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename=''
 		window_center=c(ceiling(window_dims[1]/2),ceiling(window_dims[2]/2))
 	}
 	
+	if(verbose) { print(paste("window_dims:",window_dims,sep="")) }
+	if(verbose) { print(paste("window_center:",window_center,sep="")) }
+	
 	window_rows=window_dims[1]
 	window_cols=window_dims[2]
 	
 	startrow_offset=-(window_center[1]-1)
 	endrow_offset=window_rows-window_center[1]
+	
+	# Add additional info to the args.
+	if(!is.null(args)) {
+		args$window_center=window_center
+		args$window_dims=window_dims
+	} else
+	{
+		args=list(window_center=window_center)
+		args$window_dims=window_dims
+	}
+	
+#	print(args)
 	
 	# We are going to pull out the first row and first two pixels to check the function...
 	if(verbose) { print("Checking the function on a small chunk of data.") }
@@ -112,19 +128,23 @@ focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename=''
 		if(verbose) { print("processing_unit=chunk...")}
 		r_check <- getValues(crop(x, extent(x, r1=1, r2=window_dims[1], c1=1,c2=ncol(x))))
 	}
-	if(!is.null(args)) {
+	
+	# Add additional info to the args.
+#	if(!is.null(args)) {
 		r_check_args=args
 		r_check_args$x=r_check
-		r_check_args$window_center=window_center
+#		r_check_args$window_center=window_center
 		r_check_function <- do.call(fun, r_check_args)
-	} else
-	{
-		r_check_args=list(x=r_check)
-		r_check_args$window_center=window_center
-		r_check_function <- do.call(fun, r_check_args)
-	}
-	
-	if(class(r_check_function)=="numeric" || class(r_check_function)=="integer")
+#	} else
+#	{
+#		r_check_args=list(x=r_check)
+#		r_check_args$window_center=window_center
+#		r_check_function <- do.call(fun, r_check_args)
+#	}
+#	print(class(r_check_function))
+
+	if(class(r_check_function)=="numeric" || class(r_check_function)=="integer" || 
+			(class(r_check_function)=="logical" && length(r_check_function)==1))
 	{
 		outbands=length(r_check_function)
 	} else
@@ -136,7 +156,9 @@ focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename=''
 	
 	if(verbose) { print(paste("Number of output bands determined to be:",outbands,sep=" ")) }
 	
-	tr=blockSize(x,minrows=window_rows,n=nodes*outbands)
+#	tr=blockSize(x,minrows=window_rows,n=nodes*2*outbands)
+	tr=blockSize(x,chunksize=(chunk_nrows*nodes+(window_dims[2]-1))*ncol(x))
+	
 	if (tr$n < nodes) {
 		nodes <- tr$n
 	}
@@ -174,6 +196,7 @@ focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename=''
 	close(out)
 	
 	if(verbose) { print("Loading chunk arguments.") }
+	args=
 	chunkArgs <- list(fun=fun,x,x_ncol=ncol(x),tr=tr,
 			window_dims=window_dims,window_center=window_center,
 			args=args,filename=filename,
@@ -202,7 +225,7 @@ focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename=''
 						fun_args$x=x_array
 						r_out <- do.call(fun, fun_args)
 					}	
-					return(r_out)
+					return(as.numeric(r_out))
 				},
 				window_index,
 				MoreArgs=list(x=chunk$processing_chunk,args=args,window_dims=window_dims)
@@ -227,7 +250,7 @@ focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename=''
 			chunk$row_center,
 			1:outbands
 		)
-
+		
 		parallel_write=function(filename,r_out,image_dims,chunk_position)
 		{
 			binary_image_write(filename=filename,mode=real64(),image_dims=image_dims,
@@ -355,8 +378,12 @@ focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename=''
 		reference_raster=brick(raster(x,layer=1),nl=outbands) 
 	} else
 	{
-		if(nlayers(x) > 1) { reference_raster=raster(x,layer=1) } else
-		{ reference_raster=x }	
+		if(nlayers(x) > 1) { 
+			reference_raster=raster(x,layer=1) 
+		} else
+		{ 
+			reference_raster=x
+		}	
 	}
 	
 	if(outformat=='raster') { 
@@ -366,7 +393,8 @@ focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename=''
 	}
 	
 	if(verbose) { print("Building header.") }
-	outraster <- build_raster_header(x_filename=filename,reference_raster=reference_raster,
+	outraster <- build_raster_header(x_filename=filename,
+			reference_raster=reference_raster,
 			out_nlayers=outbands,dataType='FLT8S',format=outformat,bandorder='BSQ')
 #	
 #	if(stop_cl)
