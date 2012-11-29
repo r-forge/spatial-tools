@@ -3,10 +3,10 @@
 \title{focal_hpc}
 \usage{
   focal_hpc(x, fun, window_dims, window_center,
-    args = NULL, filename = "", cl = NULL,
-    disable_cl = FALSE, overwrite = FALSE,
+    args = NULL, filename = "", overwrite = FALSE,
     outformat = "raster", verbose = FALSE,
-    processing_unit = "window")
+    processing_unit = "window", cl = NULL,
+    disable_cl = FALSE, chunk_nrows = 20)
 }
 \arguments{
   \item{x}{Raster*. A Raster* used as the input into the
@@ -35,6 +35,10 @@
 
   \item{disable_cl}{logical. Disable parallel computing?
   Default is FALSE.}
+
+  \item{chunk_nrows}{Integer. Computing tuning parameter.
+  The higher the number, the faster the process, but the
+  more memory will be used.  Defaults to 20.}
 
   \item{outformat}{character. Outformat of the raster. Must
   be a format usable by hdr(). Default is 'raster'.

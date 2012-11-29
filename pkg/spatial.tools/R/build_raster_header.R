@@ -6,6 +6,7 @@
 #' @param dataType Character. The dataType of the flat binary file.  See ?dataType for available datatypes.  Default is 'FLT8S'.
 #' @param bandorder Character. The bandorder ('BIP','BIL','BSQ') of the file. Default is 'BIP'.
 #' @param format Character. The format of the header.  See ?hdr for valid entries.  Default is 'raster'.  CURRENTLY UNSUPPORTED.
+#' @param verbose logical. Enable verbose execution? Default is FALSE.  
 #' @author Jonathan A. Greenberg and Robert Hijimans (\email{spatial.tools@@estarcion.net})
 #' @seealso \code{\link{hdr}},\code{\link{dataType}}
 #' @examples

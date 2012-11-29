@@ -4,7 +4,7 @@
 \usage{
   build_raster_header(x_filename, reference_raster,
     out_nlayers, dataType = "FLT8S", format = "raster",
-    bandorder = "BIP")
+    bandorder = "BIP", verbose = FALSE)
 }
 \arguments{
   \item{x_filename}{Character. The filename of the input
@@ -27,6 +27,9 @@
   \item{format}{Character. The format of the header.  See
   ?hdr for valid entries.  Default is 'raster'.  CURRENTLY
   UNSUPPORTED.}
+
+  \item{verbose}{logical. Enable verbose execution? Default
+  is FALSE.}
 }
 \description{
   Builds a raster header for a flat binary file.
