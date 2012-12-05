@@ -68,6 +68,13 @@
   The speed of the execution will vary based on the
   specific setup, and may, indeed, be slower than a
   sequential execution (e.g. with calc() ).
+
+  Some hints: if you are using a function that doesn't work
+  "cleanly" on matrices (e.g. var), your calc_hpc function
+  should use an apply(x,1,single_pixel_function), e.g. use
+  this as the fun for calc_hpc for var:
+
+  fun=function(x) { var_x=apply(x,1,var) return(var_x) }
 }
 \examples{
 sfInit(parallel=TRUE,cpus=1)
