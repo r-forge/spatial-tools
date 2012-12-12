@@ -2,7 +2,7 @@
 \alias{focal_hpc}
 \title{focal_hpc}
 \usage{
-  focal_hpc(x, fun, window_dims, window_center,
+  focal_hpc(x, fun, window_dims = c(1, 1), window_center,
     args = NULL, filename = "", overwrite = FALSE,
     outformat = "raster", verbose = FALSE,
     processing_unit = "window", cl = NULL,

@@ -101,6 +101,9 @@ focal_hpc <- function(x, fun, window_dims=c(1,1), window_center, args=NULL, file
 	window_rows=window_dims[2]
 	window_cols=window_dims[1]
 	
+	layer_names=names(x)
+#	print(layer_names)
+	
 	if(window_dims[1]>1 || window_dims[2]>1)
 	{
 		if(verbose) { print("Focal processing mode...") }
@@ -126,10 +129,12 @@ focal_hpc <- function(x, fun, window_dims=c(1,1), window_center, args=NULL, file
 	if(!is.null(args)) {
 		args$window_center=window_center
 		args$window_dims=window_dims
+		args$layer_names=layer_names
 	} else
 	{
 		args=list(window_center=window_center)
 		args$window_dims=window_dims
+		args$layer_names=layer_names
 	}
 	
 	# We are going to pull out the first row and first two pixels to check the function...
@@ -164,7 +169,8 @@ focal_hpc <- function(x, fun, window_dims=c(1,1), window_center, args=NULL, file
 #	print(dim(r_check_function)[3])
 	
 #	print(processing_unit)
-	
+#	print((r_check_function))	
+
 	if(processing_unit=="window")
 	{
 		if(class(r_check_function)!="numeric")
@@ -247,6 +253,7 @@ focal_hpc <- function(x, fun, window_dims=c(1,1), window_center, args=NULL, file
 #	args=
 	chunkArgs = list(fun=fun,x,x_ncol=ncol(x),tr=tr,
 			window_dims=window_dims,window_center=window_center,
+			layer_names=layer_names,
 			args=args,filename=filename,
 			outbands=outbands,processing_unit=processing_unit,
 			verbose=verbose)
