@@ -38,7 +38,7 @@
 #' @export
 
 # TODO args should include useful input parameters
-focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename='', 
+focal_hpc <- function(x, fun, window_dims=c(1,1), window_center, args=NULL, filename='', 
 		overwrite=FALSE,outformat='raster',verbose=FALSE, processing_unit="window",
 		cl=NULL, disable_cl=FALSE, chunk_nrows=20) {
 	require("raster")
@@ -46,7 +46,7 @@ focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename=''
 	require("rgdal")
 	require("mmap")
 	require("abind")
-
+	
 	if(verbose) { total_start_time = proc.time() }
 	
 	# Do some file checks up here.
@@ -78,11 +78,11 @@ focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename=''
 	}
 	
 	# Set up initial parameters
-	if(missing(window_dims))
-	{
-		print("Missing window_dims, please supply the window size as a vector.")
-		return()
-	}
+#	if(missing(window_dims))
+#	{
+#		print("Missing window_dims, please supply the window size as a vector.")
+#		return()
+#	}
 	
 	if(length(window_dims)==1)
 	{
@@ -98,11 +98,29 @@ focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename=''
 	if(verbose) { print(paste("window_dims:",window_dims,sep="")) }
 	if(verbose) { print(paste("window_center:",window_center,sep="")) }
 	
-	window_rows=window_dims[1]
-	window_cols=window_dims[2]
+	window_rows=window_dims[2]
+	window_cols=window_dims[1]
 	
-	startrow_offset=-(window_center[1]-1)
-	endrow_offset=window_rows-window_center[1]
+	if(window_dims[1]>1 || window_dims[2]>1)
+	{
+		if(verbose) { print("Focal processing mode...") }
+		processing_mode="focal"
+		if(missing(processing_unit))
+		{
+			processing_unit="window"
+		}
+	} else
+	{
+		if(verbose) { print("Pixel processing mode...") }
+		processing_mode="pixel"
+		if(missing(processing_unit))
+		{
+			processing_unit="chunk"
+		}
+	}
+	
+	startrow_offset=-(window_center[2]-1)
+	endrow_offset=window_rows-window_center[2]
 	
 	# Add additional info to the args.
 	if(!is.null(args)) {
@@ -114,43 +132,75 @@ focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename=''
 		args$window_dims=window_dims
 	}
 	
-#	print(args)
-	
 	# We are going to pull out the first row and first two pixels to check the function...
 	if(verbose) { print("Checking the function on a small chunk of data.") }
+#	if(processing_mode=="focal")
+#	{
+#		pre_check=array(data=(1:(window_dims[1]*window_dims[2]*nlayers(x))),
+#			dim=c(window_dims[1],window_dims[2],nlayers(x)))
+#		r_check_args=args
+#		r_check_args$x=pre_check
+#		r_check_function <- do.call(fun, r_check_args)
+#		
+#	}
+	
 	if(processing_unit=="window")
 	{
 		if(verbose) { print("processing_unit=window...")}
-		r_check <- getValuesBlock_enhanced(x, r1=1, r2=window_dims[1], c1=1,c2=window_dims[2])		
+		r_check <- getValuesBlock_enhanced(x, r1=1, r2=window_dims[2], c1=1,c2=window_dims[1])		
 	} else
 	{
 		# The function works on the entire chunk.
 		if(verbose) { print("processing_unit=chunk...")}
-		r_check <- getValues(crop(x, extent(x, r1=1, r2=window_dims[1], c1=1,c2=ncol(x))))
+		r_check <- getValuesBlock_enhanced(x, r1=1, r2=window_dims[2], c1=1,c2=ncol(x))
 	}
 	
 	# Add additional info to the args.
-#	if(!is.null(args)) {
-		r_check_args=args
-		r_check_args$x=r_check
-#		r_check_args$window_center=window_center
-		r_check_function <- do.call(fun, r_check_args)
+	r_check_args=args
+	r_check_args$x=r_check
+	r_check_function <- do.call(fun, r_check_args)
+	
+#	print(class(r_check_function))
+#	print(dim(r_check_function)[3])
+	
+#	print(processing_unit)
+	
+	if(processing_unit=="window")
+	{
+		if(class(r_check_function)!="numeric")
+		{
+			print("window processing units require numeric vector outputs.  Please check your function.")
+			return(NULL)
+		} else
+		{
+			outbands=length(r_check_function)
+		}
+	}
+	
+	if(processing_unit=="chunk")
+	{
+#		print("Whee!")
+		if(class(r_check_function)!="array" || 
+				dim(r_check_function)[1] != ncol(x)||
+				dim(r_check_function)[2] != window_dims[2])
+		{
+			print("chunk processing units require array vector outputs.  Please check your function.")
+			print(dim(r_check_function))
+			return(NULL)
+		} else
+		{
+			outbands=dim(r_check_function)[3]
+		}
+	}
+	
+#	if(class(r_check_function)=="numeric" || class(r_check_function)=="integer" || 
+#			(class(r_check_function)=="logical" && length(r_check_function)==1))
+#	{
+#		outbands=length(r_check_function)
 #	} else
 #	{
-#		r_check_args=list(x=r_check)
-#		r_check_args$window_center=window_center
-#		r_check_function <- do.call(fun, r_check_args)
+#		outbands=dim(r_check_function)[2]
 #	}
-#	print(class(r_check_function))
-
-	if(class(r_check_function)=="numeric" || class(r_check_function)=="integer" || 
-			(class(r_check_function)=="logical" && length(r_check_function)==1))
-	{
-		outbands=length(r_check_function)
-	} else
-	{
-		outbands=dim(r_check_function)[2]
-	}
 	
 #	outbands=dim(r_check_function)[1]
 	
@@ -178,8 +228,6 @@ focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename=''
 	
 	# We should test a single chunk here to see the size of the output...
 	
-	
-	
 	# Without the as.numeric some big files will have an integer overflow
 	outdata_ncells=as.numeric(nrow(x))*as.numeric(ncol(x))*as.numeric(outbands)
 	if(filename=="")
@@ -196,8 +244,8 @@ focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename=''
 	close(out)
 	
 	if(verbose) { print("Loading chunk arguments.") }
-	args=
-	chunkArgs <- list(fun=fun,x,x_ncol=ncol(x),tr=tr,
+#	args=
+	chunkArgs = list(fun=fun,x,x_ncol=ncol(x),tr=tr,
 			window_dims=window_dims,window_center=window_center,
 			args=args,filename=filename,
 			outbands=outbands,processing_unit=processing_unit,
@@ -211,58 +259,68 @@ focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename=''
 			# If the function is designed to work on a single array...
 			window_index=1:ncol(x)
 			r_out=mapply(
-				function(window_index,x,args,window_dims)
-				{
-					x_array=array(data=as.vector(x[(window_index:(window_index+window_dims[2]-1)),,]),
-						dim=c(length((window_index:(window_index+window_dims[2]-1))),dim(x)[2],dim(x)[3])
-					)
-					if(is.null(args)) {
-						fun_args=list(x=x_array)
-						r_out <- do.call(fun, fun_args)
-					} else
+					function(window_index,x,args,window_dims)
 					{
+						x_array=array(data=as.vector(x[(window_index:(window_index+window_dims[2]-1)),,]),
+								dim=c(length((window_index:(window_index+window_dims[2]-1))),dim(x)[2],dim(x)[3])
+						)
+#					if(is.null(args)) {
+#						fun_args=list(x=x_array)
+#						r_out <- do.call(fun, fun_args)
+#					} else
+#					{
 						fun_args=args
 						fun_args$x=x_array
 						r_out <- do.call(fun, fun_args)
-					}	
-					return(as.numeric(r_out))
-				},
-				window_index,
-				MoreArgs=list(x=chunk$processing_chunk,args=args,window_dims=window_dims)
+#					}	
+#					return(as.numeric(r_out))
+						return(r_out)
+					},
+					window_index,
+					MoreArgs=list(x=chunk$processing_chunk,args=args,window_dims=window_dims)
 			)
 		} else
 		{
 			# The function works on the entire chunk.
-			if(is.null(args)) {
-				fun_args=list(x=chunk$processing_chunk)
-				r_out <- do.call(fun, fun_args)
-			} else
-			{
-				fun_args=args
-				fun_args$x=chunk$processing_chunk
-				r_out <- do.call(fun, fun_args)
-			}	
+#			if(is.null(args)) {
+#				fun_args=list(x=chunk$processing_chunk)
+#				r_out <- do.call(fun, fun_args)
+#			} else
+#			{
+			fun_args=args
+			fun_args$x=chunk$processing_chunk
+#				print(fun_args)
+			r_out <- do.call(fun, fun_args)
+#			}	
 		}
-
+#		print(dim(r_out))
 		image_dims=dim(x)
+		image_dims=c(image_dims[2],image_dims[1],image_dims[3])
 		chunk_position=list(
-			1:ncol(x),
-			chunk$row_center,
-			1:outbands
+				1:ncol(x),
+				chunk$row_center,
+				1:outbands
 		)
+		
+#		print(chunk_position)
 		
 		parallel_write=function(filename,r_out,image_dims,chunk_position)
 		{
 			binary_image_write(filename=filename,mode=real64(),image_dims=image_dims,
-				interleave="BSQ",data=r_out,data_position=chunk_position)
+					interleave="BSQ",data=r_out,data_position=chunk_position)
 		}
-		
-		writeSuccess=FALSE
-		while(!writeSuccess)
+		if(!disable_cl)
 		{
-			writeSuccess=TRUE
-			tryCatch(parallel_write(filename,r_out,image_dims,chunk_position),
-				error=function(err) writeSuccess <<- FALSE)	
+			writeSuccess=FALSE
+			while(!writeSuccess)
+			{
+				writeSuccess=TRUE
+				tryCatch(parallel_write(filename,r_out,image_dims,chunk_position),
+						error=function(err) writeSuccess <<- FALSE)	
+			}
+		} else
+		{
+			parallel_write(filename,r_out,image_dims,chunk_position)
 		}
 	}
 	
@@ -279,16 +337,15 @@ focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename=''
 			r <- getValuesBlock_enhanced(x, r1=(tr$focal_row2[(i-1)]+1), r2=tr$focal_row2[i], c1=1, c2=ncol(x))
 		}
 		
-		
 		if(i==1)
 		{
 			# Add top cap
 			if((1-(tr$row[1]+startrow_offset))>0)
 			{
 				r=abind(
-					array(data=NA,dim=c(ncol(x),(1-(tr$row[1]+startrow_offset)),nlayers(x))),
-					r,
-					along=2)
+						array(data=NA,dim=c(ncol(x),(1-(tr$row[1]+startrow_offset)),nlayers(x))),
+						r,
+						along=2)
 			}
 		}
 		
@@ -297,8 +354,8 @@ focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename=''
 			# Add bottom cap
 			if(nrow(x)-tr$row2[tr$n]+endrow_offset>0)
 				r=abind(r,
-					array(data=NA,dim=c(ncol(x),(nrow(x)-tr$row2[tr$n]+endrow_offset),nlayers(x))),
-					along=2)
+						array(data=NA,dim=c(ncol(x),(nrow(x)-tr$row2[tr$n]+endrow_offset),nlayers(x))),
+						along=2)
 		}
 		
 		# TODO: WE NEED TO BE ABLE TO SUBTRACT STUFF HERE ALSO (if center is outside)
@@ -324,51 +381,42 @@ focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename=''
 					along=1)
 		}
 		
-		if(i>1)
+		if(i>1 && window_dims[2]>1)
 		{
 			r <- abind(r_old,r,along=2)
 		}
-						
+		
 		# We need to divide up the chunks here.
 		# This is going to cause memory issues if we aren't careful...
 		j=1:tr$nrows[i]
 		row_centers=tr$row[i]:tr$row2[i]
 		chunkList=mapply(function(j,r,texture_tr,row_centers)
-			{				
-				out_chunk=list(row_center=row_centers[j],
-					processing_chunk=array(data=as.vector(r[,texture_tr$row[j]:texture_tr$row2[j],]),
-					dim=c(dim(r)[1],length(texture_tr$row[j]:texture_tr$row2[j]),dim(r)[3]))
-				)
-				return(out_chunk)
-			}
-			,j,MoreArgs=list(r=r,texture_tr=texture_tr,row_centers=row_centers),
-			SIMPLIFY=FALSE)
-			
+				{				
+					out_chunk=list(row_center=row_centers[j],
+							processing_chunk=array(data=as.vector(r[,texture_tr$row[j]:texture_tr$row2[j],]),
+									dim=c(dim(r)[1],length(texture_tr$row[j]:texture_tr$row2[j]),dim(r)[3]))
+					)
+					return(out_chunk)
+				}
+				,j,MoreArgs=list(r=r,texture_tr=texture_tr,row_centers=row_centers),
+				SIMPLIFY=FALSE)
+		
 		# Parallel processing here.
 		if(disable_cl)
 		{
-#			if(verbose) { print("Sequential computation started.") }
-#			if(verbose) { start_time = proc.time() }
 			mapply(focalChunkFunction,chunkList,MoreArgs=chunkArgs)
-#			if(verbose) { print("Sequential computation finished.  Timing:") }
-#			if(verbose) { print(proc.time()-start_time) }
 		} else
 		{
-#			if(verbose) { print("Parallel computation started.") }
-#			if(verbose) { start_time = proc.time() }
 			clusterMap(cl,focalChunkFunction,chunkList,MoreArgs=chunkArgs)
-#			if(verbose) { print("Parallel computation finished.  Timing:") }
-#			if(verbose) { print(proc.time()-start_time) }
 		}
-
+		
 		# Preserve the read data needed for the next iteration.
-		if(i<tr$n)
+		if(i<tr$n && window_dims[2] > 1)
 		{
 			r_old=array(data=r[,(dim(r)[2]-(tr$focal_row2[i]-tr$focal_row[i+1])):dim(r)[2],],
-				dim=c(dim(r)[1],length((dim(r)[2]-(tr$focal_row2[i]-tr$focal_row[i+1])):dim(r)[2]),dim(r)[3])
+					dim=c(dim(r)[1],length((dim(r)[2]-(tr$focal_row2[i]-tr$focal_row[i+1])):dim(r)[2]),dim(r)[3])
 			)
 		}
-#		print(dim(r_old))
 	}
 	
 	# Let's see if we can trick raster into making us a proper header
@@ -396,12 +444,6 @@ focal_hpc <- function(x, fun, window_dims, window_center, args=NULL, filename=''
 	outraster <- build_raster_header(x_filename=filename,
 			reference_raster=reference_raster,
 			out_nlayers=outbands,dataType='FLT8S',format=outformat,bandorder='BSQ')
-#	
-#	if(stop_cl)
-#	{
-#		if(verbose) { print("Shutting down cluster...") }
-#		sfStop()
-#	}
 	
 	if(verbose) { print("focal_hpc complete.") }
 	

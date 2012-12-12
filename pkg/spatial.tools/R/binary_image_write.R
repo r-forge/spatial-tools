@@ -35,9 +35,8 @@ binary_image_write=function(filename,mode=real64(),image_dims,interleave="BSQ",
 	
 	# Some error checking up here.
 	
-	
-	image_x=image_dims[2]
-	image_y=image_dims[1]
+	image_x=image_dims[1]
+	image_y=image_dims[2]
 	if(length(image_dims)==3)
 	{
 		image_z=image_dims[3]
@@ -55,7 +54,14 @@ binary_image_write=function(filename,mode=real64(),image_dims,interleave="BSQ",
 			)
 	}
 	
+#	print(cell_position)
+	
+	if(class(data)=="array")
+	{
+		data=as.matrix(data,nrow=image_x*image_y,ncol=image_z)
+	}
+	
 	out = mmap(filename, mode=mode)
-	out[cell_position] <- t(data)
+	out[cell_position] <- as.numeric(data)
 	munmap(out)	
 }
