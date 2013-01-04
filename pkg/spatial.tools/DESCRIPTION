@@ -6,8 +6,8 @@ Type: Package
 LazyLoad: yes
 Author: Jonathan Asher Greenberg
 Description: R functions for working with spatial data.
-Version: 0.6-03
-Date: 2012-12-12
+Version: 0.7-01
+Date: 2013-01-04
 Depends:
     raster,
     rgdal,
@@ -33,3 +33,4 @@ Collate:
     'getValuesBlock_enhanced.R'
     'fillNA.R'
     'which_simple.R'
+    'subset_raster_by_names.R'

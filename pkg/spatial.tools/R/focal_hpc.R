@@ -159,6 +159,7 @@ focal_hpc <- function(x, fun, window_dims=c(1,1), window_center, args=NULL, file
 		if(verbose) { print("processing_unit=chunk...")}
 		r_check <- getValuesBlock_enhanced(x, r1=1, r2=window_dims[2], c1=1,c2=ncol(x))
 	}
+#	print(dimnames(r_check))
 	
 	# Add additional info to the args.
 	r_check_args=args
@@ -256,7 +257,7 @@ focal_hpc <- function(x, fun, window_dims=c(1,1), window_center, args=NULL, file
 			layer_names=layer_names,
 			args=args,filename=filename,
 			outbands=outbands,processing_unit=processing_unit,
-			verbose=verbose)
+			verbose=verbose,layer_names=layer_names)
 	
 	if(verbose) { print("Loading chunk function.") }
 	focalChunkFunction <- function(chunk,...)
@@ -271,6 +272,7 @@ focal_hpc <- function(x, fun, window_dims=c(1,1), window_center, args=NULL, file
 						x_array=array(data=as.vector(x[(window_index:(window_index+window_dims[2]-1)),,]),
 								dim=c(length((window_index:(window_index+window_dims[2]-1))),dim(x)[2],dim(x)[3])
 						)
+						dimnames(x_array)[[3]]=layer_names
 #					if(is.null(args)) {
 #						fun_args=list(x=x_array)
 #						r_out <- do.call(fun, fun_args)
@@ -296,6 +298,7 @@ focal_hpc <- function(x, fun, window_dims=c(1,1), window_center, args=NULL, file
 #			{
 			fun_args=args
 			fun_args$x=chunk$processing_chunk
+			dimnames(fun_args$x)[[3]]=layer_names
 #				print(fun_args)
 			r_out <- do.call(fun, fun_args)
 #			}	
@@ -309,7 +312,7 @@ focal_hpc <- function(x, fun, window_dims=c(1,1), window_center, args=NULL, file
 				1:outbands
 		)
 		
-#		print(chunk_position)
+
 		
 		parallel_write=function(filename,r_out,image_dims,chunk_position)
 		{
@@ -329,6 +332,7 @@ focal_hpc <- function(x, fun, window_dims=c(1,1), window_center, args=NULL, file
 		{
 			parallel_write(filename,r_out,image_dims,chunk_position)
 		}
+#		print("Here?")
 	}
 	
 	# Begin the loop
