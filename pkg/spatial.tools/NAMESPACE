@@ -1,7 +1,6 @@
 export(add_leading_zeroes)
 export(binary_image_write)
 export(build_raster_header)
-export(calc_hpc)
 export(fillNA)
 export(fix_extent)
 export(focal_hpc)

@@ -6,8 +6,8 @@ Type: Package
 LazyLoad: yes
 Author: Jonathan Asher Greenberg
 Description: R functions for working with spatial data.
-Version: 0.7-01
-Date: 2013-01-04
+Version: 0.7-02
+Date: 2013-01-24
 Depends:
     raster,
     rgdal,
@@ -24,7 +24,6 @@ Collate:
     'tahoe_lidar_highesthit_data.R'
     'remove_file_extension.R'
     'build_raster_header.R'
-    'calc_hpc.R'
     'fix_extent.R'
     'add_leading_zeroes.R'
     'spatial_sync_raster.R'
