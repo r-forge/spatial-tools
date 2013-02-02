@@ -16,10 +16,8 @@
 #' # TODO
 #' @export
 
-getValuesBlock_enhanced=function(x,r1,r2,c1,c2,format="array",...)
-{
-	# getValues(crop(x, extent(x, r1=1, r2=window_rows, c1=1,c2=window_cols)),format="matrix")
-	
+getValuesBlock_enhanced=function(x,r1=1,r2=1,c1=1,c2=ncol(x),format="array",...)
+{	
 	layer_names=names(x)
 	
 	getvalues_raw=as.numeric(getValues(crop(x, extent(x, r1=r1, r2=r2, c1=c1,c2=c2))))

@@ -7,7 +7,8 @@
 #' @param na.rm a logical indicating whether missing values should be removed.
 #' @param tie_value A character indicating how to deal with ties.  Can be "NA"
 #' (returns an NA if a tie is found) or "random" (returns a single randomly
-#' chosen member of the ties if a tie is found).
+#' chosen member of the ties if a tie is found) or "first" (returns the first
+#' class found).
 #' @return An integer of length 1 giving the index of the maximum of x or NA if
 #' the maximum of x is not unique, x has no non-NAs, or na.rm=F.
 #' @author Jonathan A. Greenberg, Alison R. Mynsberge
@@ -24,7 +25,7 @@
 #' which.max.simple(y,na.rm=FALSE)
 #' which.max.simple(x,na.rm=FALSE)
 #' }
-which.max.simple=function(x,na.rm=TRUE,tie_value="random")
+which.max.simple=function(x,na.rm=TRUE,tie_value="NA")
 {
 	if(na.rm)
 	{
@@ -53,6 +54,12 @@ which.max.simple=function(x,na.rm=TRUE,tie_value="random")
 			return(sample(tie_postions,size=1))
 		}
 		
+		if(tie_value=="first")
+		{
+			tie_postions=which(x==maxval)
+			return(tie_postions[1])
+		}
+		
 	} else
 	{
 		return(which.max(x))
@@ -70,7 +77,8 @@ which.max.simple=function(x,na.rm=TRUE,tie_value="random")
 #' @param na.rm a logical indicating whether missing values should be removed.
 #' @param tie_value A character indicating how to deal with ties.  Can be "NA"
 #' (returns an NA if a tie is found) or "random" (returns a single randomly
-#' chosen member of the ties if a tie is found).
+#' chosen member of the ties if a tie is found) or "first" (returns the first
+#' class found).
 #' @return An integer of length 1 giving the index of the minimum of x or NA if
 #' the minimum of x is not unique, x has no non-NAs, or na.rm=F.
 #' @author Jonathan A. Greenberg, Alison R. Mynsberge
@@ -87,7 +95,7 @@ which.max.simple=function(x,na.rm=TRUE,tie_value="random")
 #' which.min.simple(y,na.rm=FALSE)
 #' which.min.simple(x,na.rm=FALSE)
 #' }
-which.min.simple=function(x,na.rm=TRUE,tie_value="random")
+which.min.simple=function(x,na.rm=TRUE,tie_value="NA")
 {
 	if(na.rm)
 	{
@@ -114,6 +122,12 @@ which.min.simple=function(x,na.rm=TRUE,tie_value="random")
 		{
 			tie_postions=which(x==minval)
 			return(sample(tie_postions,size=1))
+		}
+		
+		if(tie_value=="first")
+		{
+			tie_postions=which(x==maxval)
+			return(tie_postions[1])
 		}
 		
 	} else

@@ -7,9 +7,6 @@
 #' @param processing_unit Character. TBD.
 #' @param args list. Arguments to pass to the function (see ?mapply).
 #' @param filename character. Filename of the output raster.
-#' @param cl cluster. A cluster object. calc_hpc will attempt to determine this if missing.
-#' @param disable_cl logical. Disable parallel computing? Default is FALSE. 
-#' @param chunk_nrows Integer. Computing tuning parameter.  The higher the number, the faster the process, but the more memory will be used.  Defaults to 20.
 #' @param outformat character. Outformat of the raster. Must be a format usable by hdr(). Default is 'raster'. CURRENTLY UNSUPPORTED.
 #' @param overwrite logical. Allow files to be overwritten? Default is FALSE.
 #' @param verbose logical. Enable verbose execution? Default is FALSE.  
@@ -34,15 +31,24 @@
 #' The speed of the execution will vary based on the specific setup, and may, indeed, be slower than
 #' a sequential execution (e.g. with calc() ).
 #' @examples
-#'  # TODO
+#'  tahoe_highrez <- brick(system.file("external/tahoe_highrez.tif", package="spatial.tools"))
+#'	ndvi_function <- function(x,...)
+#'	{
+#'		red_band <- inchunk[,,2]
+#'		nir_band <- inchunk[,,3]
+#'		ndvi <- (nir_band - red_band)/(nir_band + red_band)
+#'		return(ndvi)
+#'	}
+#'  tahoe_ndvi <- focal_hpc(x=tahoe_highrez,fun=ndvi_function)
 #' @export
 
 # TODO args should include useful input parameters
 focal_hpc <- function(x, fun, window_dims=c(1,1), window_center, args=NULL, filename='', 
 		overwrite=FALSE,outformat='raster',verbose=FALSE, processing_unit="window",
-		cl=NULL, disable_cl=FALSE, chunk_nrows=20) {
+		chunk_nrows=20, ...) {
 	require("raster")
-	require("snowfall")
+	require("foreach")
+#	require("snowfall")
 	require("rgdal")
 	require("mmap")
 	require("abind")
@@ -56,26 +62,33 @@ focal_hpc <- function(x, fun, window_dims=c(1,1), window_center, args=NULL, file
 #		print(args)
 #	}
 #	parallel::detectCores()
-	stop_cl=FALSE
-	if(disable_cl)
+#	stop_cl=FALSE
+#	if(disable_cl)
+#	{
+#		if(verbose) { print("Cluster disabled.") }
+#		nodes <- 1
+#	} else
+#	{
+#		if(verbose) { print("Cluster enabled, loading packages.") }
+#		if (is.null(cl)) {
+#			stop_cl=TRUE
+#			cl <- sfGetCluster()
+#			sfLibrary("snowfall",character.only=TRUE)
+#			sfLibrary("rgdal",character.only=TRUE)
+#			sfLibrary("raster",character.only=TRUE)
+#			sfLibrary("mmap",character.only=TRUE)
+#			sfLibrary("spatial.tools",character.only=TRUE)
+#		}
+#		nodes <- sfNodes()
+#		if(verbose) { print(paste("Executing on ",nodes," nodes.",sep="")) }
+#	}
+	
+	if(!getDoParRegistered())
 	{
-		if(verbose) { print("Cluster disabled.") }
-		nodes <- 1
-	} else
-	{
-		if(verbose) { print("Cluster enabled, loading packages.") }
-		if (is.null(cl)) {
-			stop_cl=TRUE
-			cl <- sfGetCluster()
-			sfLibrary("snowfall",character.only=TRUE)
-			sfLibrary("rgdal",character.only=TRUE)
-			sfLibrary("raster",character.only=TRUE)
-			sfLibrary("mmap",character.only=TRUE)
-			sfLibrary("spatial.tools",character.only=TRUE)
-		}
-		nodes <- sfNodes()
-		if(verbose) { print(paste("Executing on ",nodes," nodes.",sep="")) }
+		registerDoSEQ()
 	}
+	
+	nodes <- getDoParWorkers()
 	
 	# Set up initial parameters
 #	if(missing(window_dims))
@@ -171,7 +184,7 @@ focal_hpc <- function(x, fun, window_dims=c(1,1), window_center, args=NULL, file
 	
 #	print(processing_unit)
 #	print((r_check_function))	
-
+	
 	if(processing_unit=="window")
 	{
 		if(class(r_check_function)!="numeric")
@@ -252,7 +265,7 @@ focal_hpc <- function(x, fun, window_dims=c(1,1), window_center, args=NULL, file
 	
 	if(verbose) { print("Loading chunk arguments.") }
 #	args=
-	chunkArgs = list(fun=fun,x,x_ncol=ncol(x),tr=tr,
+	chunkArgs = list(fun=fun,x=x,x_ncol=ncol(x),tr=tr,
 			window_dims=window_dims,window_center=window_center,
 			layer_names=layer_names,
 			args=args,filename=filename,
@@ -260,8 +273,12 @@ focal_hpc <- function(x, fun, window_dims=c(1,1), window_center, args=NULL, file
 			verbose=verbose,layer_names=layer_names)
 	
 	if(verbose) { print("Loading chunk function.") }
-	focalChunkFunction <- function(chunk,...)
+	focalChunkFunction <- function(chunk,chunkArgs,...)
 	{	
+#		print(chunkArgs)
+		e <- list2env(chunkArgs,envir=environment())
+#		print(processing_unit)
+	
 		if(processing_unit=="window")
 		{
 			# If the function is designed to work on a single array...
@@ -312,26 +329,24 @@ focal_hpc <- function(x, fun, window_dims=c(1,1), window_center, args=NULL, file
 				1:outbands
 		)
 		
-
-		
 		parallel_write=function(filename,r_out,image_dims,chunk_position)
 		{
 			binary_image_write(filename=filename,mode=real64(),image_dims=image_dims,
 					interleave="BSQ",data=r_out,data_position=chunk_position)
 		}
-		if(!disable_cl)
+#		if(!disable_cl)
+#		{
+		writeSuccess=FALSE
+		while(!writeSuccess)
 		{
-			writeSuccess=FALSE
-			while(!writeSuccess)
-			{
-				writeSuccess=TRUE
-				tryCatch(parallel_write(filename,r_out,image_dims,chunk_position),
-						error=function(err) writeSuccess <<- FALSE)	
-			}
-		} else
-		{
-			parallel_write(filename,r_out,image_dims,chunk_position)
+			writeSuccess=TRUE
+			tryCatch(parallel_write(filename,r_out,image_dims,chunk_position),
+					error=function(err) writeSuccess <<- FALSE)	
 		}
+#		} else
+#		{
+#			parallel_write(filename,r_out,image_dims,chunk_position)
+#		}
 #		print("Here?")
 	}
 	
@@ -413,13 +428,20 @@ focal_hpc <- function(x, fun, window_dims=c(1,1), window_center, args=NULL, file
 				SIMPLIFY=FALSE)
 		
 		# Parallel processing here.
-		if(disable_cl)
-		{
-			mapply(focalChunkFunction,chunkList,MoreArgs=chunkArgs)
-		} else
-		{
-			clusterMap(cl,focalChunkFunction,chunkList,MoreArgs=chunkArgs)
-		}
+#		if(disable_cl)
+#		{
+#			mapply(focalChunkFunction,chunkList,MoreArgs=chunkArgs)
+#		} else
+#		{
+#			clusterMap(cl,focalChunkFunction,chunkList,MoreArgs=chunkArgs)
+#		}
+		
+# Trying to use foreach instead:
+		# Testing:
+#		focalChunkFunction(chunkList=chunkList[[1]],chunkArgs=chunkArgs,...)
+
+		foreach(chunk=chunkList, .packages=c("raster","rgdal","spatial.tools","mmap")) %dopar% 
+				focalChunkFunction(chunk,chunkArgs,...)
 		
 		# Preserve the read data needed for the next iteration.
 		if(i<tr$n && window_dims[2] > 1)
