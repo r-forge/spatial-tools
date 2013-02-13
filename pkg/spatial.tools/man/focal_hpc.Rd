@@ -5,8 +5,7 @@
   focal_hpc(x, fun, window_dims = c(1, 1), window_center,
     args = NULL, filename = "", overwrite = FALSE,
     outformat = "raster", verbose = FALSE,
-    processing_unit = "window", cl = NULL,
-    disable_cl = FALSE, chunk_nrows = 20)
+    processing_unit = "window", chunk_nrows = 20, ...)
 }
 \arguments{
   \item{x}{Raster*. A Raster* used as the input into the
@@ -29,16 +28,6 @@
 
   \item{filename}{character. Filename of the output
   raster.}
-
-  \item{cl}{cluster. A cluster object. calc_hpc will
-  attempt to determine this if missing.}
-
-  \item{disable_cl}{logical. Disable parallel computing?
-  Default is FALSE.}
-
-  \item{chunk_nrows}{Integer. Computing tuning parameter.
-  The higher the number, the faster the process, but the
-  more memory will be used.  Defaults to 20.}
 
   \item{outformat}{character. Outformat of the raster. Must
   be a format usable by hdr(). Default is 'raster'.
@@ -85,7 +74,15 @@
   sequential execution (e.g. with calc() ).
 }
 \examples{
-# TODO
+tahoe_highrez <- brick(system.file("external/tahoe_highrez.tif", package="spatial.tools"))
+	ndvi_function <- function(x,...)
+	{
+		red_band <- inchunk[,,2]
+		nir_band <- inchunk[,,3]
+		ndvi <- (nir_band - red_band)/(nir_band + red_band)
+		return(ndvi)
+	}
+ tahoe_ndvi <- focal_hpc(x=tahoe_highrez,fun=ndvi_function)
 }
 \author{
   Jonathan A. Greenberg

@@ -2,7 +2,7 @@
 \alias{which.min.simple}
 \title{Location of Minimum Value}
 \usage{
-  which.min.simple(x, na.rm = TRUE, tie_value = "random")
+  which.min.simple(x, na.rm = TRUE, tie_value = "NA")
 }
 \arguments{
   \item{x}{a numeric object}
@@ -13,7 +13,8 @@
   \item{tie_value}{A character indicating how to deal with
   ties.  Can be "NA" (returns an NA if a tie is found) or
   "random" (returns a single randomly chosen member of the
-  ties if a tie is found).}
+  ties if a tie is found) or "first" (returns the first
+  class found).}
 }
 \value{
   An integer of length 1 giving the index of the minimum of

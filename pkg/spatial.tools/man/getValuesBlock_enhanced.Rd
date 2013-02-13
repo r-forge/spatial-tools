@@ -3,8 +3,8 @@
 \title{getValuesBlock_enhanced
 Easier-to-use function for grabbing data out of a Raster*.}
 \usage{
-  getValuesBlock_enhanced(x, r1, r2, c1, c2,
-    format = "array", ...)
+  getValuesBlock_enhanced(x, r1 = 1, r2 = 1, c1 = 1,
+    c2 = ncol(x), format = "array", ...)
 }
 \arguments{
   \item{x}{TODO.}

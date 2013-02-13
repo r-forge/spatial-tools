@@ -12,16 +12,25 @@
 #' sfGetCluster()
 #' sfStop()
 #' }
+#' @export
 
-sfQuickInit <- function(...)
+sfQuickInit <- function(cpus,...)
 {
 	require("snowfall")
-	numCores <- parallel::detectCores()
-	sfInit(cpus=numCores,parallel=TRUE,...)
+#	require("snow")
+	if(missing("cpus"))
+	{
+		cpus <- parallel::detectCores()
+	}
+	#	cl <- makeCluster(numCores,type="SOCK")	
+	sfInit(cpus=cpus,parallel=TRUE,...)
 	if(any(search()=="package:foreach"))
 	{
 		require("doSNOW")
 		cl <- sfGetCluster()
 		registerDoSNOW(cl)
 	}
+	return(cl)
 }
+
+

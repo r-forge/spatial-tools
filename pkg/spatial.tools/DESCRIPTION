@@ -6,7 +6,7 @@ Type: Package
 LazyLoad: yes
 Author: Jonathan Asher Greenberg
 Description: R functions for working with spatial data.
-Version: 0.8
+Version: 0.8.1
 Date: 2013-02-01
 Depends:
     raster,
@@ -16,7 +16,7 @@ Depends:
     abind,
     snowfall,
     foreach,
-    R (>= 2.14.0)
+    R (>= 2.15.2)
 Collate:
     'spatial_sync_vector.R'
     'tahoe_highrez_data.R'
@@ -36,3 +36,5 @@ Collate:
     'subset_raster_by_names.R'
     'projectRaster_categorical.R'
     'sfQuickInit.R'
+    'raster_to_tile.R'
+    'rasterToPolygons_hpc.R'

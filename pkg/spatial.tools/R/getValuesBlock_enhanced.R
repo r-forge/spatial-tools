@@ -37,6 +37,7 @@ getValuesBlock_enhanced=function(x,r1=1,r2=1,c1=1,c2=ncol(x),format="array",...)
 		getvalues_array=array(data=getvalues_raw,
 			dim=c(getvalues_raw_ncols,getvalues_raw_nrows,getvalues_raw_nlayers))
 	}
-	dimnames(getvalues_array)[[3]]=layer_names
+	dimnames(getvalues_array) <- list(NULL,NULL,NULL)
+	if(!is.null(layer_names)) dimnames(getvalues_array)[[3]]=layer_names
 	return(getvalues_array)
 }

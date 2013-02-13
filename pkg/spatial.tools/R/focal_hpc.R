@@ -250,10 +250,12 @@ focal_hpc <- function(x, fun, window_dims=c(1,1), window_center, args=NULL, file
 	
 	# Without the as.numeric some big files will have an integer overflow
 	outdata_ncells=as.numeric(nrow(x))*as.numeric(ncol(x))*as.numeric(outbands)
+	if(verbose) print(paste("outdata_ncells=",outdata_ncells))
 	if(filename=="")
 	{	
 		filename <- tempfile()
 		if(verbose) { print(paste("No output file given, using a tempfile name:",filename,sep=" ")) }
+		dir.create(tempdir())
 	} 
 	
 	# I've been warned about using seek on Windows, but this appears to work...
@@ -289,7 +291,10 @@ focal_hpc <- function(x, fun, window_dims=c(1,1), window_center, args=NULL, file
 						x_array=array(data=as.vector(x[(window_index:(window_index+window_dims[2]-1)),,]),
 								dim=c(length((window_index:(window_index+window_dims[2]-1))),dim(x)[2],dim(x)[3])
 						)
-						dimnames(x_array)[[3]]=layer_names
+						dimnames(x_array) <- vector(mode="list",length=3)
+						
+						if(!is.null(layer_names)) dimnames(x_array)[[3]]=layer_names
+		
 #					if(is.null(args)) {
 #						fun_args=list(x=x_array)
 #						r_out <- do.call(fun, fun_args)
@@ -315,7 +320,8 @@ focal_hpc <- function(x, fun, window_dims=c(1,1), window_center, args=NULL, file
 #			{
 			fun_args=args
 			fun_args$x=chunk$processing_chunk
-			dimnames(fun_args$x)[[3]]=layer_names
+			dimnames(fun_args$x)=vector(mode="list",length=3)
+			if(!is.null(layer_names)) dimnames(fun_args$x)[[3]]=layer_names
 #				print(fun_args)
 			r_out <- do.call(fun, fun_args)
 #			}	
