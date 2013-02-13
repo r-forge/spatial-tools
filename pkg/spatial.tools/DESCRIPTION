@@ -34,7 +34,7 @@ Collate:
     'fillNA.R'
     'which_simple.R'
     'subset_raster_by_names.R'
-    'projectRaster_categorical.R'
     'sfQuickInit.R'
     'raster_to_tile.R'
     'rasterToPolygons_hpc.R'
+    'search_gdal_installation.R'

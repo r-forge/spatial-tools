@@ -16,28 +16,35 @@
 #' # TODO
 #' @export
 
-getValuesBlock_enhanced=function(x,r1=1,r2=1,c1=1,c2=ncol(x),format="array",...)
+getValuesBlock_enhanced=function(x,r1=1,r2=nrow(x),c1=1,c2=ncol(x),format="array",...)
 {	
-	layer_names=names(x)
-	
-	getvalues_raw=as.numeric(getValues(crop(x, extent(x, r1=r1, r2=r2, c1=c1,c2=c2))))
-	getvalues_raw_nrows=r2-r1+1
-	getvalues_raw_ncols=c2-c1+1
-	getvalues_raw_nlayers=nlayers(x)
-	
-	# Test the input file.
-	if(getvalues_raw_nlayers==1)
+	if(format=="array")
 	{
-	# Raster
-		getvalues_array=array(data=getvalues_raw,
-			dim=c(getvalues_raw_ncols,getvalues_raw_nrows,getvalues_raw_nlayers))		
-	} else
-	{
-	# Brick or stack
-		getvalues_array=array(data=getvalues_raw,
-			dim=c(getvalues_raw_ncols,getvalues_raw_nrows,getvalues_raw_nlayers))
+		layer_names=names(x)
+		
+		getvalues_raw=as.numeric(getValues(crop(x, extent(x, r1=r1, r2=r2, c1=c1,c2=c2))))
+		getvalues_raw_nrows=r2-r1+1
+		getvalues_raw_ncols=c2-c1+1
+		getvalues_raw_nlayers=nlayers(x)
+		
+		# Test the input file.
+		if(getvalues_raw_nlayers==1)
+		{
+		# Raster
+			getvalues_array=array(data=getvalues_raw,
+				dim=c(getvalues_raw_ncols,getvalues_raw_nrows,getvalues_raw_nlayers))		
+		} else
+		{
+		# Brick or stack
+			getvalues_array=array(data=getvalues_raw,
+				dim=c(getvalues_raw_ncols,getvalues_raw_nrows,getvalues_raw_nlayers))
+		}
+		dimnames(getvalues_array) <- list(NULL,NULL,NULL)
+		if(!is.null(layer_names)) dimnames(getvalues_array)[[3]]=layer_names
+		return(getvalues_array)
 	}
-	dimnames(getvalues_array) <- list(NULL,NULL,NULL)
-	if(!is.null(layer_names)) dimnames(getvalues_array)[[3]]=layer_names
-	return(getvalues_array)
+	if(format=="raster")
+	{
+		return(crop(x, extent(x, r1=r1, r2=r2, c1=c1,c2=c2)))
+	}
 }

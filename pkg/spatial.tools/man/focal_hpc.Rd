@@ -5,7 +5,8 @@
   focal_hpc(x, fun, window_dims = c(1, 1), window_center,
     args = NULL, filename = "", overwrite = FALSE,
     outformat = "raster", verbose = FALSE,
-    processing_unit = "window", chunk_nrows = 20, ...)
+    processing_unit = "window", chunk_nrows = 20,
+    chunk_format = "array", ...)
 }
 \arguments{
   \item{x}{Raster*. A Raster* used as the input into the
