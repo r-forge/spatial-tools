@@ -41,8 +41,7 @@ which.min.simple(x,na.rm=FALSE)
 }
 \seealso{
   \code{\link[base]{which.min}}, \code{\link[base]{which}},
-  \code{\link[base]{min}},
-  \code{\link[climstats]{index_raster_to_mask}}
+  \code{\link[base]{min}}
 }
 \keyword{calculate}
 

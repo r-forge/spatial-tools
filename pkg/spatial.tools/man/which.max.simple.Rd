@@ -41,8 +41,7 @@ which.max.simple(x,na.rm=FALSE)
 }
 \seealso{
   \code{\link[base]{which.max}}, \code{\link[base]{which}},
-  \code{\link[base]{max}},
-  \code{\link[climstats]{index_raster_to_mask}}
+  \code{\link[base]{max}}
 }
 \keyword{calculate}
 

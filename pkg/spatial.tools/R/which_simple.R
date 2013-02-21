@@ -13,7 +13,7 @@
 #' the maximum of x is not unique, x has no non-NAs, or na.rm=F.
 #' @author Jonathan A. Greenberg, Alison R. Mynsberge
 #' @seealso \code{\link[base]{which.max}}, \code{\link[base]{which}},
-#' \code{\link[base]{max}}, \code{\link[climstats]{index_raster_to_mask}}
+#' \code{\link[base]{max}}
 #' @keywords calculate
 #' @examples \dontrun{
 #' 
@@ -83,7 +83,7 @@ which.max.simple=function(x,na.rm=TRUE,tie_value="NA")
 #' the minimum of x is not unique, x has no non-NAs, or na.rm=F.
 #' @author Jonathan A. Greenberg, Alison R. Mynsberge
 #' @seealso \code{\link[base]{which.min}}, \code{\link[base]{which}},
-#' \code{\link[base]{min}}, \code{\link[climstats]{index_raster_to_mask}}
+#' \code{\link[base]{min}}
 #' @keywords calculate
 #' @examples \dontrun{
 #' 
@@ -126,7 +126,7 @@ which.min.simple=function(x,na.rm=TRUE,tie_value="NA")
 		
 		if(tie_value=="first")
 		{
-			tie_postions=which(x==maxval)
+			tie_postions=which(x==minval)
 			return(tie_postions[1])
 		}
 		

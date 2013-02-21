@@ -7,7 +7,6 @@
 #' @author Jonathan A. Greenberg (\email{spatial.tools@@estarcion.net})
 #' @export
 
-
 subset_raster_by_names=function(x,subset_names,allnames=TRUE)
 {
 	raster_names=names(x)
@@ -25,7 +24,7 @@ subset_raster_by_names=function(x,subset_names,allnames=TRUE)
 	subset_index=sapply(raster_names,FUN=function(raster_names,subset_names)
 			{ return(raster_names %in% subset_names) },subset_names=subset_names,simplify=TRUE )
 	
-	raw_data=getValues(boundary_analysis_brick)
+	raw_data=getValues(x)
 	layer_index=1:nlayers(x)
 	layer_index=layer_index[subset_index]
 	x_out=x[[layer_index]]

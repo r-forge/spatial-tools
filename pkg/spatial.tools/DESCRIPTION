@@ -6,8 +6,8 @@ Type: Package
 LazyLoad: yes
 Author: Jonathan Asher Greenberg
 Description: R functions for working with spatial data.
-Version: 0.8.1
-Date: 2013-02-01
+Version: 0.8.3
+Date: 2013-02-21
 Depends:
     raster,
     rgdal,
@@ -16,6 +16,7 @@ Depends:
     abind,
     snowfall,
     foreach,
+    doSNOW,
     R (>= 2.15.2)
 Collate:
     'spatial_sync_vector.R'
@@ -38,3 +39,5 @@ Collate:
     'raster_to_tile.R'
     'rasterToPolygons_hpc.R'
     'search_gdal_installation.R'
+    'create_blank_raster.R'
+    'sfQuickStop.R'
