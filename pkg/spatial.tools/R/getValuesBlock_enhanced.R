@@ -12,7 +12,7 @@
 #' @author Jonathan A. Greenberg
 #' @seealso \code{\link[raster]{getValues}}
 #' @examples
-#' tahoe_highrez <- brick(system.file("external/tahoe_highrez.tif", package="spatial.tools")) <- brick(system.file("external/tahoe_highrez.tif", package="spatial.tools"))
+#' tahoe_highrez <- brick(system.file("external/tahoe_highrez.tif", package="spatial.tools"))
 #' mychunk <- getValuesBlock_enhanced(tahoe_highrez,r1=100,r2=110,c1=20,c2=50)
 #' class(mychunk)
 #' dim(mychunk)
