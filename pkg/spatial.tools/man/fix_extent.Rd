@@ -1,6 +1,6 @@
 \name{fix_extent}
 \alias{fix_extent}
-\title{fix_extent}
+\title{Forces a list of Raster*s to all have the same extent.}
 \usage{
   fix_extent(extent_reference, broken_extents)
 }
@@ -16,9 +16,6 @@
 }
 \description{
   Forces a list of Raster*s to all have the same extent.
-}
-\examples{
-# TODO
 }
 \author{
   Jonathan A. Greenberg

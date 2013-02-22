@@ -1,6 +1,6 @@
 \name{build_raster_header}
 \alias{build_raster_header}
-\title{build_raster_header}
+\title{Builds a raster header for a flat binary file.}
 \usage{
   build_raster_header(x_filename, reference_raster,
     out_nlayers, dataType = "FLT8S", format = "raster",

@@ -1,6 +1,4 @@
-#' sfQuickInit
-#' 
-#' Quickly initializes a parallel snowfall cluster.
+#' Quickly initializes a parallel snowfall cluster and registers it with foreach.
 #' 
 #' @param cpus Number of cpus.  Will default to the max available cpus.
 #' @param ... parameters to pass to sfInit()

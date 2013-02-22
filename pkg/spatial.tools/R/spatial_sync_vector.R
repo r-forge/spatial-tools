@@ -1,5 +1,4 @@
 #' Matches a vector's projection to another vector or raster object's projection.
-#' @title spatial_sync_vector
 #' @param unsynced The vector to be projected.
 #' @param reference A raster or vector object who's projection the unsynced will be matched to.
 #' @param verbose Logical. Verbose logging?

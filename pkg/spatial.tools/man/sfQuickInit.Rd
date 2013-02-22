@@ -1,6 +1,6 @@
 \name{sfQuickInit}
 \alias{sfQuickInit}
-\title{sfQuickInit}
+\title{Quickly initializes a parallel snowfall cluster and registers it with foreach.}
 \usage{
   sfQuickInit(cpus, ...)
 }
@@ -11,7 +11,8 @@
   \item{...}{parameters to pass to sfInit()}
 }
 \description{
-  Quickly initializes a parallel snowfall cluster.
+  Quickly initializes a parallel snowfall cluster and
+  registers it with foreach.
 }
 \details{
   (Even more) quickly start a snowfall cluster with maximum

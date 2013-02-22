@@ -1,5 +1,3 @@
-#' @export
-
 raster_to_tile <- function(x,tilesize=c(1024,1024),crop=FALSE)
 {
 	ncol_x <- ncol(x)

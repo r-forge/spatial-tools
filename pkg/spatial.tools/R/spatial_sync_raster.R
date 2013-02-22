@@ -7,8 +7,6 @@
 #' reference raster.  This is helpful in preparing multiple files of different
 #' projections, resolutions, extents, and rotations for performing map algebra or 
 #' change detection.
-#' @name spatial_sync_raster
-#' @title spatial_sync_raster
 #' @param unsynced A Raster object to be aligned to the reference raster.
 #' @param reference A Raster object to be used as the reference for syncing.
 #' Syncing will use the reference's projection, resolution, and extent.

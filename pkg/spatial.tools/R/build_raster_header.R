@@ -1,5 +1,4 @@
 #' Builds a raster header for a flat binary file.
-#' @title build_raster_header
 #' @param x_filename Character. The filename of the input binary file.
 #' @param reference_raster Raster*. A Raster* object containing the header information to be used.
 #' @param out_nlayers Numeric. The number of layers in the flat binary file (defaults to nlayers(reference_raster)).

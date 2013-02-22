@@ -1,6 +1,6 @@
 \name{spatial_sync_raster}
 \alias{spatial_sync_raster}
-\title{spatial_sync_raster}
+\title{Spatially Sync Rasters}
 \usage{
   spatial_sync_raster(unsynced, reference, method = "ngb",
     size_only = FALSE, raster_size, verbose = FALSE)
@@ -29,11 +29,9 @@
   synced to the reference raster object.
 }
 \description{
-  Spatially Sync Rasters
+  Aligns ("syncs") a Raster to a reference Raster.
 }
 \details{
-  Aligns ("syncs") a Raster to a reference Raster.
-
   Uses bilinear or nearest neighbor resampling to align a
   raster to the extent and projection of a reference raster
   and match the resolution of the reference raster.  This

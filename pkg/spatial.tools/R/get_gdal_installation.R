@@ -1,4 +1,3 @@
-#' @export
 # Cribbed from the MODIS package with mods for spatial.tools
 
 get_gdal_installation=function(quiet=FALSE,return_drivers=TRUE,return_versions=TRUE,

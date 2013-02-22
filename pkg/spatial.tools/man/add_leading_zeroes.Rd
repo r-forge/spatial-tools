@@ -1,7 +1,6 @@
 \name{add_leading_zeroes}
 \alias{add_leading_zeroes}
-\title{add_leading_zeroes
-Add Leading Zeroes to a Numeric Vector}
+\title{Add Leading Zeroes to a Numeric Vector}
 \usage{
   add_leading_zeroes(number, number_length, max_number)
 }

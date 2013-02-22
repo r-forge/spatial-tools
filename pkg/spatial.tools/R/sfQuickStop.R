@@ -1,5 +1,3 @@
-#' sfQuickStop
-#' 
 #' Quickly stops a parallel snowfall cluster and deregisters it from foreach.
 #' 
 #' @param ... parameters to pass to sfStop()

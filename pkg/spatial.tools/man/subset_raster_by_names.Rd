@@ -1,6 +1,6 @@
 \name{subset_raster_by_names}
 \alias{subset_raster_by_names}
-\title{subset_raster_by_names}
+\title{Subsets a raster based on its layer names}
 \usage{
   subset_raster_by_names(x, subset_names, allnames = TRUE)
 }

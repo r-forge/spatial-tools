@@ -1,6 +1,6 @@
 \name{spatial_sync_vector}
 \alias{spatial_sync_vector}
-\title{spatial_sync_vector}
+\title{Matches a vector's projection to another vector or raster object's projection.}
 \usage{
   spatial_sync_vector(unsynced, reference, verbose = TRUE)
 }

@@ -1,5 +1,4 @@
 #' Subsets a raster based on its layer names
-#' @title subset_raster_by_names
 #' @param x A Raster* object to be subsetted.
 #' @param subset_names Character. A vector of layer names to use to subset the Raster*.
 #' @param allnames Logical. Make sure all subset_names are contained by x?

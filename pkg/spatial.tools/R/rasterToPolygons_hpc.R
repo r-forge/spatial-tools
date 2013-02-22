@@ -1,5 +1,3 @@
-#' @export
-
 rasterToPolygons_hpc <- function(x, fun=NULL, n=4, na.rm=TRUE, digits=12, dissolve=TRUE,
 		tilesize = c(128,128),verbose=FALSE,tile_prefix,
 		driver="GML",tile_suffix=".gml",layer="value")

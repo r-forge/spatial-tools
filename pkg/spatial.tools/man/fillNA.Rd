@@ -28,9 +28,6 @@
 \description{
   Fill in NA regions from adjacent regions.
 }
-\examples{
-# TODO
-}
 \author{
   Jonathan A. Greenberg
   (\email{spatial.tools@estarcion.net})
