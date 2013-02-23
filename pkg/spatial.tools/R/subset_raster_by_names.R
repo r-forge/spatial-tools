@@ -15,8 +15,7 @@ subset_raster_by_names=function(x,subset_names,allnames=TRUE)
 		test_allnames=intersect(raster_names,subset_names)
 		if(length(test_allnames)<length(subset_names))
 		{
-			print("Missing some layers in the input raster...")
-			return(NULL)
+			stop("Missing some layers in the input raster...")
 		}
 	}
 	

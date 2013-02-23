@@ -77,8 +77,7 @@ get_gdal_installation=function(quiet=FALSE,return_drivers=TRUE,return_versions=T
 		}
 		if(sum(format_checked)==0)
 		{
-			print("No GDAL installations match those drivers...")
-			return(NULL)
+			stop("No GDAL installations match those drivers...")
 		} else
 		{
 			gdal_installation_list=gdal_installation_list[format_checked]

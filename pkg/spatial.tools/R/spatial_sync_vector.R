@@ -15,7 +15,7 @@
 
 spatial_sync_vector <- function(unsynced,reference,verbose=TRUE)
 {
-	require("rgdal")
+#	require("rgdal")
 	new_projection=projection(reference)
 	old_projection=projection(unsynced)
 
@@ -26,6 +26,6 @@ spatial_sync_vector <- function(unsynced,reference,verbose=TRUE)
 	{
 		synced_vector=unsynced
 	}
-	if(verbose){ print(projection(synced_vector)) } 
+	if(verbose){ message(projection(synced_vector)) } 
 	return(synced_vector)
 }

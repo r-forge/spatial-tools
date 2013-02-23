@@ -1,0 +1,36 @@
+add_leading_zeroes      Add Leading Zeroes to a Numeric Vector
+binary_image_write      Writes image data to a flat binary file using
+                        col/row/band positioning.
+build_raster_header     Builds a raster header for a flat binary file.
+create_blank_raster     Create an empty raster and header.
+fix_extent              Forces a list of Raster*s to all have the same
+                        extent.
+focal_hpc               Engine for performing fast, easy to develop
+                        pixel and focal raster calculations with
+                        parallel processing capability.
+getValuesBlock_enhanced
+                        Easier-to-use function for grabbing a block of
+                        data out of a Raster*.
+remove_file_extension   remove_file_extension
+sfQuickInit             Quickly initializes a parallel snowfall cluster
+                        and registers it with foreach.
+sfQuickStop             Quickly stops a parallel snowfall cluster and
+                        deregisters it from foreach.
+spatial_sync_raster     Spatially Sync Rasters
+spatial_sync_vector     Matches a vector's projection to another vector
+                        or raster object's projection.
+subset_raster_by_names
+                        Subsets a raster based on its layer names
+tahoe_highrez.tif       High resolution false color infrared image from
+                        the Lake Tahoe Basin.
+tahoe_highrez_training
+                        Point and polygon files for use with
+                        spatial.tools
+tahoe_lidar_bareearth.tif
+                        Lidar-derived bare earth digital elevation
+                        model from the Lake Tahoe Basin.
+tahoe_lidar_highesthit.tif
+                        Lidar-derived highest hit (aka canopy) digital
+                        elevation model from the Lake Tahoe Basin.
+which.max.simple        Location of Maximum Value
+which.min.simple        Location of Minimum Value

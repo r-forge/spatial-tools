@@ -75,13 +75,11 @@
   formats, including raster and ENVI.
 }
 \examples{
-\dontrun{
 tahoe_highrez <- brick(system.file("external/tahoe_highrez.tif", package="spatial.tools"))
 test_blank_file <- create_blank_raster(reference_raster=tahoe_highrez)
 file.info(test_blank_file)
 test_blank_raster <- create_blank_raster(reference_raster=tahoe_highrez,return_filename=FALSE)
 test_blank_raster
-}
 }
 \author{
   Jonathan A. Greenberg

@@ -2,13 +2,13 @@
 
 focal_hpc_precheck <- function(x,window_dims,window_center,verbose)
 {
-	if(verbose) print("Performing pre-checks...")
+	if(verbose) message("Performing pre-checks...")
 	
 	if(length(window_dims)==1) window_dims=c(window_dims,window_dims)	
 	if(length(window_center)==1) window_center <- c(window_center,window_center)
 	
-	if(verbose) { print(paste("window_dims:",window_dims,sep="")) }
-	if(verbose) { print(paste("window_center:",window_center,sep="")) }
+	if(verbose) { message(paste("window_dims:",window_dims,sep="")) }
+	if(verbose) { message(paste("window_center:",window_center,sep="")) }
 	
 	window_rows=window_dims[2]
 	window_cols=window_dims[1]
@@ -17,12 +17,12 @@ focal_hpc_precheck <- function(x,window_dims,window_center,verbose)
 	
 	if(any(window_dims>1))
 	{
-		if(verbose) print("Focal processing mode...")
+		if(verbose) message("Focal processing mode...")
 		processing_mode="focal"
 		processing_unit="window"
 	} else
 	{
-		if(verbose) print("Pixel processing mode...")
+		if(verbose) message("Pixel processing mode...")
 		processing_mode="pixel"
 		processing_unit="chunk"
 	}
@@ -42,7 +42,7 @@ focal_hpc_test <- function(x,fun,window_center,window_dims,args,
 		startrow_offset,endrow_offset,processing_unit,chunk_format,
 		verbose)
 {
-	if(verbose) { print("Checking the function on a small chunk of data.") }
+	if(verbose) { message("Checking the function on a small chunk of data.") }
 	
 	# Add additional info to the args.
 	if(!is.null(args)) {
@@ -60,13 +60,13 @@ focal_hpc_test <- function(x,fun,window_center,window_dims,args,
 	
 	if(processing_unit=="window")
 	{
-		if(verbose) { print("processing_unit=window...")}
+		if(verbose) { message("processing_unit=window...")}
 		r_check <- getValuesBlock_enhanced(x, r1=1, r2=window_dims[2], c1=1,c2=window_dims[1],
 				format=chunk_format)		
 	} else
 	{
 		# The function works on the entire chunk.
-		if(verbose) { print("processing_unit=chunk...")}
+		if(verbose) { message("processing_unit=chunk...")}
 		r_check <- getValuesBlock_enhanced(x, r1=1, r2=window_dims[2], c1=1,c2=ncol(x),
 				format=chunk_format)
 	}
@@ -90,11 +90,11 @@ focal_hpc_test <- function(x,fun,window_center,window_dims,args,
 				dim(r_check_function)[1] != ncol(x)||
 				dim(r_check_function)[2] != window_dims[2])
 		{
-			print("chunk processing units require array vector outputs.  Please check your function.")
+			message("chunk processing units require array vector outputs.  Please check your function.")
 			stop(dim(r_check_function))
 		} else outbands=dim(r_check_function)[3]
 	}
-	if(verbose) { print(paste("Number of output bands determined to be:",outbands,sep=" ")) }
+	if(verbose) { message(paste("Number of output bands determined to be:",outbands,sep=" ")) }
 	return(outbands)
 }
 
@@ -134,6 +134,11 @@ focal_hpc_chunk_setup <- function(x,window_dims,window_center,
 
 focal_hpc_focal_getChunk <- function(x,tr,format,r,i,r_old,chunkArgs)
 {
+	# Create some blank variables:
+	window_center <- NULL
+	window_dims <- NULL
+	
+	
 	list2env(chunkArgs,envir=environment())
 	
 	startrow_offset <- tr$startrow_offset
@@ -200,6 +205,14 @@ focal_hpc_focal_getChunk <- function(x,tr,format,r,i,r_old,chunkArgs)
 
 focal_hpc_focalChunkFunction <- function(chunk,chunkArgs)
 {	
+	# Create some blank variables:
+	x <- NULL
+	layer_names <- NULL
+	fun <- NULL
+	window_dims <- NULL
+	outbands <- NULL
+	
+	#
 	e <- list2env(chunkArgs,envir=environment())
 	
 	window_index=1:ncol(x)
@@ -284,6 +297,13 @@ focal_hpc_pixelChunkFunction <- function(chunkID,tr,x,
 
 focal_hpc_pixel_processing <- function(tr,chunkArgs)
 {
+	# Create some blank variables:
+	x <- NULL
+	chunk_format <- NULL
+	fun <- NULL
+	layer_names <- NULL
+	outbands <- NULL
+		
 	list2env(chunkArgs,envir=environment())
 	chunkID <- seq(tr$n)
 	foreach(chunkID=chunkID, .packages=c("raster","rgdal","spatial.tools","mmap")) %dopar% 
@@ -293,6 +313,13 @@ focal_hpc_pixel_processing <- function(tr,chunkArgs)
 
 focal_hpc_focal_processing <- function(tr,texture_tr,chunkArgs)
 {
+	# Create some blank variables:
+	verbose <- NULL
+	x <- NULL
+	chunk_format <- NULL
+	chunk <- NULL
+	window_dims <- NULL
+	
 	list2env(chunkArgs,envir=environment())
 	
 	r_old <- NULL
@@ -399,10 +426,11 @@ focal_hpc_focal_processing <- function(tr,texture_tr,chunkArgs)
 #' will run in sequential mode.
 #' 
 #' @examples
+
 #'  tahoe_highrez <- brick(system.file("external/tahoe_highrez.tif", package="spatial.tools"))
 #' # Pixel-based processing:
 #' # Uncomment sfQuickInit()/sfQuickStop() to (potentially) speed this up:
-#' # sfQuickInit()
+#' 	sfQuickInit(cpus=2)
 #' 	ndvi_function <- function(x,...)
 #'	{
 #' 		# Note that x is received by the function as a 3-d array:
@@ -415,8 +443,8 @@ focal_hpc_focal_processing <- function(tr,texture_tr,chunkArgs)
 #'		return(ndvi)
 #'	}
 #'  tahoe_ndvi <- focal_hpc(x=tahoe_highrez,fun=ndvi_function)
-#' # sfQuickStop()
-#' 
+#' sfQuickStop()
+#' \dontrun{ 
 #' # Focal-based processing:
 #' local_smoother <- function(x,...)
 #' {
@@ -427,12 +455,11 @@ focal_hpc_focal_processing <- function(tr,texture_tr,chunkArgs)
 #'	return(smoothed)
 #' }
 #' # Apply the function to a 3x3 window:
-#' # sfQuickInit()
+#' sfQuickInit(cpus=2)
 #' tahoe_3x3_smoothed <- focal_hpc(x=tahoe_highrez,fun=local_smoother,window_dims=c(3,3))
-#' # sfQuickStop()
+#' sfQuickStop()
 #' 
-#' # Example with 7 x 7 window in parallel mode:
-#' \dontrun{ 
+#' # Example with 7 x 7 window in full parallel mode:
 #' sfQuickInit()
 #' tahoe_7x7_smoothed <- focal_hpc(x=tahoe_highrez,fun=local_smoother,window_dims=c(7,7))
 #' sfQuickStop()
@@ -448,11 +475,22 @@ focal_hpc <- function(x,
 		verbose=FALSE) 
 {
 	# Required libraries:
-	require("raster")
-	require("foreach")
-	require("rgdal")
-	require("mmap")
-	require("abind")
+#	require("raster")
+#	require("foreach")
+#	require("rgdal")
+#	require("mmap")
+#	require("abind")
+	
+	# Create some blank variables to avoid warnings:
+
+	layer_names <- NULL
+	startrow_offset <- NULL
+	endrow_offset <- NULL
+	processing_unit <- NULL
+	chunk_nrows <- NULL
+	tr <- NULL
+	processing_mode <- NULL
+	texture_tr <- NULL
 	
 	# Register a sequential backend if one is not already registered:
 	if(!getDoParRegistered()) registerDoSEQ()
@@ -479,7 +517,7 @@ focal_hpc <- function(x,
 			overwrite=overwrite,verbose=verbose)
 	
 	# Create chunk arguments.
-	if(verbose) { print("Loading chunk arguments.") }
+	if(verbose) { message("Loading chunk arguments.") }
 	chunkArgs = list(fun=fun,x=x,x_ncol=ncol(x),tr=tr,
 			window_dims=window_dims,window_center=window_center,
 			layer_names=layer_names,

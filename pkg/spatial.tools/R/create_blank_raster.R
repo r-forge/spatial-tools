@@ -31,13 +31,11 @@
 #' 
 #' @author Jonathan A. Greenberg
 #' @examples
-#' \dontrun{ 
 #' tahoe_highrez <- brick(system.file("external/tahoe_highrez.tif", package="spatial.tools"))
 #' test_blank_file <- create_blank_raster(reference_raster=tahoe_highrez)
 #' file.info(test_blank_file)
 #' test_blank_raster <- create_blank_raster(reference_raster=tahoe_highrez,return_filename=FALSE)
 #' test_blank_raster
-#' }
 #' @export
 create_blank_raster <- function(filename=NULL,
 	format="raster",dataType="FLT8S",bandorder="BSQ",
@@ -56,14 +54,14 @@ create_blank_raster <- function(filename=NULL,
 	if(is.null(filename))
 	{	
 		filename <- tempfile()
-		if(verbose) { print(paste("No output file given, using a tempfile name:",filename,sep=" ")) }
+		if(verbose) { message(paste("No output file given, using a tempfile name:",filename,sep=" ")) }
 		if(!file.exists(tempdir())) dir.create(tempdir())
 	} 
 	
 	if(dataType=="FLT8S") numBytes = 8
 	
 	# I've been warned about using seek on Windows, but this appears to work...
-	if(verbose) { print("Creating empty file.") }
+	if(verbose) { message("Creating empty file.") }
 	out=file(filename,"wb")
 	seek(out,(outdata_ncells-1)*numBytes)
 	writeBin(raw(numBytes),out)
@@ -72,7 +70,7 @@ create_blank_raster <- function(filename=NULL,
 	if(create_header)
 	{
 		# Setup header.
-		if(verbose) { print("Setting up output header.") }
+		if(verbose) { message("Setting up output header.") }
 		if(nlayers > 1) 
 		{ 
 			reference_raster=brick(raster(reference_raster,layer=1),nl=nlayers) 
@@ -84,7 +82,7 @@ create_blank_raster <- function(filename=NULL,
 		}
 		
 		if(format=="raster") { 
-			if(verbose) { print("Outformat is raster.  Appending .gri to filename.") }
+			if(verbose) { message("Outformat is raster.  Appending .gri to filename.") }
 			file.rename(filename,paste(filename,".gri",sep=""))
 			filename=paste(filename,".gri",sep="")
 		}

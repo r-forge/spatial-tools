@@ -15,8 +15,8 @@
 
 sfQuickInit <- function(cpus,...)
 {
-	require("snowfall")
-	require("doSNOW")
+#	require("snowfall")
+#	require("doSNOW")
 	if(missing("cpus"))
 	{
 		cpus <- parallel::detectCores()

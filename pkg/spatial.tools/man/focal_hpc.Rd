@@ -111,7 +111,7 @@
 tahoe_highrez <- brick(system.file("external/tahoe_highrez.tif", package="spatial.tools"))
 # Pixel-based processing:
 # Uncomment sfQuickInit()/sfQuickStop() to (potentially) speed this up:
-# sfQuickInit()
+	sfQuickInit(cpus=2)
 	ndvi_function <- function(x,...)
 	{
 		# Note that x is received by the function as a 3-d array:
@@ -124,8 +124,8 @@ tahoe_highrez <- brick(system.file("external/tahoe_highrez.tif", package="spatia
 		return(ndvi)
 	}
  tahoe_ndvi <- focal_hpc(x=tahoe_highrez,fun=ndvi_function)
-# sfQuickStop()
-
+sfQuickStop()
+\dontrun{
 # Focal-based processing:
 local_smoother <- function(x,...)
 {
@@ -136,12 +136,11 @@ local_smoother <- function(x,...)
 	return(smoothed)
 }
 # Apply the function to a 3x3 window:
-# sfQuickInit()
+sfQuickInit(cpus=2)
 tahoe_3x3_smoothed <- focal_hpc(x=tahoe_highrez,fun=local_smoother,window_dims=c(3,3))
-# sfQuickStop()
+sfQuickStop()
 
-# Example with 7 x 7 window in parallel mode:
-\dontrun{
+# Example with 7 x 7 window in full parallel mode:
 sfQuickInit()
 tahoe_7x7_smoothed <- focal_hpc(x=tahoe_highrez,fun=local_smoother,window_dims=c(7,7))
 sfQuickStop()

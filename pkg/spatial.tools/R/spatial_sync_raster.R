@@ -38,7 +38,7 @@ spatial_sync_raster <- function(unsynced,reference,method="ngb",size_only=FALSE,
 		if((new_extent[1,1] < 0 && old_extent[1,1] >=0) 
 			|| (new_extent[1,1] >= 0 && old_extent[1,1] <0))
 		{
-			if(verbose) { print ("Rotating...") }
+			if(verbose) { message ("Rotating...") }
 			unsynced_rotated=rotate(unsynced)
 		} else
 		{
@@ -53,33 +53,32 @@ spatial_sync_raster <- function(unsynced,reference,method="ngb",size_only=FALSE,
 			res(pr_extent)=res(reference)
 			if(new_projection!=old_projection)
 			{
-				if(verbose) { print("Projecting and resampling...") }
+				if(verbose) { message("Projecting and resampling...") }
 				pr <- projectRaster(unsynced_rotated, pr_extent,method=method)
 			} else
 			{
-				if(verbose) { print("Same projection, resampling only...") }
+				if(verbose) { message("Same projection, resampling only...") }
 				pr <- raster::resample(unsynced_rotated, pr_extent,method=method)
 			}
 		} else
 		{
-			if(verbose) { print("Same projection and pixel size...") }
+			if(verbose) { message("Same projection and pixel size...") }
 			pr=unsynced_rotated
 		}
 		
-		if(verbose) { print("Expanding...") }
+		if(verbose) { message("Expanding...") }
 		expanded_raster=expand(pr,reference)
-		if(verbose) { print("Cropping...") }
+		if(verbose) { message("Cropping...") }
 		synced_raster=crop(expanded_raster,reference)
 	
 		# This in theory shouldn't be neccessary...
-		if(verbose) { print("Fixing extents...") }
+		if(verbose) { message("Fixing extents...") }
 		extent(synced_raster)=extent(reference)
 	} else
 	{
 		if(missing(raster_size))
 		{
-			print("For size_only=TRUE you must set the raster_size as c(ncol,nrow)")
-			return()
+			stop("For size_only=TRUE you must set the raster_size as c(ncol,nrow)")
 		} 
 		
 		unsynced_ncol=ncol(unsynced)

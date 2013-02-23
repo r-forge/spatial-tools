@@ -14,8 +14,8 @@
 
 sfQuickStop <- function(...)
 {
-	require("snowfall")
-	require("foreach")
+#	require("snowfall")
+#	require("foreach")
 	registerDoSEQ()
 	sfStop(...)
 }

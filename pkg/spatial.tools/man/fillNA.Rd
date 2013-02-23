@@ -3,7 +3,7 @@
 \title{fillNA}
 \usage{
   fillNA(x, stopmask = NULL, maxiter = 1000,
-    verbose = FALSE, disable_cl = FALSE, ...)
+    verbose = FALSE, ...)
 }
 \arguments{
   \item{x}{Raster*. Raster* object containing NA values to
@@ -16,9 +16,6 @@
   \item{maxiter}{Numeric. The algorithm is iterative, so if
   you want to have it stop after a certain number of
   iterations, set the value here.  Defaults to 1000.}
-
-  \item{disable_cl}{logical. Disable parallel computing?
-  Default is FALSE.}
 
   \item{verbose}{logical. Enable verbose execution? Default
   is FALSE.}

@@ -3,12 +3,11 @@
 ##' @param x Raster*. Raster* object containing NA values to be filled in.
 ##' @param stopmask Raster*. (Optional) A Raster* mask with 0s at locations x should be filled in, and 1s for locations that should be left alone.
 ##' @param maxiter Numeric. The algorithm is iterative, so if you want to have it stop after a certain number of iterations, set the value here.  Defaults to 1000.
-##' @param disable_cl logical. Disable parallel computing? Default is FALSE. 
 ##' @param verbose logical. Enable verbose execution? Default is FALSE.  
 ##' @param ... Other parameters to pass to 
 ##' @author Jonathan A. Greenberg (\email{spatial.tools@@estarcion.net})
 
-fillNA <- function(x,stopmask=NULL,maxiter=1000,verbose=FALSE,disable_cl=FALSE,...)
+fillNA <- function(x,stopmask=NULL,maxiter=1000,verbose=FALSE,...)
 {
 #	print(disable_cl)
 	if(is.null(stopmask))
@@ -69,7 +68,7 @@ fillNA <- function(x,stopmask=NULL,maxiter=1000,verbose=FALSE,disable_cl=FALSE,.
 	{
 		if(verbose) { print(paste("Iteration #",iter)) }
 		x_focal=focal_hpc(x=x_filled,window_dims=c(3,3),fun=fillNA_function,
-			verbose=verbose,disable_cl=disable_cl)
+			verbose=verbose)
 		if(verbose) { print("Finishing focal...") }
 #		x_focal
 #		if(verbose) { print(summary(x_focal)) }
