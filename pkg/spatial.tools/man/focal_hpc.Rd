@@ -110,8 +110,6 @@
 \examples{
 tahoe_highrez <- brick(system.file("external/tahoe_highrez.tif", package="spatial.tools"))
 # Pixel-based processing:
-# Uncomment sfQuickInit()/sfQuickStop() to (potentially) speed this up:
-	sfQuickInit(cpus=2)
 	ndvi_function <- function(x,...)
 	{
 		# Note that x is received by the function as a 3-d array:
@@ -124,7 +122,6 @@ tahoe_highrez <- brick(system.file("external/tahoe_highrez.tif", package="spatia
 		return(ndvi)
 	}
  tahoe_ndvi <- focal_hpc(x=tahoe_highrez,fun=ndvi_function)
-sfQuickStop()
 \dontrun{
 # Focal-based processing:
 local_smoother <- function(x,...)
