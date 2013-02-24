@@ -16,11 +16,8 @@
   foreach back to sequential mode via registerDoSEQ().
 }
 \examples{
-\dontrun{
-sfQuickInit()
-sfGetCluster()
+sfQuickInit(cpus=2)
 sfQuickStop()
-}
 }
 \author{
   Jonathan A. Greenberg

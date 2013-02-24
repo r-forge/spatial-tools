@@ -121,7 +121,9 @@ tahoe_highrez <- brick(system.file("external/tahoe_highrez.tif", package="spatia
 		ndvi <- array(ndvi,dim=c(dim(x)[1],dim(x)[2],1))
 		return(ndvi)
 	}
+	sfQuickInit(cpus=2)
  tahoe_ndvi <- focal_hpc(x=tahoe_highrez,fun=ndvi_function)
+	sfQuickStop()
 \dontrun{
 # Focal-based processing:
 local_smoother <- function(x,...)

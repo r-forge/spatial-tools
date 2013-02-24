@@ -6,28 +6,30 @@
 #' @seealso \code{\link[snowfall]{sfInit}}
 #' @details (Even more) quickly start a snowfall cluster with maximum available
 #' cpus, parallel = TRUE, and type = "SOCK" and registers it with foreach.  
-#' @examples \dontrun{
-#' sfQuickInit()
-#' sfGetCluster()
+#' @examples 
+#' sfQuickInit(cpus=2)
 #' sfQuickStop()
-#' }
 #' @export
 
 sfQuickInit <- function(cpus,...)
 {
-#	require("snowfall")
-#	require("doSNOW")
+
 	if(missing("cpus"))
 	{
 		cpus <- parallel::detectCores()
 	}
-	sfInit(cpus=cpus,parallel=TRUE,...)
-	if(any(search()=="package:foreach"))
-	{
-		require("doSNOW")
-		cl <- sfGetCluster()
-		registerDoSNOW(cl)
-	}
+	
+	cl <- makeCluster(spec=cpus,type="PSOCK")
+	setDefaultCluster(cl=cl)
+	registerDoParallel(cl)
+	
+#	sfInit(cpus=cpus,parallel=TRUE,...)
+#	if(any(search()=="package:foreach"))
+#	{
+#		require("doSNOW")
+#		cl <- sfGetCluster()
+#		registerDoSNOW(cl)
+#	}
 	return(cl)
 }
 

@@ -20,11 +20,8 @@
   registers it with foreach.
 }
 \examples{
-\dontrun{
-sfQuickInit()
-sfGetCluster()
+sfQuickInit(cpus=2)
 sfQuickStop()
-}
 }
 \author{
   Jonathan A. Greenberg

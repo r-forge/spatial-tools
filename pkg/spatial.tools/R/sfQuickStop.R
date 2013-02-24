@@ -5,19 +5,16 @@
 #' @seealso \code{\link[snowfall]{sfInit}}
 #' @details (Even more) quickly stop a snowfall cluster and sets foreach back
 #' to sequential mode via registerDoSEQ().
-#' @examples \dontrun{
-#' sfQuickInit()
-#' sfGetCluster()
+#' @examples
+#' sfQuickInit(cpus=2)
 #' sfQuickStop()
-#' }
 #' @export
 
 sfQuickStop <- function(...)
 {
-#	require("snowfall")
-#	require("foreach")
+	cl <- parallel:::defaultCluster()
 	registerDoSEQ()
-	sfStop(...)
+	stopCluster(cl)
 }
 
 

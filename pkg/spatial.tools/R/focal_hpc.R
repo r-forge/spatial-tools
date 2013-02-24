@@ -440,7 +440,9 @@ focal_hpc_focal_processing <- function(tr,texture_tr,chunkArgs)
 #' 		ndvi <- array(ndvi,dim=c(dim(x)[1],dim(x)[2],1))
 #'		return(ndvi)
 #'	}
+#' 	sfQuickInit(cpus=2)
 #'  tahoe_ndvi <- focal_hpc(x=tahoe_highrez,fun=ndvi_function)
+#' 	sfQuickStop()
 #' \dontrun{ 
 #' # Focal-based processing:
 #' local_smoother <- function(x,...)
