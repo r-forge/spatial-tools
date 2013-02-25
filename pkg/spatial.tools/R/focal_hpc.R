@@ -67,7 +67,8 @@ focal_hpc_test <- function(x,fun,window_center,window_dims,args,
 	{
 		# The function works on the entire chunk.
 		if(verbose) { message("processing_unit=chunk...")}
-		r_check <- getValuesBlock_enhanced(x, r1=1, r2=window_dims[2], c1=1,c2=ncol(x),
+		r_check <- getValuesBlock_enhanced(x, r1=1, r2=window_dims[2], 
+				c1=1,c2=window_dims[1],
 				format=chunk_format)
 	}
 	
@@ -87,7 +88,7 @@ focal_hpc_test <- function(x,fun,window_center,window_dims,args,
 	if(processing_unit=="chunk")
 	{
 		if(class(r_check_function)!="array" || 
-				dim(r_check_function)[1] != ncol(x)||
+				dim(r_check_function)[1] != window_dims[1] ||
 				dim(r_check_function)[2] != window_dims[2])
 		{
 			message("chunk processing units require array vector outputs.  Please check your function.")
@@ -99,14 +100,18 @@ focal_hpc_test <- function(x,fun,window_center,window_dims,args,
 }
 
 focal_hpc_chunk_setup <- function(x,window_dims,window_center,
-		chunk_nrows,startrow_offset,endrow_offset,minblocks)
+		chunk_nrows,startrow_offset,endrow_offset,minblocks,verbose)
 {
 	nodes <- getDoParWorkers() 
+	if(minblocks=="max" ) minblocks <- nodes
+	
 #	tr=blockSize(x,chunksize=(chunk_nrows*nodes+(window_dims[2]-1))*ncol(x))
 	
 	tr=blockSize(x,n=nlayers(x),minrows=window_dims[2],minblocks=minblocks)
 	
 	if (tr$n < nodes) nodes <- tr$n
+	
+	if(verbose) message(paste("Total number of blocks to process:",tr$n))
 	
 	tr$row2 <- tr$row + tr$nrows - 1
 	
@@ -137,7 +142,6 @@ focal_hpc_focal_getChunk <- function(x,tr,format,r,i,r_old,chunkArgs)
 	# Create some blank variables:
 	window_center <- NULL
 	window_dims <- NULL
-	
 	
 	list2env(chunkArgs,envir=environment())
 	
@@ -306,7 +310,7 @@ focal_hpc_pixel_processing <- function(tr,chunkArgs)
 	
 	list2env(chunkArgs,envir=environment())
 	chunkID <- seq(tr$n)
-	foreach(chunkID=chunkID, .packages=c("raster","rgdal","spatial.tools","mmap")) %dopar% 
+	foreach(chunkID=chunkID, .packages=c("raster","rgdal","spatial.tools","mmap"),.verbose=verbose) %dopar% 
 			spatial.tools:::focal_hpc_pixelChunkFunction(chunkID,tr,x,chunk_format,fun,args,layer_names,outbands,
 					filename)
 }
@@ -359,7 +363,8 @@ focal_hpc_focal_processing <- function(tr,texture_tr,chunkArgs)
 				SIMPLIFY=FALSE)
 		
 #		browser()
-		foreach(chunk=chunkList, .packages=c("raster","rgdal","spatial.tools","mmap")) %dopar% 
+		foreach(chunk=chunkList, .packages=c("raster","rgdal","spatial.tools","mmap"),
+						.verbose=verbose) %dopar% 
 				spatial.tools:::focal_hpc_focalChunkFunction(chunk,chunkArgs)
 		
 		if(i<tr$n && window_dims[2] > 1)
@@ -472,7 +477,7 @@ focal_hpc <- function(x,
 		window_dims=c(1,1), 
 		window_center=c(ceiling(window_dims[1]/2),ceiling(window_dims[2]/2)),
 		filename=NULL, overwrite=FALSE,outformat="raster",
-		chunk_format="array",minblocks=1,
+		chunk_format="array",minblocks="max",
 		verbose=FALSE) 
 {
 	# Required libraries:

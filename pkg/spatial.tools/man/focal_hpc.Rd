@@ -6,7 +6,7 @@
     window_center = c(ceiling(window_dims[1]/2), ceiling(window_dims[2]/2)),
     filename = NULL, overwrite = FALSE,
     outformat = "raster", chunk_format = "array",
-    minblocks = 1, verbose = FALSE)
+    minblocks = "max", verbose = FALSE)
 }
 \arguments{
   \item{x}{Raster*. A Raster* used as the input into the
@@ -121,9 +121,11 @@ tahoe_highrez <- brick(system.file("external/tahoe_highrez.tif", package="spatia
 		ndvi <- array(ndvi,dim=c(dim(x)[1],dim(x)[2],1))
 		return(ndvi)
 	}
+
 	sfQuickInit(cpus=2)
  tahoe_ndvi <- focal_hpc(x=tahoe_highrez,fun=ndvi_function)
 	sfQuickStop()
+
 \dontrun{
 # Focal-based processing:
 local_smoother <- function(x,...)

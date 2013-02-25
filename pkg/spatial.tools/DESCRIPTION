@@ -8,8 +8,8 @@ Author: Jonathan Asher Greenberg
 Description: Spatial functions meant to enhance the core functionality of the
     package "raster", including a parallel processing engine for use with
     rasters.
-Version: 0.9.4
-Date: 2013-02-24
+Version: 0.9.5
+Date: 2013-02-25
 Depends:
     raster,
     rgdal,
@@ -39,7 +39,7 @@ Collate:
     'subset_raster_by_names.R'
     'sfQuickInit.R'
     'raster_to_tile.R'
-    'rasterToPolygons_hpc.R'
     'create_blank_raster.R'
     'sfQuickStop.R'
     'get_gdal_installation.R'
+    'projectRaster_areal.R'
