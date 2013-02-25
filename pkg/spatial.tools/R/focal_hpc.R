@@ -303,7 +303,7 @@ focal_hpc_pixel_processing <- function(tr,chunkArgs)
 	fun <- NULL
 	layer_names <- NULL
 	outbands <- NULL
-		
+	
 	list2env(chunkArgs,envir=environment())
 	chunkID <- seq(tr$n)
 	foreach(chunkID=chunkID, .packages=c("raster","rgdal","spatial.tools","mmap")) %dopar% 
@@ -440,9 +440,11 @@ focal_hpc_focal_processing <- function(tr,texture_tr,chunkArgs)
 #' 		ndvi <- array(ndvi,dim=c(dim(x)[1],dim(x)[2],1))
 #'		return(ndvi)
 #'	}
+#' 
 #' 	sfQuickInit(cpus=2)
 #'  tahoe_ndvi <- focal_hpc(x=tahoe_highrez,fun=ndvi_function)
 #' 	sfQuickStop()
+#' 
 #' \dontrun{ 
 #' # Focal-based processing:
 #' local_smoother <- function(x,...)
@@ -481,7 +483,7 @@ focal_hpc <- function(x,
 #	require("abind")
 	
 	# Create some blank variables to avoid warnings:
-
+	
 	layer_names <- NULL
 	startrow_offset <- NULL
 	endrow_offset <- NULL
