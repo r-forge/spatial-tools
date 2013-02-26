@@ -16,8 +16,8 @@
 #' 
 #' A word of warning: this algorithm is SLOW.  The function uses focal_hpc, so we 
 #' highly recommend using it with a foreach engine running (e.g. use sfQuickInit() ).
-#' Keep in mind this is a "dirty" parallel problem, so different chunks execute at
-#' different speeds.
+#' Keep in mind this is a "dirty" parallel problem, so different chunks may execute at
+#' different speeds and have different memory footprints.
 #' 
 #' @export
 
@@ -25,6 +25,7 @@ projectRaster_areal <- function(from,to,method="mode",verbose=FALSE)
 {
 	chunk_function <- function(x,from,method,...)
 	{
+		gc()
 		chunk_vector <- rasterToPolygons(x,na.rm=FALSE,n=16)
 		chunk_vector_reproject <- spTransform(chunk_vector,CRS(projection(from)))
 		chunk_vector_extract <- extract(from,chunk_vector_reproject,weights=TRUE,na.rm=FALSE)
@@ -43,5 +44,5 @@ projectRaster_areal <- function(from,to,method="mode",verbose=FALSE)
 		return(array(chunk_vector_extract_area,dim=c(dim(x)[2],dim(x)[1],1)))
 	}
 	return(focal_hpc(x=raster(to,layer=1),fun=chunk_function,args=list(from=from,method=method),
-					chunk_format="raster",verbose=verbose))
+					chunk_format="raster",blocksize=1,verbose=verbose))
 }
