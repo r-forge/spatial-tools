@@ -36,7 +36,7 @@ extract_enhanced_reproj <- function(x,y,verbose)
 extract_enhanced_data.frame <- function(x,y_reproj,fun,verbose)
 {
 	extract_enhanced_one_raster <- function(raster_vector_combinations,
-		x,y_reproj,verbose)
+			x,y_reproj,verbose)
 	{
 		current_raster <- as.numeric(raster_vector_combinations[1])
 		current_vector <- as.numeric(raster_vector_combinations[2])
@@ -45,15 +45,15 @@ extract_enhanced_data.frame <- function(x,y_reproj,fun,verbose)
 		y_reproj_id <- which(names(y_reproj[[current_vector]])==projection(x[[current_raster]]))
 		
 		extracted_data <- extract(x=x[[current_raster]],
-			y=y_reproj[[current_vector]][[y_reproj_id]],fun=fun,df=TRUE)
+				y=y_reproj[[current_vector]][[y_reproj_id]],fun=fun,df=TRUE)
 		
 		return(extracted_data)
 	}
 	
 	raster_vector_combinations <- expand.grid(list(seq(x),seq(y_reproj)))
 	extracted_data_list <- foreach(raster_vector_combinations-raster_vector_combinations,
-		.packages=c("raster"),.verbose=verbose) %dopar% 
-		extract_enhanced_one_raster(raster_vector_combinations,x,y_reproj,verbose)
+					.packages=c("raster"),.verbose=verbose) %dopar% 
+			extract_enhanced_one_raster(raster_vector_combinations,x,y_reproj,verbose)
 	
 	return(extracted_data_list)
 	
@@ -82,36 +82,51 @@ extract_enhanced_core <- function(raster,vector,
 	{
 		if(outformat=="matrix") df=FALSE else df=TRUE
 		extracted_data <- extract(x=raster,y=vector_reproj,
-			method=method,buffer=buffer,small=small,
-			fun=fun,na.rm=na.rm,
-			cellnumbers=cellnumbers,
-			df=df,
-			weights=weights,factors=factors,
-			layer=layer,nl=nl)
+				method=method,buffer=buffer,small=small,
+				fun=fun,na.rm=na.rm,
+				cellnumbers=cellnumbers,
+				df=df,
+				weights=weights,factors=factors,
+				layer=layer,nl=nl)
 #		if(class(vector_reproj)==)
-	
+		
 		if(outformat=="matrix") return(extracted_data)
 		
 		if(outformat=="Spatial" | outformat=="data.frames")
 		{
 			if(class(vector_reproj)=="SpatialPointsDataFrame" |
-				class(vector_reproj)=="SpatialLinesDataFrame" |
-				class(vector_reproj)=="SpatialPolygonsDataFrame")
+					class(vector_reproj)=="SpatialLinesDataFrame" |
+					class(vector_reproj)=="SpatialPolygonsDataFrame")
 			{
+				# Extract and merge with Spatial*DataFrame
 				SpatialDataFrame <- vector_reproj@data
 				extracted_data <- merge(SpatialDataFrame,extracted_data,all=TRUE)
-			}
-			if(outformat=="Spatial")
-			{
-				
+				if(outformat=="Spatial")
+				{
+					outvector <- vector
+					outvector@data <- extracted_data
+					return(outvector)
+				} else
+				{
+					return(extracted_data)
+				}
 			} else
 			{
-				return(extracted_data)
+				if(outformat=="Spatial")
+				{
+					outvector <- vector
+					outvector@data <- extracted_data
+					return(outvector)
+				} else
+				{
+					return(extracted_data)
+				}
 			}
 			
+			
 		}
-	
-	
+		
+		
 	}
 	# Minirasters here
 	

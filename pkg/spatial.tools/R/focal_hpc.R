@@ -251,7 +251,6 @@ focal_hpc_focalChunkFunction <- function(chunk,chunkArgs)
 			chunk$row_center,
 			1:outbands
 	)
-	
 	writeSuccess <- FALSE
 	while(!writeSuccess)
 	{
