@@ -8,8 +8,8 @@ Author: Jonathan Asher Greenberg
 Description: Spatial functions meant to enhance the core functionality of the
     package "raster", including a parallel processing engine for use with
     rasters.
-Version: 0.9.5
-Date: 2013-02-25
+Version: 0.9.6
+Date: 2013-03-20
 Depends:
     raster,
     rgdal,
@@ -19,6 +19,7 @@ Depends:
     parallel,
     foreach,
     doParallel,
+    rgeos,
     R (>= 2.15.2)
 Collate:
     'spatial_sync_vector.R'
