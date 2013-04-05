@@ -6,7 +6,7 @@
     window_center = c(ceiling(window_dims[1]/2), ceiling(window_dims[2]/2)),
     filename = NULL, overwrite = FALSE,
     outformat = "raster", chunk_format = "array",
-    minblocks = "max", verbose = FALSE)
+    minblocks = "max", blocksize = NULL, verbose = FALSE)
 }
 \arguments{
   \item{x}{Raster*. A Raster* used as the input into the
@@ -32,6 +32,10 @@
 
   \item{minblocks}{Numeric. The minimum number of chunks to
   divide the raster into for processing.  Defaults to 1.}
+
+  \item{blocksize}{Numeric. The size (in rows) for a block
+  of data.  If unset, focal_hpc will attempt to figure out
+  an optimal blocksize.}
 
   \item{filename}{character. Filename of the output
   raster.}

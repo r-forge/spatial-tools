@@ -27,7 +27,7 @@ extract_enhanced_reproj <- function(x,y,verbose)
 		names(y_reproj) <- x_proj_unique
 		return(y_reproj)
 	}
-	
+	i=NULL
 	y_reproj <- foreach(i=y,.packages=c("sp","raster")) %dopar%
 			extract_enhanced_reprojFunction(i,x_proj_unique)
 	return(y_reproj)
@@ -156,8 +156,7 @@ extract_enhanced <- function(x,y,
 	
 	return(extracted_data_list)
 }
-require("spatial.tools")
-x <- brick(system.file("external/tahoe_highrez.tif", package="spatial.tools"))
-y <- readOGR(dsn=system.file("external", package="spatial.tools"),layer="tahoe_highrez_training_points_utm")
-debug(extract_enhanced_core)
-extract_enhanced_core(raster=x,vector=y)
+#require("spatial.tools")
+#x <- brick(system.file("external/tahoe_highrez.tif", package="spatial.tools"))
+#y <- readOGR(dsn=system.file("external", package="spatial.tools"),layer="tahoe_highrez_training_points_utm")
+#extract_enhanced_core(raster=x,vector=y)

@@ -111,7 +111,7 @@ focal_hpc_chunk_setup <- function(x,window_dims,window_center,
 		tr=blockSize(x,n=nlayers(x),minrows=window_dims[2],minblocks=minblocks)
 	else
 		tr=blockSize(x,chunksize=ncol(x)*blocksize*nlayers(x),
-			n=nlayers(x),minrows=window_dims[2],minblocks=minblocks)
+				n=nlayers(x),minrows=window_dims[2],minblocks=minblocks)
 	
 	if (tr$n < nodes) nodes <- tr$n
 	
@@ -213,6 +213,7 @@ focal_hpc_focal_getChunk <- function(x,tr,format,r,i,r_old,chunkArgs)
 
 focal_hpc_focalChunkFunction <- function(chunk,chunkArgs)
 {	
+#	browser()
 	# Create some blank variables:
 	x <- NULL
 	layer_names <- NULL
@@ -229,7 +230,7 @@ focal_hpc_focalChunkFunction <- function(chunk,chunkArgs)
 							mapply(
 									function(window_index,chunk,args,window_dims)
 									{
-										x_array=chunk[(window_index:(window_index+window_dims[2]-1)),,]									
+										x_array=chunk[(window_index:(window_index+window_dims[2]-1)),,,drop=FALSE]									
 										dimnames(x_array) <- vector(mode="list",length=3)
 										if(!is.null(layer_names)) dimnames(x_array)[[3]]=layer_names
 										
@@ -264,7 +265,6 @@ focal_hpc_focalChunkFunction <- function(chunk,chunkArgs)
 }
 
 
-
 focal_hpc_focal_processing <- function(tr,texture_tr,chunkArgs)
 {
 	# Create some blank variables:
@@ -296,7 +296,7 @@ focal_hpc_focal_processing <- function(tr,texture_tr,chunkArgs)
 					{
 #						processing_chunk=array(data=as.vector(r[,texture_tr$row[j]:texture_tr$row2[j],]),
 #								dim=c(dim(r)[1],length(texture_tr$row[j]:texture_tr$row2[j]),dim(r)[3]))
-						processing_chunk=r[,texture_tr$row[j]:texture_tr$row2[j],]
+						processing_chunk=r[,texture_tr$row[j]:texture_tr$row2[j],,drop=FALSE]
 					}
 					if(chunk_format=="raster")
 					{
@@ -315,7 +315,7 @@ focal_hpc_focal_processing <- function(tr,texture_tr,chunkArgs)
 #		browser()
 		foreach(chunk=chunkList, .packages=c("raster","rgdal","spatial.tools","mmap"),
 						.verbose=verbose) %dopar% 
-				spatial.tools:::focal_hpc_focalChunkFunction(chunk,chunkArgs)
+			spatial.tools:::focal_hpc_focalChunkFunction(chunk,chunkArgs)
 		
 		if(i<tr$n && window_dims[2] > 1)
 			r_old=array(data=r[,(dim(r)[2]-(tr$focal_row2[i]-tr$focal_row[i+1])):dim(r)[2],],
@@ -521,7 +521,8 @@ focal_hpc <- function(x,
 					x=x,window_dims=window_dims,window_center=window_center,
 					chunk_nrows=chunk_nrows,startrow_offset=startrow_offset,
 					endrow_offset=endrow_offset,
-					minblocks=minblocks,blocksize=blocksize,
+					minblocks=minblocks,
+					blocksize=blocksize,
 					verbose=verbose),
 			envir=environment())
 	
