@@ -330,13 +330,15 @@ focal_hpc_focal_processing <- function(tr,texture_tr,chunkArgs)
 focal_hpc_pixelChunkFunction <- function(chunkID,tr,x,
 		chunk_format,fun,fun_args,layer_names,outbands,filename)
 {
+	
 	# Seeing some memory creep, hopefully this will help:
-	gc()
+	# gc()
 	# Read the chunk
 	r <- getValuesBlock_enhanced(x,r1=tr$row[chunkID],r2=tr$row2[chunkID],
 			c1=1,c2=ncol(x),format=chunk_format)
 	
 	fun_args$x=r
+	
 	if(chunk_format=="array")
 	{
 		dimnames(fun_args$x)=vector(mode="list",length=3)
@@ -387,7 +389,7 @@ focal_hpc_pixel_processing <- function(tr,chunkArgs)
 #' Engine for performing fast, easy to develop pixel and focal raster calculations with parallel processing capability.
 #' @param x Raster*. A Raster* used as the input into the function.  Multiple inputs should be stacked together.
 #' @param fun function. A focal function to be applied to the image. See Details.
-#' @param args list. Arguments to pass to the function (see ?mapply).
+#' @param args list. Arguments to pass to the function (see ?mapply).  Note that the 'fun' should explicitly name the variables.
 #' @param window_dims Vector. The size of a processing window in col x row order.  Be default, a single pixel (c(1,1).
 #' @param window_center Vector. The local coordinate of the center of a processing window.  By default the middle of the processing window.  UNSUPPORTED.
 #' @param chunk_format Character. The format to send the chunk to the function.  Can be "array" (default) or "raster".
@@ -513,7 +515,8 @@ focal_hpc <- function(x,
 	list2env(spatial.tools:::focal_hpc_precheck(x,window_dims,window_center,verbose),envir=environment())
 	
 	# Test focal_hpc and determine the number of outbands.
-	outbands <- spatial.tools:::focal_hpc_test(x,fun,window_center,window_dims,args,layer_names,
+	outbands <- 
+	spatial.tools:::focal_hpc_test(x,fun,window_center,window_dims,args,layer_names,
 			startrow_offset,endrow_offset,processing_unit,chunk_format,verbose)
 	
 	# Set up chunking parameters.
