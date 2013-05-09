@@ -16,7 +16,8 @@
   the image. See Details.}
 
   \item{args}{list. Arguments to pass to the function (see
-  ?mapply).}
+  ?mapply).  Note that the 'fun' should explicitly name the
+  variables.}
 
   \item{window_dims}{Vector. The size of a processing
   window in col x row order.  Be default, a single pixel

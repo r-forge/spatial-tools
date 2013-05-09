@@ -78,10 +78,10 @@ spatial_sync_raster <- function(unsynced,reference,method="ngb",
 		extent(synced_raster)=extent(reference)
 	} else
 	{
-		if(missing(raster_size))
-		{
-			stop("For size_only=TRUE you must set the raster_size as c(ncol,nrow)")
-		} 
+#		if(missing(raster_size))
+#		{
+#			stop("For size_only=TRUE you must set the raster_size as c(ncol,nrow)")
+#		} 
 		
 		unsynced_ncol=ncol(unsynced)
 		unsynced_nrow=nrow(unsynced)
@@ -97,10 +97,10 @@ spatial_sync_raster <- function(unsynced,reference,method="ngb",
 		extent(synced_raster)=full_extent
 		res(synced_raster)=c(1,1)
 	}
-	if(!missing(filename))
-	{
-		writeRaster(synced_raster,...)
-	}
+#	if(!missing(filename))
+#	{
+#		writeRaster(synced_raster,...)
+#	}
 	return(synced_raster)
 	
 }

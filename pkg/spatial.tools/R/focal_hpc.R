@@ -488,6 +488,7 @@ focal_hpc <- function(x,
 		window_center=c(ceiling(window_dims[1]/2),ceiling(window_dims[2]/2)),
 		filename=NULL, overwrite=FALSE,outformat="raster",
 		chunk_format="array",minblocks="max",blocksize=NULL,
+		force_stack_to_brick=FALSE,
 		verbose=FALSE) 
 {
 	# Required libraries:
@@ -507,6 +508,13 @@ focal_hpc <- function(x,
 	tr <- NULL
 	processing_mode <- NULL
 	texture_tr <- NULL
+	
+	# Hack for slow crop on stack
+	if(force_stack_to_brick && class(x)=="RasterStack")
+	{
+		if(verbose) message("Pre-converting the RasterStack to RasterBrick.")
+		x <- writeRaster(x,filename=tempfile())
+	}
 	
 	# Register a sequential backend if one is not already registered:
 	if(!getDoParRegistered()) registerDoSEQ()

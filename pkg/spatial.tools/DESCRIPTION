@@ -49,3 +49,4 @@ Collate:
     'is.Raster.R'
     'raster_to_filenames.R'
     'bbox_to_SpatialPolygons.R'
+    'crop_stack.R'
