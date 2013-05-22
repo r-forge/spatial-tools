@@ -6,6 +6,7 @@ focal_hpc_precheck <- function(x,window_dims,window_center,verbose)
 	
 	if(length(window_dims)==1) window_dims=c(window_dims,window_dims)	
 	if(length(window_center)==1) window_center <- c(window_center,window_center)
+	if(is.na(window_center[2])) window_center[2] <- ceiling(window_dims[2]/2)
 	
 	if(verbose) { message(paste("window_dims:",window_dims,sep="")) }
 	if(verbose) { message(paste("window_center:",window_center,sep="")) }
@@ -219,10 +220,23 @@ focal_hpc_focalChunkFunction <- function(chunk,chunkArgs)
 	layer_names <- NULL
 	fun <- NULL
 	window_dims <- NULL
+	# window_center <- NULL
 	outbands <- NULL
 	
 	#
 	e <- list2env(chunkArgs,envir=environment())
+	
+	# Add additional info to the args.
+	if(!is.null(args)) {
+		args$window_center=window_center
+		args$window_dims=window_dims
+		args$layer_names=layer_names
+	} else
+	{
+		args=list(window_center=window_center)
+		args$window_dims=window_dims
+		args$layer_names=layer_names
+	}
 	
 	window_index=1:ncol(x)
 	r_out=
@@ -510,12 +524,12 @@ focal_hpc <- function(x,
 	texture_tr <- NULL
 	
 	# Hack for slow crop on stack
-	if(force_stack_to_brick && class(x)=="RasterStack")
-	{
-		if(verbose) message("Pre-converting the RasterStack to RasterBrick.")
-		x <- writeRaster(x,filename=tempfile())
-	}
-	
+#	if(force_stack_to_brick && class(x)=="RasterStack")
+#	{
+#		if(verbose) message("Pre-converting the RasterStack to RasterBrick.")
+#		x <- writeRaster(x,filename=tempfile())
+#	}
+#	
 	# Register a sequential backend if one is not already registered:
 	if(!getDoParRegistered()) registerDoSEQ()
 	

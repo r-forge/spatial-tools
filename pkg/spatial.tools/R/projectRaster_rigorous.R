@@ -21,11 +21,12 @@
 #' 
 #' @export
 
-projectRaster_areal <- function(from,to,method="mode",verbose=FALSE)
+projectRaster_rigorous <- function(from,to,method="mode",na.rm=FALSE,verbose=FALSE)
 {
-	chunk_function <- function(x,from,method,...)
+	chunk_function <- function(x,from,method,na.rm,...)
 	{
-		gc()
+#		gc()
+		# This should be changed and the polys made "manually":
 		chunk_vector <- rasterToPolygons(x,na.rm=FALSE,n=16)
 		chunk_vector_reproject <- spTransform(chunk_vector,CRS(projection(from)))
 		chunk_vector_extract <- extract(from,chunk_vector_reproject,weights=TRUE,na.rm=FALSE)
@@ -41,8 +42,23 @@ projectRaster_areal <- function(from,to,method="mode",verbose=FALSE)
 							}
 					)
 		}
+		
+		if(method=="mean")
+		{
+			chunk_vector_extract_area <- 
+					sapply(chunk_vector_extract,
+							function(x,na.rm)
+							{
+								return(weighted.mean(x[,1],x[,2],na.rm))
+#								sum_class<-tapply(x[,2],x[,1],sum)
+#								class_names <- names(sum_class)
+#								return(as.numeric(class_names[which.max(sum_class)]))
+							},na.rm=na.rm
+					)
+		}
+		
 		return(array(chunk_vector_extract_area,dim=c(dim(x)[2],dim(x)[1],1)))
 	}
-	return(focal_hpc(x=raster(to,layer=1),fun=chunk_function,args=list(from=from,method=method),
+	return(focal_hpc(x=raster(to,a=1),fun=chunk_function,args=list(from=from,method=method,na.rm=na.rm),
 					chunk_format="raster",blocksize=1,verbose=verbose))
 }

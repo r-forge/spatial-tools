@@ -6,6 +6,7 @@
 ##' @param verbose logical. Enable verbose execution? Default is FALSE.  
 ##' @param ... Other parameters to pass to 
 ##' @author Jonathan A. Greenberg (\email{spatial.tools@@estarcion.net})
+#' @export
 
 fillNA <- function(x,stopmask=NULL,maxiter=1000,verbose=FALSE,...)
 {
@@ -31,7 +32,7 @@ fillNA <- function(x,stopmask=NULL,maxiter=1000,verbose=FALSE,...)
 	
 	iter=1
 	x_filled=x
-	if(summary_x[NAs_idx]>0)
+	if(length(summary_x[NAs_idx])!=0)
 	{
 		noNAs=FALSE
 	} else
@@ -44,7 +45,7 @@ fillNA <- function(x,stopmask=NULL,maxiter=1000,verbose=FALSE,...)
 	fillNA_function=function(x,window_center,...)
 	{
 		# Only works for single layers right now
-#		print(window_center)
+		print(window_center)
 		x_center=x[window_center[1],window_center[2],]
 		if(is.na(x_center))
 		{
@@ -52,18 +53,23 @@ fillNA <- function(x,stopmask=NULL,maxiter=1000,verbose=FALSE,...)
 			x_vector_mean=mean(x_vector,na.rm=TRUE)
 			if(is.nan(x_vector_mean))
 			{
-				return(NA)
+				# print("NA")
+				return(as.numeric(NA))
 			} else
 			{
+				# print("xvecmean")
 				return(x_vector_mean)
 			}
 		} else
 		{
+			# print("xcen")
 			return(x_center)
 		}
 	}
 		
-		
+	print(iter)
+	print(maxiter)
+	print(noNAs)
 	while(iter <= maxiter && noNAs!="TRUE")
 	{
 		if(verbose) { print(paste("Iteration #",iter)) }
@@ -73,7 +79,8 @@ fillNA <- function(x,stopmask=NULL,maxiter=1000,verbose=FALSE,...)
 #		x_focal
 #		if(verbose) { print(summary(x_focal)) }
 		x_NA_mask=is.na(x_filled)
-		x_filled[x_NA_mask]=x_focal[x_NA_mask]
+		x_filled <- (x_NA_mask*x_focal)+((x_NA_mask==0)*x_filled)
+#		[x_NA_mask]=x_focal[x_NA_mask]
 	
 		if(is.null(stopmask))
 		{
@@ -108,6 +115,5 @@ fillNA <- function(x,stopmask=NULL,maxiter=1000,verbose=FALSE,...)
 #	{
 #		x_filled[initial_mask==0]=NA
 #	}
-
 	return(x_filled)
 }

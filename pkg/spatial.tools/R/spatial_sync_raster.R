@@ -73,7 +73,7 @@ spatial_sync_raster <- function(unsynced,reference,method="ngb",
 		if(verbose) { message("Cropping...") }
 		synced_raster=crop(expanded_raster,reference)
 	
-		# This in theory shouldn't be neccessary...
+		# This in theory shouldn't be neccesasary...
 		if(verbose) { message("Fixing extents...") }
 		extent(synced_raster)=extent(reference)
 	} else
