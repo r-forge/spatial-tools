@@ -59,6 +59,14 @@ projectRaster_rigorous <- function(from,to,method="mode",na.rm=FALSE,verbose=FAL
 		
 		return(array(chunk_vector_extract_area,dim=c(dim(x)[2],dim(x)[1],1)))
 	}
-	return(focal_hpc(x=raster(to,a=1),fun=chunk_function,args=list(from=from,method=method,na.rm=na.rm),
+	if(class(to)!="RasterLayer")
+	{
+		x <- raster(to,layer=1)
+	} else
+	{
+		x <- to
+	}
+	
+	return(focal_hpc(x=x,fun=chunk_function,args=list(from=from,method=method,na.rm=na.rm),
 					chunk_format="raster",blocksize=1,verbose=verbose))
 }

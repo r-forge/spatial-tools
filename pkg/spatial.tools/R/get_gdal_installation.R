@@ -1,7 +1,7 @@
 # Cribbed from the MODIS package with mods for spatial.tools
 
 get_gdal_installation=function(quiet=FALSE,return_drivers=TRUE,return_versions=TRUE,
-		check_for_drivers,check_for_python_utilities=TRUE)
+		check_for_drivers,check_for_python_utilities=TRUE,verbose=FALSE)
 {
 	if (.Platform$OS=="unix")
 	{    
@@ -39,29 +39,40 @@ get_gdal_installation=function(quiet=FALSE,return_drivers=TRUE,return_versions=T
 			setwd(gdal_paths[i])
 			gdal_installation_list[[i]]$gdal_path=getwd()
 			gdal <- shell(cmd,intern=TRUE)
-			version=strsplit(strsplit(gdal,",")[[1]][1]," ")[[1]][2]
-			
-			gdal_installation_list[[i]]$version=version
-			if(return_drivers)
+			if(length(grep(glob2rx("GDAL*"),gdal)) != 0)
 			{
-				drivers_raw=shell("gdalinfo --formats",intern=TRUE)
-				drivers=strsplit(drivers_raw,":")
-				driver_names=gsub("^ ","",sapply(drivers,function(x) { x[2] })) # Need to remove spaces
-				driver_codes_perm=strsplit(sapply(drivers,function(x) { x[1] }),"\\(")
-				driver_codes=gsub(" ","",sapply(driver_codes_perm,function(x) { x[1] }),fixed=TRUE)
-				driver_perm=gsub("\\)","",sapply(driver_codes_perm,function(x) { x[2] }))
-				drivers_dataframe=data.frame(format_code=driver_codes,format_rw=driver_perm,format_name=driver_names)
 				
-				drivers_dataframe=drivers_dataframe[2:dim(drivers_dataframe)[1],]
-				gdal_installation_list[[i]]$drivers=drivers_dataframe
-			}
-			if(check_for_python_utilities)
-			{
-				gdal_installation_list[[i]]$python_utilities <- dir(pattern=".py") 
+				version=strsplit(strsplit(gdal,",")[[1]][1]," ")[[1]][2]
+				
+				gdal_installation_list[[i]]$version=version
+				if(return_drivers)
+				{
+					drivers_raw=shell("gdalinfo --formats",intern=TRUE)
+					drivers=strsplit(drivers_raw,":")
+					driver_names=gsub("^ ","",sapply(drivers,function(x) { x[2] })) # Need to remove spaces
+					driver_codes_perm=strsplit(sapply(drivers,function(x) { x[1] }),"\\(")
+					driver_codes=gsub(" ","",sapply(driver_codes_perm,function(x) { x[1] }),fixed=TRUE)
+					driver_perm=gsub("\\)","",sapply(driver_codes_perm,function(x) { x[2] }))
+					drivers_dataframe=data.frame(format_code=driver_codes,format_rw=driver_perm,format_name=driver_names)
+					
+					drivers_dataframe=drivers_dataframe[2:dim(drivers_dataframe)[1],]
+					gdal_installation_list[[i]]$drivers=drivers_dataframe
+				}
+				if(check_for_python_utilities)
+				{
+					gdal_installation_list[[i]]$python_utilities <- dir(pattern=".py") 
 					# file.exists("gdal_polygonize.py")
+				}
+			} else
+			{
+				# Broken install
+				if(verbose) message(paste("Probably broken install of gdal at ",
+					gdal_installation_list[[i]]$gdal_path),sep="")
+				gdal_installation_list[[i]]$version=NULL
+				gdal_installation_list[[i]]$drivers=NULL
+				gdal_installation_list[[i]]$python_utilities=NULL
 			}
 		}
-		
 		setwd(current_dir)
 		
 	}
@@ -77,7 +88,8 @@ get_gdal_installation=function(quiet=FALSE,return_drivers=TRUE,return_versions=T
 		}
 		if(sum(format_checked)==0)
 		{
-			stop("No GDAL installations match those drivers...")
+			if(verbose) message("No GDAL installations match those drivers...")
+			return(NULL)
 		} else
 		{
 			gdal_installation_list=gdal_installation_list[format_checked]

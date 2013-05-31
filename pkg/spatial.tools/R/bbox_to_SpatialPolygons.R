@@ -1,3 +1,5 @@
+#' @export
+
 bbox_to_SpatialPolygons <- function(x,proj4string=CRS(as.character(NA)))
 {	
 	if(class(x)=="RasterLayer" || class(x)=="RasterBrick" || class(x)=="RasterStack")
