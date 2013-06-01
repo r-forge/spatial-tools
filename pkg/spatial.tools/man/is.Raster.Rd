@@ -17,7 +17,8 @@
 \examples{
 tahoe_highrez <- brick(system.file("external/tahoe_highrez.tif", package="spatial.tools"))
 is.Raster(tahoe_highrez)
-tahoe_lidar_bareearth <- raster(system.file("external/tahoe_lidar_bareearth.tif", package="spatial.tools"))
+tahoe_lidar_bareearth <-
+	raster(system.file("external/tahoe_lidar_bareearth.tif", package="spatial.tools"))
 is.Raster(tahoe_lidar_bareearth)
 is.Raster("character")
 }
