@@ -1,5 +1,3 @@
-#' @export
-
 fillNA_fhf=function(x,window_center,...)
 {
 	# Only works for single layers right now

@@ -1,5 +1,3 @@
-#' @export
-
 crop_stack <- function(x,y,filename="",snap="near",datatype=NULL,...)
 {
 	if(class(x)=="RasterStack")

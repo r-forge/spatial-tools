@@ -1,12 +1,12 @@
 
 
-modis_hdf4_subdatasets <- function(x,gdal_path)
+modis_hdf4_subdatasets <- function(x,gdal_path,verbose=FALSE)
 {
 	
 	if(is.null(gdal_path))
 	{
 		if(verbose) message("Searching for GDAL (set gdal_path for faster execution)...")
-		gdal_installs <- get_gdal_installation(check_for_drivers="HDF4")
+		gdal_installs <- get_gdal_installation(required_drivers="HDF4")
 		if(length(gdal_installs)==0) 
 		{stop("You need a GDAL that has the HDF4 driver.  
 							If you are using Windows, try installing OSGEO4W or FWTools.  

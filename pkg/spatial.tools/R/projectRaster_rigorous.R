@@ -1,8 +1,9 @@
-#' Performs a performs area-weighted resampling of raster datasets.
+#' Performs an area-weighted resampling of raster datasets.
 #' 
 #' @param from Raster* The sources raster to be resampled.
 #' @param to Raster* A target raster that the from will be resampled to (extent, resolution, projection).
 #' @param method Character. Default is "mode". See details.
+#' @param na.rm Logical. Remove NAs before calculating cell stats?
 #' @param verbose logical. Enable verbose execution? Default is FALSE.  
 #' @author Jonathan A. Greenberg
 #' @seealso \code{\link[raster]{projectRaster}}, \code{\link[raster]{extract}}, \code{\link[raster]{aggregate}}

@@ -214,6 +214,7 @@ focal_hpc_focal_getChunk <- function(x,tr,format,r,i,r_old,chunkArgs)
 
 focal_hpc_focalChunkFunction <- function(chunk,chunkArgs)
 {	
+	
 #	browser()
 	# Create some blank variables:
 	x <- NULL
@@ -222,6 +223,7 @@ focal_hpc_focalChunkFunction <- function(chunk,chunkArgs)
 	window_dims <- NULL
 	# window_center <- NULL
 	outbands <- NULL
+	window_center <- NULL
 	
 	#
 	e <- list2env(chunkArgs,envir=environment())
@@ -392,6 +394,7 @@ focal_hpc_pixel_processing <- function(tr,chunkArgs)
 	fun <- NULL
 	layer_names <- NULL
 	outbands <- NULL
+	verbose <- NULL
 	
 	list2env(chunkArgs,envir=environment())
 	chunkID <- seq(tr$n)
@@ -502,7 +505,6 @@ focal_hpc <- function(x,
 		window_center=c(ceiling(window_dims[1]/2),ceiling(window_dims[2]/2)),
 		filename=NULL, overwrite=FALSE,outformat="raster",
 		chunk_format="array",minblocks="max",blocksize=NULL,
-		force_stack_to_brick=FALSE,
 		verbose=FALSE) 
 {
 	# Required libraries:
@@ -523,13 +525,6 @@ focal_hpc <- function(x,
 	processing_mode <- NULL
 	texture_tr <- NULL
 	
-	# Hack for slow crop on stack
-#	if(force_stack_to_brick && class(x)=="RasterStack")
-#	{
-#		if(verbose) message("Pre-converting the RasterStack to RasterBrick.")
-#		x <- writeRaster(x,filename=tempfile())
-#	}
-#	
 	# Register a sequential backend if one is not already registered:
 	if(!getDoParRegistered()) registerDoSEQ()
 	

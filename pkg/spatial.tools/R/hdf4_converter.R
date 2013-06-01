@@ -10,7 +10,7 @@ hdf4_converter <- function(
 	if(is.null(gdal_path))
 	{
 		if(verbose) message("Searching for GDAL (set gdal_path for faster execution)...")
-		gdal_installs <- get_gdal_installation(check_for_drivers="HDF4")
+		gdal_installs <- get_gdal_installation(required_drivers="HDF4")
 		if(length(gdal_installs)==0) 
 		{stop("You need a GDAL that has the HDF4 driver.  
 							If you are using Windows, try installing OSGEO4W or FWTools.  
@@ -62,4 +62,4 @@ hdf4_converter <- function(
 }
 
 
-"c:/Program Files (x86)/Quantum GIS Lisboa/bin/gdal_translate.exe" -of GTiff "HDF4_EOS:EOS_GRID:P:/housing_bubble/scratch/test_ModisDownload/MOD13Q1.A2001001.h10v10.005.2008270004349.hdf:MODIS_Grid_16DAY_250m_500m_VI:250m 16 days NDVI" mooR.tif
+#"c:/Program Files (x86)/Quantum GIS Lisboa/bin/gdal_translate.exe" -of GTiff "HDF4_EOS:EOS_GRID:P:/housing_bubble/scratch/test_ModisDownload/MOD13Q1.A2001001.h10v10.005.2008270004349.hdf:MODIS_Grid_16DAY_250m_500m_VI:250m 16 days NDVI" mooR.tif
