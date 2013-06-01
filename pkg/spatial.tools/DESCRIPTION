@@ -8,8 +8,8 @@ Author: Jonathan Asher Greenberg
 Description: Spatial functions meant to enhance the core functionality of the
     package "raster", including a parallel processing engine for use with
     rasters.
-Version: 0.9.7
-Date: 2013-04-05
+Version: 1.0.3
+Date: 2013-06-01
 Depends:
     raster,
     rgdal,
@@ -20,7 +20,7 @@ Depends:
     foreach,
     doParallel,
     rgeos,
-    R (>= 2.15.2)
+    R (>= 2.15.3)
 Collate:
     'spatial_sync_vector.R'
     'tahoe_highrez_data.R'
@@ -48,10 +48,16 @@ Collate:
     'is.Raster.R'
     'raster_to_filenames.R'
     'bbox_to_SpatialPolygons.R'
-    'crop_stack.R'
-    'getValuesBlock_stackfix.R'
     'arithmetic_fhf.R'
+    'brickstack_to_raster_list.R'
+    'crop_stack.R'
     'fillNA_fhf.R'
+    'getValuesBlock_stackfix.R'
+    'hdf4_converter.R'
+    'modify_raster_margins.R'
+    'modis_hdf4_subdatasets.R'
+    'ncep_to_grid.R'
     'projectRaster_rigorous.R'
     'rasterMinMax.R'
     'rotate_enhanced.R'
+    'spSplit.R'
