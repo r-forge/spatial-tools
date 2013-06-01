@@ -1,6 +1,6 @@
 \name{projectRaster_rigorous}
 \alias{projectRaster_rigorous}
-\title{Performs a performs area-weighted resampling of raster datasets.}
+\title{Performs an area-weighted resampling of raster datasets.}
 \usage{
   projectRaster_rigorous(from, to, method = "mode",
     na.rm = FALSE, verbose = FALSE)
@@ -13,12 +13,14 @@
 
   \item{method}{Character. Default is "mode". See details.}
 
+  \item{na.rm}{Logical. Remove NAs before calculating cell
+  stats?}
+
   \item{verbose}{logical. Enable verbose execution? Default
   is FALSE.}
 }
 \description{
-  Performs a performs area-weighted resampling of raster
-  datasets.
+  Performs an area-weighted resampling of raster datasets.
 }
 \details{
   This function is designed to solve the problem of
