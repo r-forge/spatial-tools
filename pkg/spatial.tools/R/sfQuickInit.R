@@ -12,7 +12,6 @@
 
 sfQuickInit <- function(cpus,...)
 {
-
 	if(missing("cpus"))
 	{
 		cpus <- parallel::detectCores()
@@ -21,14 +20,6 @@ sfQuickInit <- function(cpus,...)
 	cl <- makeCluster(spec=cpus,type="PSOCK")
 	setDefaultCluster(cl=cl)
 	registerDoParallel(cl)
-	
-#	sfInit(cpus=cpus,parallel=TRUE,...)
-#	if(any(search()=="package:foreach"))
-#	{
-#		require("doSNOW")
-#		cl <- sfGetCluster()
-#		registerDoSNOW(cl)
-#	}
 	return(cl)
 }
 
