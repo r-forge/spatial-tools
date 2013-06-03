@@ -31,7 +31,7 @@
 #' mygdals <- get_gdal_installation(return_most_current=FALSE)
 #' sapply(mygdals,function(X) X$gdal_path)
 #' # Only return GDAL installs that support a given driver: 
-#' mygdals <- get_gdal_installation(required_drivers="HDF")
+#' mygdals <- get_gdal_installation(required_drivers="HDF4")
 #' }
 #' @export
 
