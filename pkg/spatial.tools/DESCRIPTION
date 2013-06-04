@@ -61,3 +61,6 @@ Collate:
     'rasterMinMax.R'
     'rotate_enhanced.R'
     'spSplit.R'
+    'Rgdal_translate.R'
+    'by.Raster.R'
+    'focal_hpc_multiRaster.R'
