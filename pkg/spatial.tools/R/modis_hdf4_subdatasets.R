@@ -4,7 +4,6 @@
 #' @param verbose Logical. Enable verbose execution? Default is FALSE. 
 #' @return A character vector of subdataset names.
 #' @author Jonathan A. Greenberg
-#' @examples
 #' @examples \dontrun{ 
 #'  # Download a MODIS GPP tile:
 #'  download.file(
