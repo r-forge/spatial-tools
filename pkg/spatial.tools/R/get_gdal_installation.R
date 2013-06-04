@@ -46,15 +46,16 @@
 #' sapply(mygdals,function(X) X$gdal_path)
 #' # Only return GDAL installs that support a given driver: 
 #' mygdals <- get_gdal_installation(required_drivers="HDF4")
+#' 
 #' }
 #' @export
 
 get_gdal_installation=function(return_drivers=TRUE,
-	return_python_utilities=TRUE,
-	return_most_current=TRUE,
-	required_drivers=NULL,
-	setOptions=TRUE,
-	verbose=FALSE)
+		return_python_utilities=TRUE,
+		return_most_current=TRUE,
+		required_drivers=NULL,
+		setOptions=TRUE,
+		verbose=FALSE)
 {
 	
 	#TODO: Search path, search common install locations.
@@ -85,7 +86,7 @@ get_gdal_installation=function(return_drivers=TRUE,
 	{	
 		# Windows
 		cmd <- 'gdalinfo --version'
-		gdalinfo_paths=list.files(path="c:/",pattern="^gdalinfo.exe$", full.names=TRUE, recursive=TRUE,include.dirs=TRUE)
+		gdalinfo_paths=normalizePath(list.files(path="c:/",pattern="^gdalinfo.exe$", full.names=TRUE, recursive=TRUE,include.dirs=TRUE))
 		if(length(gdalinfo_paths)==0) 
 		{
 			if(verbose) message(paste("No GDAL was found."))
@@ -101,7 +102,7 @@ get_gdal_installation=function(return_drivers=TRUE,
 # Determine the versions:
 	for(i in 1:length(gdalinfo_paths))
 	{
-		cmd <- paste("'",gdalinfo_paths[i],"'"," --version",sep="")
+		cmd <- paste('"',gdalinfo_paths[i],'"'," --version",sep="")
 #		setwd(gdalinfo_paths[i])
 		gdal_installation_list[[i]]$gdal_path=dirname(gdalinfo_paths[i])
 # Does shell work here?
@@ -134,23 +135,29 @@ get_gdal_installation=function(return_drivers=TRUE,
 	{
 		for(i in 1:length(gdalinfo_paths))
 		{
-			drivers_cmd <- paste("'",gdalinfo_paths[i],"'"," --formats",sep="")
-			if (.Platform$OS=="unix") 
+			if(!is.na(gdal_installation_list[[i]]$version))
 			{
-				drivers_raw <- system(drivers_cmd,intern=TRUE) 
-			} else 
+				drivers_cmd <- paste('"',gdalinfo_paths[i],'"'," --formats",sep="")
+				if (.Platform$OS=="unix") 
+				{
+					drivers_raw <- system(drivers_cmd,intern=TRUE) 
+				} else 
+				{
+					drivers_raw <- shell(drivers_cmd,intern=TRUE)
+				}
+				drivers=strsplit(drivers_raw,":")
+				driver_names=gsub("^ ","",sapply(drivers,function(x) { x[2] })) # Need to remove spaces
+				driver_codes_perm=strsplit(sapply(drivers,function(x) { x[1] }),"\\(")
+				driver_codes=gsub(" ","",sapply(driver_codes_perm,function(x) { x[1] }),fixed=TRUE)
+				driver_perm=gsub("\\)","",sapply(driver_codes_perm,function(x) { x[2] }))
+				drivers_dataframe=data.frame(format_code=driver_codes,format_rw=driver_perm,format_name=driver_names)
+				
+				drivers_dataframe=drivers_dataframe[2:dim(drivers_dataframe)[1],]
+				gdal_installation_list[[i]]$drivers=drivers_dataframe
+			} else
 			{
-				drivers_raw <- shell(drivers_cmd,intern=TRUE)
+				gdal_installation_list[[i]]$drivers=NA
 			}
-			drivers=strsplit(drivers_raw,":")
-			driver_names=gsub("^ ","",sapply(drivers,function(x) { x[2] })) # Need to remove spaces
-			driver_codes_perm=strsplit(sapply(drivers,function(x) { x[1] }),"\\(")
-			driver_codes=gsub(" ","",sapply(driver_codes_perm,function(x) { x[1] }),fixed=TRUE)
-			driver_perm=gsub("\\)","",sapply(driver_codes_perm,function(x) { x[2] }))
-			drivers_dataframe=data.frame(format_code=driver_codes,format_rw=driver_perm,format_name=driver_names)
-			
-			drivers_dataframe=drivers_dataframe[2:dim(drivers_dataframe)[1],]
-			gdal_installation_list[[i]]$drivers=drivers_dataframe
 		}
 	}
 	
@@ -169,8 +176,14 @@ get_gdal_installation=function(return_drivers=TRUE,
 		check_for_drivers_n=length(required_drivers)
 		for(i in 1:length(gdal_installation_list))
 		{
-			check=required_drivers %in% gdal_installation_list[[i]]$drivers$format_code
-			format_checked[i]=sum(check)==check_for_drivers_n
+			if(!is.na(gdal_installation_list[[i]]$version))
+			{
+				check=required_drivers %in% gdal_installation_list[[i]]$drivers$format_code
+				format_checked[i]=sum(check)==check_for_drivers_n
+			} else
+			{
+				format_checked[i]=FALSE
+			}
 		}
 		if(sum(format_checked)==0)
 		{
@@ -181,15 +194,15 @@ get_gdal_installation=function(return_drivers=TRUE,
 			gdal_installation_list=gdal_installation_list[format_checked]
 		}
 	}
-	
+
 	if(return_most_current || setOptions)
 	{
-	#	if(length(gdal_installation_list)>1)
-	#	{
-			versions <- sapply(gdal_installation_list,function(X) X$version)
-			best_version <- (order(versions,decreasing=TRUE)==1)
-	#	}
-	
+		#	if(length(gdal_installation_list)>1)
+		#	{
+		versions <- sapply(gdal_installation_list,function(X) X$version,simplify=TRUE)
+		best_version <- (order(versions,decreasing=TRUE,na.last=FALSE)==1)
+		#	}
+		
 		if(setOptions) { options ("spatial.tools.gdalInstallation" = gdal_installation_list[best_version][[1]])}
 		if(return_most_current) { gdal_installation_list <- gdal_installation_list[best_version] }
 		

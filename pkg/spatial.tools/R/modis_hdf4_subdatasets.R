@@ -1,26 +1,35 @@
+#' Return MODIS subdataset names
+#'
+#' @param x Character. A MODIS HDF4 filename.
+#' @param verbose Logical. Enable verbose execution? Default is FALSE. 
+#' @return A character vector of subdataset names.
+#' @author Jonathan A. Greenberg
+#' @examples
+#' @examples \dontrun{ 
+#'  # Download a MODIS GPP tile:
+#'  download.file(
+#' 		"http://e4ftl01.cr.usgs.gov/MOLT/MOD17A3.055/2000.01.01/MOD17A3.A2000001.h19v10.055.2011276104211.hdf",
+#' 		"MOD17A3.A2000001.h19v10.055.2011276104211.hdf",mode="wb")
+#'  modis_hdf4_subdatasets("MOD17A3.A2000001.h19v10.055.2011276104211.hdf")
+#' # This can be used in a Rgdal_translate statement by subselecting one layer:
+#' gpp_sds <- modis_hdf4_subdatasets("MOD17A3.A2000001.h19v10.055.2011276104211.hdf")[1]
+#' Rgdal_translate(gpp_sds,"MOD17A3.A2000001.h19v10.055.2011276104211.tif")
+#' # This is an equivalent calling the index directly from Rgdal_translate:
+#' Rgdal_translate("MOD17A3.A2000001.h19v10.055.2011276104211.hdf","MOD17A3.A2000001.h19v10.055.2011276104211.tif",modis_sds_index=1)
+#' }
+#' @export
 
-
-modis_hdf4_subdatasets <- function(x,gdal_path,verbose=FALSE)
+modis_hdf4_subdatasets <- function(x,verbose=FALSE)
 {
-	
-	if(is.null(gdal_path))
+	if(is.null(getOption("spatial.tools.gdalInstallation")))
 	{
-		if(verbose) message("Searching for GDAL (set gdal_path for faster execution)...")
-		gdal_installs <- get_gdal_installation(required_drivers="HDF4")
-		if(length(gdal_installs)==0) 
-		{stop("You need a GDAL that has the HDF4 driver.  
-							If you are using Windows, try installing OSGEO4W or FWTools.  
-							?get_gdal_installation for more info.")
-		} else
-		{
-			if(verbose) message(paste("Using ",gdal_installs[[1]]$gdal_path,sep=""))
-			gdal_path <- gdal_installs[[1]]$gdal_path
-		}
+		if(verbose) { message("spatial.tools.gdalInstallation not set, searching for a valid GDAL install (this may take some time)...")}
+		gdal_installation <- get_gdal_installation()
 	}
 	
-#	current_dir <- getwd()
-#	setwd(gdal_path)
-	gdalinfo_path <- file.path(gdal_path,list.files(path=gdal_path,pattern=glob2rx("gdalinfo*"))[1])
+	gdal_path <- getOption("spatial.tools.gdalInstallation")$gdal_path
+	
+	gdalinfo_path <- normalizePath(file.path(gdal_path,list.files(path=gdal_path,pattern=glob2rx("gdalinfo*"))[1]))
 	if(dirname(x)==".")	{ x_fullpath <- file.path(getwd(),x) } else x_fullpath <- x
 	cmd <- paste("\"",gdalinfo_path,"\" ",x_fullpath,sep="")
 	gdalinfo_dump <- shell(cmd,intern=TRUE)

@@ -8,8 +8,8 @@ Author: Jonathan Asher Greenberg
 Description: Spatial functions meant to enhance the core functionality of the
     package "raster", including a parallel processing engine for use with
     rasters.
-Version: 1.0.3
-Date: 2013-06-01
+Version: 1.0.4
+Date: 2013-06-04
 Depends:
     raster,
     rgdal,
