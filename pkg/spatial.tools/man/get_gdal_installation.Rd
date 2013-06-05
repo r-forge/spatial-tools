@@ -53,7 +53,7 @@
   author's experience, for each OS, we recommend the
   following installations:
 
-  Unix: See \url{http://gdal.org/} for building/installing
+  Unix: See \url{http://gdal.org} for building/installing
   GDAL on your system.
 
   Mac: Install the William Kyngesburye's GDAL Complete
@@ -81,14 +81,13 @@ mygdals <- get_gdal_installation(return_most_current=FALSE)
 sapply(mygdals,function(X) X$gdal_path)
 # Only return GDAL installs that support a given driver:
 mygdals <- get_gdal_installation(required_drivers="HDF4")
-
 }
 }
 \author{
   Jonathan A. Greenberg and Matteo Mattiuzzi
 }
 \references{
-  \url{http://gdal.org/}
+  \url{http://gdal.org}
 }
 \keyword{format}
 

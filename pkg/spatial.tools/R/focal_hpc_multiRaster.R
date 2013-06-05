@@ -1,7 +1,7 @@
  # examples
-tahoe_lidar_bareearth <- raster(system.file("external/tahoe_lidar_bareearth.tif", package="spatial.tools"))
-tahoe_lidar_highesthit <- raster(system.file("external/tahoe_lidar_highesthit.tif", package="spatial.tools"))
-tahoe_highrez <- brick(system.file("external/tahoe_highrez.tif", package="spatial.tools"))
+#tahoe_lidar_bareearth <- raster(system.file("external/tahoe_lidar_bareearth.tif", package="spatial.tools"))
+#tahoe_lidar_highesthit <- raster(system.file("external/tahoe_lidar_highesthit.tif", package="spatial.tools"))
+#tahoe_highrez <- brick(system.file("external/tahoe_highrez.tif", package="spatial.tools"))
 
 focal_hpc_multiRaster <- function(x,
 		fun,args=NULL, 
@@ -50,10 +50,10 @@ focal_hpc_multiRaster <- function(x,
 	return(NULL)
 }
 
-height_function <- function(firstreturn,bareearth,...)
-{
-	return(bareearth-firstreturn)
-}
-
-debug(focal_hpc_multiRaster)
-focal_hpc_multiRaster(firstreturn=tahoe_lidar_highesthit,bareearth=tahoe_highrez,fun=height_function)
+#height_function <- function(firstreturn,bareearth,...)
+#{
+#	return(bareearth-firstreturn)
+#}
+#
+#debug(focal_hpc_multiRaster)
+#focal_hpc_multiRaster(firstreturn=tahoe_lidar_highesthit,bareearth=tahoe_highrez,fun=height_function)
