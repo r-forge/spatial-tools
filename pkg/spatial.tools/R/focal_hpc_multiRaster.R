@@ -27,10 +27,21 @@ focal_hpc_multiRaster <- function(x,
 		nlayers_indices <- unlist(mapply(function(varname,nlayers) { rep(varname,nlayers) },
 			varname=c("x",names(additional_vars_Raster)),nlayers=nlayers_Rasters))
 	}
-	
+
+	#	r_check_function <- do.call(fun, r_check_args)
+
 	focal_hpc_multiRaster_function <- function(x,nlayers_indices,fun,...)
 	{
-		
+		varnames <- unique(nlayers_indices)
+		# Create a list of variables
+		function_vars <- sapply(varnames,
+			function(X,nlayers_indices)
+			{
+				
+				
+				
+			},nlayers_indices=nlayers_indices,x=x,
+			simplify=FALSE)
 		
 		
 	}
@@ -43,3 +54,6 @@ height_function <- function(firstreturn,bareearth,...)
 {
 	return(bareearth-firstreturn)
 }
+
+debug(focal_hpc_multiRaster)
+focal_hpc_multiRaster(firstreturn=tahoe_lidar_highesthit,bareearth=tahoe_highrez,fun=height_function)

@@ -77,6 +77,11 @@ Rgdal_translate <- function(src_dataset,dst_dataset,ot,strict,of="Gtiff",
 		gdal_installation <- get_gdal_installation(required_drivers=of)
 	}
 	
+	if(is.null(getOption("spatial.tools.gdalInstallation")))
+	{
+		stop("GDAL with the proper drivers was not found, please check your installation.  See ?get_gdal_installation for more hints.")	
+	}
+	
 	gdal_path <- getOption("spatial.tools.gdalInstallation")$gdal_path
 	
 	# Don't know if this will work on windows yet...
