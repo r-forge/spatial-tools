@@ -22,7 +22,7 @@
 #' Each user's installation will be different, but in the author's experience, for each OS, we 
 #' recommend the following installations: 
 #' 
-#' Unix: See \url{http://gdal.org/} for building/installing GDAL on your system. 
+#' Unix: See \url{http://gdal.org} for building/installing GDAL on your system. 
 #' 
 #' Mac: Install the William Kyngesburye's GDAL Complete Framework: \url{http://www.kyngchaos.com/software:frameworks}
 #' 
@@ -33,7 +33,7 @@
 #' \item FWTools, 32-bit only: \url{http://fwtools.maptools.org/}
 #' }
 #' 
-#' @references \url{http://gdal.org/}
+#' @references \url{http://gdal.org}
 #' @examples \dontrun{ 
 #' # Determine the most current GDAL installations:
 #' mygdals <- get_gdal_installation()
@@ -46,7 +46,6 @@
 #' sapply(mygdals,function(X) X$gdal_path)
 #' # Only return GDAL installs that support a given driver: 
 #' mygdals <- get_gdal_installation(required_drivers="HDF4")
-#' 
 #' }
 #' @export
 
@@ -79,7 +78,7 @@ get_gdal_installation=function(return_drivers=TRUE,
 			}
 		} else
 		{
-			gdalinfo_paths <- system("which gdalinfo")
+			gdalinfo_paths <- system("which gdalinfo",intern=TRUE)
 			gdal_installation_list=vector(mode="list",length=1)
 		}
 	} else 
