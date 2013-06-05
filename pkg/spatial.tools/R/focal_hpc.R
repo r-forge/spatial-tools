@@ -329,7 +329,7 @@ focal_hpc_focal_processing <- function(tr,texture_tr,chunkArgs)
 				SIMPLIFY=FALSE)
 		
 #		browser()
-		foreach(chunk=chunkList, .packages=c("raster","rgdal","spatial.tools","mmap"),
+		foreach(chunk=chunkList, .packages=c("rgdal","raster","spatial.tools","mmap"),
 						.verbose=verbose) %dopar% 
 			spatial.tools:::focal_hpc_focalChunkFunction(chunk,chunkArgs)
 		
@@ -398,7 +398,7 @@ focal_hpc_pixel_processing <- function(tr,chunkArgs)
 	
 	list2env(chunkArgs,envir=environment())
 	chunkID <- seq(tr$n)
-	foreach(chunkID=chunkID, .packages=c("raster","rgdal","spatial.tools","mmap"),.verbose=verbose) %dopar% 
+	foreach(chunkID=chunkID, .packages=c("rgdal","raster","spatial.tools","mmap"),.verbose=verbose) %dopar% 
 			spatial.tools:::focal_hpc_pixelChunkFunction(chunkID,tr,x,chunk_format,fun,args,layer_names,outbands,
 					filename)
 }
