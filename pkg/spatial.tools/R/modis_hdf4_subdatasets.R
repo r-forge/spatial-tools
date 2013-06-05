@@ -23,7 +23,7 @@ modis_hdf4_subdatasets <- function(x,verbose=FALSE)
 	if(is.null(getOption("spatial.tools.gdalInstallation")))
 	{
 		if(verbose) { message("spatial.tools.gdalInstallation not set, searching for a valid GDAL install (this may take some time)...")}
-		gdal_installation <- get_gdal_installation()
+		gdal_installation <- get_gdal_installation(required_drivers="HDF4")
 	}
 	
 	gdal_path <- getOption("spatial.tools.gdalInstallation")$gdal_path
