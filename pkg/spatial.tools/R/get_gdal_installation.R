@@ -115,7 +115,6 @@ get_gdal_installation=function(return_drivers=TRUE,
 		
 		if(length(grep(glob2rx("GDAL*"),gdal_version)) != 0)
 		{
-			
 			version=strsplit(strsplit(gdal_version,",")[[1]][1]," ")[[1]][2]
 			gdal_installation_list[[i]]$version <- version
 		} else
@@ -124,12 +123,13 @@ get_gdal_installation=function(return_drivers=TRUE,
 			if(verbose)
 			{
 				message(paste("Probably broken install of gdal at ",gdal_installation_list[[i]]$gdal_path),sep="")
-				gdal_installation_list[[i]]$version=NA
+				
 			}
+			gdal_installation_list[[i]]$version=NA
 		}
 	}
 	
-	
+	# browser()
 	if(return_drivers)
 	{
 		for(i in 1:length(gdalinfo_paths))
