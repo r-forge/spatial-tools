@@ -35,7 +35,7 @@ modis_hdf4_subdatasets <- function(x,verbose=FALSE)
 	
 	gdalinfo_path <- normalizePath(file.path(gdal_path,list.files(path=gdal_path,pattern=glob2rx("gdalinfo*"))[1]))
 	if(dirname(x)==".")	{ x_fullpath <- file.path(getwd(),x) } else x_fullpath <- x
-	if(!file.exists(normalizePath(x_fullpath))) { stop(paste(x_fullpath," not found, exiting.",sep="")) }
+	if(!file.exists(normalizePath(x_fullpath))) { stop(paste(normalizePath(x_fullpath)," not found, exiting.",sep="")) }
 	
 	cmd <- paste("\"",gdalinfo_path,"\" ",x_fullpath,sep="")
 	if (.Platform$OS=="unix")
