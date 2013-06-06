@@ -37,7 +37,8 @@ modis_hdf4_subdatasets <- function(x,verbose=FALSE)
 	if(dirname(x)==".")	{ x_fullpath <- file.path(getwd(),x) } else x_fullpath <- x
 	if(!file.exists(normalizePath(x_fullpath))) { stop(paste(normalizePath(x_fullpath)," not found, exiting.",sep="")) }
 	
-	cmd <- paste("\"",gdalinfo_path,"\" ",x_fullpath,sep="")
+	cmd <- paste('"',gdalinfo_path,'" ','"',x_fullpath,'"',sep="")
+	if(verbose) { message(paste("Using command: ",cmd,sep=""))}
 	if (.Platform$OS=="unix")
 	{    
 		gdalinfo_dump <- system(cmd,intern=TRUE)
@@ -45,6 +46,7 @@ modis_hdf4_subdatasets <- function(x,verbose=FALSE)
 	{
 		gdalinfo_dump <- shell(cmd,intern=TRUE)
 	}
+	
 	subdataset_rawnames <- gdalinfo_dump[grep(glob2rx("*SUBDATASET*NAME*"),gdalinfo_dump)]
 	
 	subdataset_names <- sapply(X=seq(length(subdataset_rawnames)),FUN=function(X)
