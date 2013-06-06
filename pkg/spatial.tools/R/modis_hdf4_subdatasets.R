@@ -20,6 +20,10 @@
 
 modis_hdf4_subdatasets <- function(x,verbose=FALSE)
 {
+	
+	if(dirname(x)==".")	{ x_fullpath <- file.path(getwd(),x) } else x_fullpath <- x
+	if(!file.exists(normalizePath(x_fullpath))) { stop(paste(normalizePath(x_fullpath)," not found, exiting.",sep="")) }
+	
 	if(is.null(getOption("spatial.tools.gdalInstallation")))
 	{
 		if(verbose) { message("spatial.tools.gdalInstallation not set, searching for a valid GDAL install (this may take some time)...")}
@@ -34,8 +38,6 @@ modis_hdf4_subdatasets <- function(x,verbose=FALSE)
 	gdal_path <- getOption("spatial.tools.gdalInstallation")$gdal_path
 	
 	gdalinfo_path <- normalizePath(file.path(gdal_path,list.files(path=gdal_path,pattern=glob2rx("gdalinfo*"))[1]))
-	if(dirname(x)==".")	{ x_fullpath <- file.path(getwd(),x) } else x_fullpath <- x
-	if(!file.exists(normalizePath(x_fullpath))) { stop(paste(normalizePath(x_fullpath)," not found, exiting.",sep="")) }
 	
 	cmd <- paste('"',gdalinfo_path,'" ','"',x_fullpath,'"',sep="")
 	if(verbose) { message(paste("Using command: ",cmd,sep=""))}
