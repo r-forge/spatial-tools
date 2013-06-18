@@ -184,9 +184,11 @@ src_dataset <- system.file("external/tahoe_highrez.tif", package="spatial.tools"
 # Rgdal_translate:
 Rgdal_translate(src_dataset,"tahoe_highrez_tiled.tif",of="Gtiff",co="TILED=YES",verbose=TRUE)
 # Pull out a chunk and return as a raster:
-Rgdal_translate(src_dataset,"tahoe_highrez_tiled.tif",of="Gtiff",srcwin=c(1,1,100,100),output_Raster=TRUE,verbose=TRUE)
+Rgdal_translate(src_dataset,"tahoe_highrez_tiled.tif",of="Gtiff",
+srcwin=c(1,1,100,100),output_Raster=TRUE,verbose=TRUE)
 # Notice this is the equivalent, but follows gdal_translate's parameter format:
-Rgdal_translate(src_dataset,"tahoe_highrez_tiled.tif",of="Gtiff",srcwin="1 1 100 100",output_Raster=TRUE,verbose=TRUE)
+Rgdal_translate(src_dataset,"tahoe_highrez_tiled.tif",of="Gtiff",
+srcwin="1 1 100 100",output_Raster=TRUE,verbose=TRUE)
 }
 }
 \author{

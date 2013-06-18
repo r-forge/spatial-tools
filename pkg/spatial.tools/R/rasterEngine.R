@@ -1,10 +1,11 @@
- # examples
+# # examples
 #tahoe_lidar_bareearth <- raster(system.file("external/tahoe_lidar_bareearth.tif", package="spatial.tools"))
 #tahoe_lidar_highesthit <- raster(system.file("external/tahoe_lidar_highesthit.tif", package="spatial.tools"))
 #tahoe_highrez <- brick(system.file("external/tahoe_highrez.tif", package="spatial.tools"))
+#' @export
 
-focal_hpc_multiRaster <- function(x,
-		fun,args=NULL, 
+rasterEngine <- function(x,
+		fun=NULL,args=NULL, 
 		window_dims=c(1,1), 
 		window_center=c(ceiling(window_dims[1]/2),ceiling(window_dims[2]/2)),
 		filename=NULL, overwrite=FALSE,outformat="raster",
@@ -34,26 +35,36 @@ focal_hpc_multiRaster <- function(x,
 	{
 		varnames <- unique(nlayers_indices)
 		# Create a list of variables
-		function_vars <- sapply(varnames,
-			function(X,nlayers_indices)
+		function_vars <- sapply(X=varnames,
+			FUN=function(X,nlayers_indices,x) 
 			{
-				
-				
-				
-			},nlayers_indices=nlayers_indices,x=x,
+				var_index <- which(nlayers_indices==X)
+				var_sub <- x[,,var_index,drop=FALSE]
+				return(var_sub)
+			},nlayers_indices=nlayers_indices,
+			x=x,
 			simplify=FALSE)
-		
-		
+		function_vars <- c(function_vars,list(...))
+		out <- do.call(fun,function_vars)
+		dim(out) <- c(dim(x)[1:2],(length(out)/prod(dim(x)[1:2])))
+		return(out)
 	}
 	
-	
-	return(NULL)
+	focal_hpc(x,fun=focal_hpc_multiRaster_function,args=c(list(nlayers_indices=nlayers_indices,fun=fun),args),
+			window_dims=window_dims, 
+			window_center=window_center,
+			filename=filename, overwrite=overwrite,outformat=outformat,
+			chunk_format=chunk_format,minblocks=minblocks,blocksize=blocksize,
+			verbose=verbose)
 }
 
-#height_function <- function(firstreturn,bareearth,...)
+#height_function <- function(firstreturn,bareearth,offsetmoo,...)
 #{
-#	return(bareearth-firstreturn)
+#	return((bareearth-firstreturn+offsetmoo))
+##	return(as.vector(bareearth-firstreturn))
 #}
-#
-#debug(focal_hpc_multiRaster)
-#focal_hpc_multiRaster(firstreturn=tahoe_lidar_highesthit,bareearth=tahoe_highrez,fun=height_function)
+##
+### debug(focal_hpc_multiRaster)
+#height_diff <- focal_hpc_multiRaster(firstreturn=tahoe_lidar_highesthit,bareearth=tahoe_lidar_bareearth,fun=height_function,args=list(offsetmoo=100),verbose=TRUE)
+##
+#height_diff_nohpc <- tahoe_lidar_bareearth - tahoe_lidar_highesthit
