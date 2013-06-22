@@ -21,7 +21,7 @@
 #' mychunk_raster
 #' @export
 
-getValuesBlock_enhanced=function(x,r1=1,r2=nrow(x),c1=1,c2=ncol(x),lyrs=(1:nlayers(x)),format="array",...)
+getValuesBlock_enhanced=function(x,r1=1,r2=nrow(x),c1=1,c2=ncol(x),lyrs=seq(nlayers(x)),format="array",...)
 {	
 	if(format=="array")
 	{

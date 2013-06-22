@@ -1,4 +1,4 @@
-
+#' @export
 
 by.Raster <- function(x,INDICES,FUN,verbose=FALSE,...)
 {
