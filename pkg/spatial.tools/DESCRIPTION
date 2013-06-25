@@ -8,8 +8,8 @@ Author: Jonathan Asher Greenberg
 Description: Spatial functions meant to enhance the core functionality of the
     package "raster", including a parallel processing engine for use with
     rasters.
-Version: 1.0.8
-Date: 2013-06-18
+Version: 1.0.9
+Date: 2013-06-25
 Depends:
     raster,
     rgdal,
@@ -50,7 +50,6 @@ Collate:
     'bbox_to_SpatialPolygons.R'
     'arithmetic_fhf.R'
     'brickstack_to_raster_list.R'
-    'crop_stack.R'
     'fillNA_fhf.R'
     'getValuesBlock_stackfix.R'
     'modify_raster_margins.R'
@@ -63,3 +62,4 @@ Collate:
     'Rgdal_translate.R'
     'by.Raster.R'
     'rasterEngine.R'
+    'rasterEngine_prestack.R'

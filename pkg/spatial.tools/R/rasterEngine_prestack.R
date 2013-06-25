@@ -1,3 +1,4 @@
+#' @export 
 
 rasterEngine_prestack <- function(x,...,quick=TRUE,verbose=FALSE)
 {

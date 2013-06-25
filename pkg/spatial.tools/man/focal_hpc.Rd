@@ -6,7 +6,8 @@
     window_center = c(ceiling(window_dims[1]/2), ceiling(window_dims[2]/2)),
     filename = NULL, overwrite = FALSE,
     outformat = "raster", chunk_format = "array",
-    minblocks = "max", blocksize = NULL, verbose = FALSE)
+    minblocks = "max", blocksize = NULL, outbands = NULL,
+    verbose = FALSE)
 }
 \arguments{
   \item{x}{Raster*. A Raster* used as the input into the
@@ -48,6 +49,10 @@
 
   \item{overwrite}{logical. Allow files to be overwritten?
   Default is FALSE.}
+
+  \item{outbands}{Numeric. If known, how many bands in the
+  output file?  Assigning this will allow focal_hpc to skip
+  the pre-check.}
 
   \item{verbose}{logical. Enable verbose execution? Default
   is FALSE.}
