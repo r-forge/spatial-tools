@@ -10,39 +10,54 @@ rasterEngine <- function(x,
 		window_center=c(ceiling(window_dims[1]/2),ceiling(window_dims[2]/2)),
 		filename=NULL, overwrite=FALSE,outformat="raster",
 		chunk_format="array",minblocks="max",blocksize=NULL,
-		quick=TRUE,verbose=FALSE,...) 
+		prestack=NULL,
+		quick=TRUE,outbands=NULL,
+		verbose=FALSE,...) 
 {
 	additional_vars <- list(...)
 	additional_vars_isRaster <- sapply(additional_vars,is.Raster)
 	additional_vars_Raster <- additional_vars[additional_vars_isRaster]
+	
 	if(verbose) { message("Prestacking inputs...") }
 	if(missing(x))
 	{
-	#	x <- stack(additional_vars_Raster,quick=quick)
 		additional_vars_Raster_names <- names(additional_vars_Raster)
-		names(additional_vars_Raster) <- NULL
-		names(additional_vars_Raster)[1] <- "x"
-		x <- do.call(stack,c(additional_vars_Raster,quick=quick))
-		
+		if(is.null(prestack))
+		{
+			#	x <- stack(additional_vars_Raster,quick=quick)
+			names(additional_vars_Raster) <- NULL
+			names(additional_vars_Raster)[1] <- "x"
+			x <- do.call(stack,c(additional_vars_Raster,quick=quick))
+		} else
+		{
+			x <- prestack
+		}
 		nlayers_Rasters <- sapply(additional_vars_Raster,nlayers)
 		nlayers_indices <- unlist(mapply(function(varname,nlayers) { rep(varname,nlayers) },
-				varname=additional_vars_Raster_names,nlayers=nlayers_Rasters))
+						varname=additional_vars_Raster_names,nlayers=nlayers_Rasters))
 	} else
 	{
-		x <- stack(x,additional_vars_Raster,quick=quick)
+		if(is.null(prestack))
+		{
+			x <- stack(x,additional_vars_Raster,quick=quick)
+		} else
+		{
+			x <- prestack
+		}
 		nlayers_Rasters <- c(nlayers(x),sapply(additional_vars_Raster,nlayers))
 		nlayers_indices <- unlist(mapply(function(varname,nlayers) { rep(varname,nlayers) },
-			varname=c("x",names(additional_vars_Raster)),nlayers=nlayers_Rasters))
+						varname=c("x",names(additional_vars_Raster)),nlayers=nlayers_Rasters))
 	}
-
+	
 	if(verbose) { message("Finished prestacking inputs...") }
-	#	r_check_function <- do.call(fun, r_check_args)
 
-	focal_hpc_multiRaster_function <- function(x,nlayers_indices,fun,...)
-	{
-		varnames <- unique(nlayers_indices)
-		# Create a list of variables
-		function_vars <- sapply(X=varnames,
+#	r_check_function <- do.call(fun, r_check_args)
+
+focal_hpc_multiRaster_function <- function(x,nlayers_indices,fun,...)
+{
+	varnames <- unique(nlayers_indices)
+	# Create a list of variables
+	function_vars <- sapply(X=varnames,
 			FUN=function(X,nlayers_indices,x) 
 			{
 				var_index <- which(nlayers_indices==X)
@@ -51,18 +66,19 @@ rasterEngine <- function(x,
 			},nlayers_indices=nlayers_indices,
 			x=x,
 			simplify=FALSE)
-		function_vars <- c(function_vars,list(...))
-		out <- do.call(fun,function_vars)
-		dim(out) <- c(dim(x)[1:2],(length(out)/prod(dim(x)[1:2])))
-		return(out)
-	}
-	
-	focal_hpc(x,fun=focal_hpc_multiRaster_function,args=c(list(nlayers_indices=nlayers_indices,fun=fun),args),
-			window_dims=window_dims, 
-			window_center=window_center,
-			filename=filename, overwrite=overwrite,outformat=outformat,
-			chunk_format=chunk_format,minblocks=minblocks,blocksize=blocksize,
-			verbose=verbose)
+	function_vars <- c(function_vars,list(...))
+	out <- do.call(fun,function_vars)
+	dim(out) <- c(dim(x)[1:2],(length(out)/prod(dim(x)[1:2])))
+	return(out)
+}
+
+focal_hpc(x,fun=focal_hpc_multiRaster_function,args=c(list(nlayers_indices=nlayers_indices,fun=fun),args),
+		window_dims=window_dims, 
+		window_center=window_center,
+		filename=filename, overwrite=overwrite,outformat=outformat,
+		chunk_format=chunk_format,minblocks=minblocks,blocksize=blocksize,
+		outbands=outbands,
+		verbose=verbose)
 }
 
 #height_function <- function(firstreturn,bareearth,offsetmoo,...)

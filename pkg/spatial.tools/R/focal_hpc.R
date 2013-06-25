@@ -331,7 +331,7 @@ focal_hpc_focal_processing <- function(tr,texture_tr,chunkArgs)
 #		browser()
 		foreach(chunk=chunkList, .packages=c("rgdal","raster","spatial.tools","mmap"),
 						.verbose=verbose) %dopar% 
-			spatial.tools:::focal_hpc_focalChunkFunction(chunk,chunkArgs)
+				spatial.tools:::focal_hpc_focalChunkFunction(chunk,chunkArgs)
 		
 		if(i<tr$n && window_dims[2] > 1)
 			r_old=array(data=r[,(dim(r)[2]-(tr$focal_row2[i]-tr$focal_row[i+1])):dim(r)[2],],
@@ -415,6 +415,7 @@ focal_hpc_pixel_processing <- function(tr,chunkArgs)
 #' @param filename character. Filename of the output raster.
 #' @param outformat character. Outformat of the raster. Must be a format usable by hdr(). Default is 'raster'. CURRENTLY UNSUPPORTED.
 #' @param overwrite logical. Allow files to be overwritten? Default is FALSE.
+#' @param outbands Numeric. If known, how many bands in the output file?  Assigning this will allow focal_hpc to skip the pre-check.
 #' @param verbose logical. Enable verbose execution? Default is FALSE.  
 #' @author Jonathan A. Greenberg (\email{spatial.tools@@estarcion.net})
 #' @seealso \code{\link{foreach}}, \code{\link{mmap}}, \code{\link{dataType}}, \code{\link{hdr}} 
@@ -505,6 +506,7 @@ focal_hpc <- function(x,
 		window_center=c(ceiling(window_dims[1]/2),ceiling(window_dims[2]/2)),
 		filename=NULL, overwrite=FALSE,outformat="raster",
 		chunk_format="array",minblocks="max",blocksize=NULL,
+		outbands=NULL,
 		verbose=FALSE) 
 {
 	# Required libraries:
@@ -532,10 +534,12 @@ focal_hpc <- function(x,
 	list2env(spatial.tools:::focal_hpc_precheck(x,window_dims,window_center,verbose),envir=environment())
 	
 	# Test focal_hpc and determine the number of outbands.
-	outbands <- 
-	spatial.tools:::focal_hpc_test(x,fun,window_center,window_dims,args,layer_names,
-			startrow_offset,endrow_offset,processing_unit,chunk_format,verbose)
-	
+	if(is.null(outbands))
+	{
+		outbands <- 
+				spatial.tools:::focal_hpc_test(x,fun,window_center,window_dims,args,layer_names,
+						startrow_offset,endrow_offset,processing_unit,chunk_format,verbose)
+	}
 	# Set up chunking parameters.
 	list2env(spatial.tools:::focal_hpc_chunk_setup(
 					x=x,window_dims=window_dims,window_center=window_center,
