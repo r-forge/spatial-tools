@@ -528,8 +528,11 @@ focal_hpc <- function(x,
 	texture_tr <- NULL
 	
 	# Register a sequential backend if one is not already registered:
-	if(!getDoParRegistered()) registerDoSEQ()
-	
+	if(!getDoParRegistered()) 
+	{
+		if(verbose) { warning("No parallel backend registered.  Operating in sequential mode.") }
+		registerDoSEQ()
+	}
 	# Prechecks.
 	list2env(spatial.tools:::focal_hpc_precheck(x,window_dims,window_center,verbose),envir=environment())
 	
