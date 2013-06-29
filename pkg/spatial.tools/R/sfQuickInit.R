@@ -4,7 +4,7 @@
 #' @param methods Logical. Load the methods package? (if FALSE, faster startup). Default=FALSE.
 #' @param ... parameters to pass to sfInit()
 #' @author Jonathan A. Greenberg
-#' @details (Even more) quickly start a parallel cluster with maximum available
+#' @details (Even more) quickly start a parallel cluster with half of available
 #' cpus, parallel = TRUE, and type = "SOCK" and registers it with foreach.  
 #' @examples 
 #' sfQuickInit(cpus=2)
@@ -15,7 +15,7 @@ sfQuickInit <- function(cpus,methods=FALSE,...)
 {
 	if(missing("cpus"))
 	{
-		cpus <- detectCores()
+		cpus <- floor(detectCores()/2)
 	}
 	
 	cl <- makeCluster(spec=cpus,type="PSOCK",methods=methods)

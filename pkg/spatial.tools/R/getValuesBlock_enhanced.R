@@ -23,6 +23,7 @@
 
 getValuesBlock_enhanced=function(x,r1=1,r2=nrow(x),c1=1,c2=ncol(x),lyrs=seq(nlayers(x)),format="array",...)
 {	
+	#if(is.null(c2)) { c2 <- ncol(x) }
 	if(format=="array")
 	{
 		layer_names=names(x)
