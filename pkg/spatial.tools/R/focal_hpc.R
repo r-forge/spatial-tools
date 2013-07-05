@@ -194,6 +194,7 @@ focal_hpc_focal_getChunk <- function(x,tr,format,r,i,r_old,chunkArgs)
 	endrow_offset <- tr$endrow_offset
 	
 	chunk_format=format
+	
 	if(i==1)
 	{
 		r <- getValuesBlock_enhanced(x, r1=tr$focal_row[i], r2=tr$focal_row2[i], c1=1, c2=ncol(x),
@@ -280,31 +281,57 @@ focal_hpc_focalChunkFunction <- function(chunk,chunkArgs)
 		args$layer_names=layer_names
 	}
 	
-	window_index=1:ncol(x)
+	if(is.list(x))
+	{
+		ncol_x=ncol(x[[1]])
+		image_dims=dim(x[[1]])
+	} else
+	{
+		ncol_x=ncol(x)
+		image_dims=dim(x)
+	}
+	window_index=1:ncol_x
+	
 	r_out=
 			array(t(
 							mapply(
 									function(window_index,chunk,args,window_dims)
 									{
-										x_array=chunk[(window_index:(window_index+window_dims[2]-1)),,,drop=FALSE]									
-										dimnames(x_array) <- vector(mode="list",length=3)
-										if(!is.null(layer_names)) dimnames(x_array)[[3]]=layer_names
-										
+										if(is.list(chunk))
+										{
+											x_array <- mapply(FUN=
+															function(chunk,layer_names,window_index,window_dims)
+													{
+														x_array=chunk[(window_index:(window_index+window_dims[2]-1)),,,drop=FALSE]									
+														dimnames(x_array) <- vector(mode="list",length=3)
+														if(!is.null(layer_names)) dimnames(x_array)[[3]]=layer_names
+														return(x_array)
+													},chunk=chunk,layer_name=layer_names,
+													MoreArgs=list(window_index=window_index,window_dims=window_dims),
+													SIMPLIFY=FALSE)	
+											#	browser()
+											
+										} else
+										{
+											x_array=chunk[(window_index:(window_index+window_dims[2]-1)),,,drop=FALSE]									
+											dimnames(x_array) <- vector(mode="list",length=3)
+											if(!is.null(layer_names)) dimnames(x_array)[[3]]=layer_names
+										}
 										fun_args=args
 										fun_args$x=x_array
 										r_out <- do.call(fun, fun_args)
+										#					browser()
 										return(r_out)
 									}
 									,
 									window_index,
 									MoreArgs=list(chunk=chunk$processing_chunk,args=args,window_dims=window_dims)
 							)
-					),dim=c(ncol(x),1,outbands))
+					),dim=c(ncol_x,1,outbands))
 	
-	image_dims=dim(x)
 	image_dims=c(image_dims[2],image_dims[1],image_dims[3])
 	chunk_position=list(
-			1:ncol(x),
+			1:ncol_x,
 			chunk$row_center,
 			1:outbands
 	)
@@ -317,7 +344,7 @@ focal_hpc_focalChunkFunction <- function(chunk,chunkArgs)
 						interleave="BSQ",data=r_out,data_position=chunk_position)
 				,
 				error=function(err) writeSuccess <<- FALSE)	
-	}
+	}	
 }
 
 
@@ -332,14 +359,35 @@ focal_hpc_focal_processing <- function(tr,texture_tr,chunkArgs)
 	
 	list2env(chunkArgs,envir=environment())
 	
-	r_old <- NULL
+	if(is.list(x))
+	{
+		r_old <- vector(mode="list",length=length(x))
+	} else
+	{
+		r_old <- NULL
+	}
+	
 	for(i in 1:tr$n)
 	{
 		if(verbose) cat("Iteration: ",i," of ",tr$n,"\n")
 		
-		r <- spatial.tools:::focal_hpc_focal_getChunk(x=x,tr=tr,format=chunk_format,i=i,r_old=r_old,
-				chunkArgs=chunkArgs)
-		
+		if(is.list(x))
+		{
+			r <- mapply(FUN=function(X,tr,format,i,r_old,chunkArgs)
+					{
+						chunkArgs$x <- X
+						spatial.tools:::focal_hpc_focal_getChunk(x=X,tr=tr,format=format,i=i,r_old=r_old,
+								chunkArgs=chunkArgs)	
+					},X=x,r_old=r_old,
+					MoreArgs=list(tr=tr,format=chunk_format,i=i,chunkArgs=chunkArgs),
+					SIMPLIFY=FALSE
+			)
+		} else
+		{
+			r <- spatial.tools:::focal_hpc_focal_getChunk(x=x,tr=tr,format=chunk_format,i=i,r_old=r_old,
+					chunkArgs=chunkArgs)
+			
+		}
 		# We need to divide up the chunks here.
 		# This is going to cause memory issues if we aren't careful...
 		j=1:tr$nrows[i]
@@ -347,19 +395,36 @@ focal_hpc_focal_processing <- function(tr,texture_tr,chunkArgs)
 		
 		#(tr$row[i]:tr$row2[i])-(tr$startrow_offset)
 		chunkList=mapply(function(j,r,texture_tr,row_centers,chunk_format)
-				{				
-					if(chunk_format=="array")
+				{
+					if(is.list(r))
 					{
-#						processing_chunk=array(data=as.vector(r[,texture_tr$row[j]:texture_tr$row2[j],]),
-#								dim=c(dim(r)[1],length(texture_tr$row[j]:texture_tr$row2[j]),dim(r)[3]))
-						processing_chunk=r[,texture_tr$row[j]:texture_tr$row2[j],,drop=FALSE]
-					}
-					if(chunk_format=="raster")
+						processing_chunk <- sapply(X=r,FUN=function(X,texture_tr,j,chunk_format)
+								{
+									if(chunk_format=="array")
+									{
+										processing_chunk=X[,texture_tr$row[j]:texture_tr$row2[j],,drop=FALSE]
+									}
+									if(chunk_format=="raster")
+									{
+										processing_chunk=getValuesBlock_enhanced(X,
+												r1=texture_tr$row[j],r2=texture_tr$row2[j],
+												format="raster")
+									}
+									return(processing_chunk)
+								},texture_tr=texture_tr,j=j,chunk_format=chunk_format,
+								simplify=FALSE)
+					} else
 					{
-						processing_chunk=getValuesBlock_enhanced(r,
-								r1=texture_tr$row[j],r2=texture_tr$row2[j],
-								format="raster")
-						#	processing_chunk=r[,texture_tr$row[j]:texture_tr$row2[j],]
+						if(chunk_format=="array")
+						{
+							processing_chunk=r[,texture_tr$row[j]:texture_tr$row2[j],,drop=FALSE]
+						}
+						if(chunk_format=="raster")
+						{
+							processing_chunk=getValuesBlock_enhanced(r,
+									r1=texture_tr$row[j],r2=texture_tr$row2[j],
+									format="raster")
+						}
 					}
 					out_chunk=list(row_center=row_centers[j],
 							processing_chunk=processing_chunk)
@@ -368,18 +433,35 @@ focal_hpc_focal_processing <- function(tr,texture_tr,chunkArgs)
 				,j,MoreArgs=list(r=r,texture_tr=texture_tr,row_centers=row_centers,chunk_format=chunk_format),
 				SIMPLIFY=FALSE)
 		
-#		browser()
 		foreach(chunk=chunkList, .packages=c("rgdal","raster","spatial.tools","mmap"),
 						.verbose=verbose) %dopar% 
 				spatial.tools:::focal_hpc_focalChunkFunction(chunk,chunkArgs)
 		
 		if(i<tr$n && window_dims[2] > 1)
-			r_old=array(data=r[,(dim(r)[2]-(tr$focal_row2[i]-tr$focal_row[i+1])):dim(r)[2],],
-					dim=c(
-							dim(r)[1],
-							length((dim(r)[2]-(tr$focal_row2[i]-tr$focal_row[i+1])):dim(r)[2]),
-							dim(r)[3])
-			)
+			if(is.list(r))
+			{
+				r_old <- sapply(X=r,FUN=function(X,tr,i)
+						{
+							r <- X
+							r_old <- array(data=r[,(dim(r)[2]-(tr$focal_row2[i]-tr$focal_row[i+1])):dim(r)[2],],
+									dim=c(
+											dim(r)[1],
+											length((dim(r)[2]-(tr$focal_row2[i]-tr$focal_row[i+1])):dim(r)[2]),
+											dim(r)[3])
+							)
+							return(r_old)
+						},
+						tr=tr,i=i,
+						simplify=FALSE)
+			} else
+			{
+				r_old <- array(data=r[,(dim(r)[2]-(tr$focal_row2[i]-tr$focal_row[i+1])):dim(r)[2],],
+						dim=c(
+								dim(r)[1],
+								length((dim(r)[2]-(tr$focal_row2[i]-tr$focal_row[i+1])):dim(r)[2]),
+								dim(r)[3])
+				)
+			}
 	}
 }
 
@@ -651,7 +733,7 @@ focal_hpc <- function(x,
 	# Processing:
 	if(processing_mode=="focal")
 	{
-		if(is.list(x)) stop("x as list not yet supported for window functions.  Stay tuned.")
+		#	if(is.list(x)) stop("x as list not yet supported for window functions.  Stay tuned.")
 		spatial.tools:::focal_hpc_focal_processing(tr,texture_tr,chunkArgs)
 	} else
 	{
