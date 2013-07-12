@@ -26,7 +26,7 @@ focal_hpc_precheck <- function(x,window_dims,window_center,processing_unit,verbo
 	{
 		if(verbose) message("Focal processing mode...")
 		processing_mode="focal"
-	#	processing_unit="single"
+		#	processing_unit="single"
 	} else
 	{
 		if(verbose) message("Pixel processing mode...")
@@ -265,6 +265,7 @@ focal_hpc_focalChunkFunction <- function(chunk,chunkArgs)
 	# window_center <- NULL
 	outbands <- NULL
 	window_center <- NULL
+	processing_unit <- NULL
 	
 	#
 	e <- list2env(chunkArgs,envir=environment())
@@ -336,28 +337,52 @@ focal_hpc_focalChunkFunction <- function(chunk,chunkArgs)
 #)
 	} else
 	{
-	#	processing_chunk=chunk$processing_chunk
+		#	processing_chunk=chunk$processing_chunk
 		if(verbose) message("Chunk mode...")
-		x_off <- (1:window_dims[1])-ceiling(window_dims[1]/2)
-		y_off <- (1:window_dims[2]) 
-		z_off <- 1:dim(chunk$processing_chunk)[3]
-		xyz_off <- as.data.frame(t(expand.grid(x_off,y_off,z_off)))
 		
-		central_index <- (1:(dim(chunk$processing_chunk)[1]-(window_dims[1]-1)))+(ceiling(window_dims[1]/2))-1
 		
-		focal_shifted_array <- sapply(X=xyz_off,FUN=
-						function(X,chunk,central_index)
-				{
-					#	print(X)
-					central_index_off <- central_index+X[1]
-					#	outchunk <- 
-					return(chunk[central_index_off,X[2],X[3]])
-					#	print(class(outchunk))
-					#	print(dim(outchunk))
-					#	return(outchunk)
-				},chunk=chunk$processing_chunk,central_index=central_index
-		)
-		
+		if(is.list(chunk$processing_chunk))
+		{
+			x_off <- (1:window_dims[1])-ceiling(window_dims[1]/2)
+			y_off <- (1:window_dims[2]) 
+			z_off <- 1:dim(chunk$processing_chunk[[1]])[3]
+			xyz_off <- as.data.frame(t(expand.grid(x_off,y_off,z_off)))
+			
+			central_index <- (1:(dim(chunk$processing_chunk[[1]])[1]-(window_dims[1]-1)))+(ceiling(window_dims[1]/2))-1
+			
+			focal_shifted_array <- mapply(
+					FUN=function(chunk,layer_names,window_index,window_dims,xyz_off,central_index)
+					{
+						focal_shifted_array <- sapply(X=xyz_off,
+								FUN=function(X,chunk,central_index)
+								{						
+									central_index_off <- central_index+X[1]
+									return(chunk[central_index_off,X[2],X[3]])
+								},chunk=chunk,central_index=central_index)
+				#		browser()
+						dimnames(focal_shifted_array) <- vector(mode="list",length=2)
+						if(!is.null(layer_names)) dimnames(focal_shifted_array)[[2]]=layer_names[as.numeric(xyz_off[3,])]
+						return(focal_shifted_array)
+					},chunk=chunk$processing_chunk,layer_name=layer_names,
+					MoreArgs=list(window_index=window_index,window_dims=window_dims,
+							xyz_off=xyz_off,central_index=central_index),
+					SIMPLIFY=FALSE)
+		} else
+		{
+			x_off <- (1:window_dims[1])-ceiling(window_dims[1]/2)
+			y_off <- (1:window_dims[2]) 
+			z_off <- 1:dim(chunk$processing_chunk)[3]
+			xyz_off <- as.data.frame(t(expand.grid(x_off,y_off,z_off)))
+			
+			central_index <- (1:(dim(chunk$processing_chunk)[1]-(window_dims[1]-1)))+(ceiling(window_dims[1]/2))-1
+			
+			focal_shifted_array <- sapply(X=xyz_off,FUN=
+							function(X,chunk,central_index)
+					{
+						central_index_off <- central_index+X[1]
+						return(chunk[central_index_off,X[2],X[3]])
+					},chunk=chunk$processing_chunk,central_index=central_index)	
+		}
 		fun_args=args
 		fun_args$x=focal_shifted_array
 		r_out <- do.call(fun, fun_args)
@@ -469,7 +494,7 @@ focal_hpc_focal_processing <- function(tr,texture_tr,chunkArgs)
 		
 		foreach(chunk=chunkList, .packages=c("rgdal","raster","spatial.tools","mmap"),
 						.verbose=verbose) %dopar% 
-						spatial.tools:::focal_hpc_focalChunkFunction(chunk,chunkArgs)
+				spatial.tools:::focal_hpc_focalChunkFunction(chunk,chunkArgs)
 		
 		if(i<tr$n && window_dims[2] > 1)
 			if(is.list(r))
@@ -770,7 +795,7 @@ focal_hpc <- function(x,
 	{
 		#	if(is.list(x)) stop("x as list not yet supported for window functions.  Stay tuned.")
 #	browser()
-	spatial.tools:::focal_hpc_focal_processing(tr,texture_tr,chunkArgs)
+		spatial.tools:::focal_hpc_focal_processing(tr,texture_tr,chunkArgs)
 	} else
 	{
 		# We need to create a more efficient pixel-based processor

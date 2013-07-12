@@ -8,6 +8,7 @@ rasterEngine <- function(x,
 		chunk_format="array",minblocks="max",blocksize=NULL,
 		prestack=NULL,
 		quick=TRUE,outbands=NULL,
+		processing_unit,
 		verbose=FALSE,...) 
 {
 	additional_vars <- list(...)
@@ -36,5 +37,6 @@ rasterEngine <- function(x,
 			filename=filename, overwrite=overwrite,outformat=outformat,
 			chunk_format=chunk_format,minblocks=minblocks,blocksize=blocksize,
 			outbands=outbands,
+			processing_unit=processing_unit,
 			verbose=verbose)
 }
