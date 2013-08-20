@@ -8,12 +8,25 @@ rasterEngine <- function(x,
 		chunk_format="array",minblocks="max",blocksize=NULL,
 		prestack=NULL,
 		quick=TRUE,outbands=NULL,
-		processing_unit,
+		processing_unit=NA,
 		verbose=FALSE,...) 
 {
 	additional_vars <- list(...)
 	additional_vars_isRaster <- sapply(additional_vars,is.Raster)
 	additional_vars_Raster <- additional_vars[additional_vars_isRaster]
+	
+	# Need to add processing unit processing_unit
+	if(is.na(processing_unit))
+	{
+		if(sum(window_dims) > 2)
+		{
+			processing_unit="single"
+		} else
+		{
+			processing_unit="chunk"
+		}
+	}
+	
 	
 	if(missing(x))
 	{

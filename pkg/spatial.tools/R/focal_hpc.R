@@ -339,8 +339,6 @@ focal_hpc_focalChunkFunction <- function(chunk,chunkArgs)
 	{
 		#	processing_chunk=chunk$processing_chunk
 		if(verbose) message("Chunk mode...")
-		
-		
 		if(is.list(chunk$processing_chunk))
 		{
 			x_off <- (1:window_dims[1])-ceiling(window_dims[1]/2)
@@ -357,11 +355,14 @@ focal_hpc_focalChunkFunction <- function(chunk,chunkArgs)
 								FUN=function(X,chunk,central_index)
 								{						
 									central_index_off <- central_index+X[1]
-									return(chunk[central_index_off,X[2],X[3]])
+									outchunk <- chunk[central_index_off,X[2],X[3]]
+									outchunk <- aperm(outchunk,c(2,1,3))
+									return(outchunk)
 								},chunk=chunk,central_index=central_index)
 				#		browser()
-						dimnames(focal_shifted_array) <- vector(mode="list",length=2)
-						if(!is.null(layer_names)) dimnames(focal_shifted_array)[[2]]=layer_names[as.numeric(xyz_off[3,])]
+						dim(focal_shifted_array) <- c(length(central_index),prod(window_dims),dim(chunk)[3])
+						dimnames(focal_shifted_array) <- vector(mode="list",length=3)
+						if(!is.null(layer_names)) dimnames(focal_shifted_array)[[3]]=layer_names # [as.numeric(xyz_off[3,])]
 						return(focal_shifted_array)
 					},chunk=chunk$processing_chunk,layer_name=layer_names,
 					MoreArgs=list(window_index=window_index,window_dims=window_dims,
@@ -380,12 +381,18 @@ focal_hpc_focalChunkFunction <- function(chunk,chunkArgs)
 							function(X,chunk,central_index)
 					{
 						central_index_off <- central_index+X[1]
-						return(chunk[central_index_off,X[2],X[3]])
+						outchunk <- chunk[central_index_off,X[2],X[3]]
+						outchunk <- aperm(outchunk,c(2,1,3))
+						return(outchunk)
 					},chunk=chunk$processing_chunk,central_index=central_index)	
+			dim(focal_shifted_array) <- c(length(central_index),prod(window_dims),dim(chunk)[3])
+			dimnames(focal_shifted_array) <- vector(mode="list",length=3)
+			if(!is.null(layer_names)) dimnames(focal_shifted_array)[[3]]=layer_names
 		}
 		fun_args=args
 		fun_args$x=focal_shifted_array
 		r_out <- do.call(fun, fun_args)
+		dim(r_out) <- c(ncol_x,1,outbands)
 	}
 	
 	image_dims=c(image_dims[2],image_dims[1],image_dims[3])
