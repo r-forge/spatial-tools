@@ -848,8 +848,7 @@ focal_hpc <- function(x,
 	if(is.null(outbands))
 	{
 		outbands <- 
-		#		spatial.tools:::
-		focal_hpc_test(x,fun,window_center,window_dims,args,layer_names,
+		spatial.tools:::focal_hpc_test(x,fun,window_center,window_dims,args,layer_names,
 						startrow_offset,endrow_offset,
 						processing_mode,processing_unit,chunk_format,
 						verbose)
