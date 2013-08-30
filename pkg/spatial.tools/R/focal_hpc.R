@@ -46,7 +46,8 @@ focal_hpc_precheck <- function(x,window_dims,window_center,processing_unit,verbo
 
 focal_hpc_test <- function(x,fun,window_center,window_dims,args,
 		layer_names,
-		startrow_offset,endrow_offset,processing_unit,chunk_format,
+		startrow_offset,endrow_offset,
+		processing_mode,processing_unit,chunk_format,
 		verbose)
 {
 	if(verbose) { message("Checking the function on a small chunk of data.") }
@@ -62,6 +63,13 @@ focal_hpc_test <- function(x,fun,window_center,window_dims,args,
 		args$window_dims=window_dims
 		args$layer_names=layer_names
 	}
+	
+#	if(processing_mode=="focal")
+#	{
+#		
+#		
+#	} else
+#	{
 	
 	# We are going to pull out the first row and first two pixels to check the function...
 	
@@ -92,15 +100,86 @@ focal_hpc_test <- function(x,fun,window_center,window_dims,args,
 			r_check <- sapply(X=x,
 					FUN=function(X,window_dims,chunk_format)
 					{
-						getValuesBlock_enhanced(X, r1=1, r2=1, c1=1,c2=2,
+#						getValuesBlock_enhanced(X, r1=1, r2=1, c1=1,c2=2,
+#								format=chunk_format)
+						
+						test_chunk <- getValuesBlock_enhanced(X, 
+								r1=1, r2=window_dims[2], c1=1,c2=(window_dims[1]+1),
 								format=chunk_format)
 						
+						if(processing_mode=="focal")
+						{
+							x_off <- (1:window_dims[1])-ceiling(window_dims[1]/2)
+							y_off <- (1:window_dims[2]) 
+							z_off <- 1:dim(test_chunk[[1]])[3]
+							xyz_off <- as.data.frame(t(expand.grid(x_off,y_off,z_off)))
+							central_index <- (1:(dim(test_chunk[[1]])[1]
+											-(window_dims[1]-1)))+(ceiling(window_dims[1]/2))-1
+							
+							focal_shifted_array <- mapply(
+									FUN=function(chunk,layer_names,window_index,window_dims,xyz_off,central_index)
+									{
+										focal_shifted_array <- sapply(X=xyz_off,
+												FUN=function(X,chunk,central_index)
+												{						
+													central_index_off <- central_index+X[1]
+													outchunk <- chunk[central_index_off,X[2],X[3],drop=FALSE]
+													outchunk <- aperm(outchunk,c(2,1,3))
+													return(outchunk)
+												},chunk=chunk,central_index=central_index)
+										#		browser()
+										dim(focal_shifted_array) <- c(length(central_index),prod(window_dims),dim(chunk)[3])
+										dimnames(focal_shifted_array) <- vector(mode="list",length=3)
+										if(!is.null(layer_names)) dimnames(focal_shifted_array)[[3]]=layer_names # [as.numeric(xyz_off[3,])]
+										return(focal_shifted_array)
+									},chunk=test_chunk,layer_name=layer_names,
+									MoreArgs=list(window_index=window_index,window_dims=window_dims,
+											xyz_off=xyz_off,central_index=central_index),
+									SIMPLIFY=FALSE)
+							return(focal_shifted_array)
+						} else
+						{
+							return(test_chunk)
+						}
 					},window_dims=window_dims,chunk_format=chunk_format,simplify=FALSE)
 		} else
 		{
-			r_check <- getValuesBlock_enhanced(x, r1=1, r2=1, 
-					c1=1,c2=2,
+#			r_check <- getValuesBlock_enhanced(x, r1=1, r2=1, 
+#					c1=1,c2=2,
+#					format=chunk_format)
+			
+			test_chunk <- getValuesBlock_enhanced(x, 
+					r1=1, r2=window_dims[2], c1=1,c2=(window_dims[1]+1),
 					format=chunk_format)
+			
+			if(processing_mode=="focal")
+			{
+				x_off <- (1:window_dims[1])-ceiling(window_dims[1]/2)
+				y_off <- (1:window_dims[2]) 
+				z_off <- 1:dim(test_chunk)[3]
+				xyz_off <- as.data.frame(t(expand.grid(x_off,y_off,z_off)))
+				central_index <- (1:(dim(test_chunk)[1]
+								-(window_dims[1]-1)))+(ceiling(window_dims[1]/2))-1
+				
+				focal_shifted_array <- sapply(X=xyz_off,FUN=
+								function(X,chunk,central_index)
+						{
+							central_index_off <- central_index+X[1]
+							outchunk <- chunk[central_index_off,X[2],X[3],drop=FALSE]
+							outchunk <- aperm(outchunk,c(2,1,3))
+							return(outchunk)
+						},chunk=test_chunk,central_index=central_index)	
+				dim(focal_shifted_array) <- c(length(central_index),
+					prod(window_dims),dim(test_chunk)[3])
+				dimnames(focal_shifted_array) <- vector(mode="list",length=3)
+				if(!is.null(layer_names)) { dimnames(focal_shifted_array)[[3]] <- layer_names }
+				
+				r_check <- focal_shifted_array
+				
+			} else
+			{
+				r_check <- test_chunk
+			}
 		}
 	}
 	
@@ -127,6 +206,7 @@ focal_hpc_test <- function(x,fun,window_center,window_dims,args,
 			stop(dim(r_check_function))
 		} else outbands=dim(r_check_function)[3]
 	}
+#	}
 	if(verbose) { message(paste("Number of output bands determined to be:",outbands,sep=" ")) }
 	return(outbands)
 }
@@ -297,7 +377,6 @@ focal_hpc_focalChunkFunction <- function(chunk,chunkArgs)
 #	system.time(
 	if(processing_unit=="single")	
 	{
-		
 		r_out <-
 				array(t(
 								mapply(
@@ -393,7 +472,6 @@ focal_hpc_focalChunkFunction <- function(chunk,chunkArgs)
 		fun_args$x=focal_shifted_array
 		r_out <- do.call(fun, fun_args)
 		dim(r_out) <- c(ncol_x,1,outbands)
-		print(dim(r_out))
 	}
 	
 	image_dims=c(image_dims[2],image_dims[1],image_dims[3])
@@ -443,8 +521,7 @@ focal_hpc_focal_processing <- function(tr,texture_tr,chunkArgs)
 			r <- mapply(FUN=function(X,tr,format,i,r_old,chunkArgs)
 					{
 						chunkArgs$x <- X
-						# spatial.tools:::
-						focal_hpc_focal_getChunk(x=X,tr=tr,format=format,i=i,r_old=r_old,
+						spatial.tools:::focal_hpc_focal_getChunk(x=X,tr=tr,format=format,i=i,r_old=r_old,
 								chunkArgs=chunkArgs)	
 					},X=x,r_old=r_old,
 					MoreArgs=list(tr=tr,format=chunk_format,i=i,chunkArgs=chunkArgs),
@@ -453,8 +530,7 @@ focal_hpc_focal_processing <- function(tr,texture_tr,chunkArgs)
 		} else
 		{
 			r <- 
-					#		spatial.tools:::
-					focal_hpc_focal_getChunk(x=x,tr=tr,format=chunk_format,i=i,r_old=r_old,
+					spatial.tools:::focal_hpc_focal_getChunk(x=x,tr=tr,format=chunk_format,i=i,r_old=r_old,
 							chunkArgs=chunkArgs)
 			
 		}
@@ -505,8 +581,7 @@ focal_hpc_focal_processing <- function(tr,texture_tr,chunkArgs)
 		
 		foreach(chunk=chunkList, .packages=c("rgdal","raster","spatial.tools","mmap"),
 						.verbose=verbose) %dopar% 
-				#		spatial.tools:::
-				focal_hpc_focalChunkFunction(chunk,chunkArgs)
+				spatial.tools:::focal_hpc_focalChunkFunction(chunk,chunkArgs)
 		
 		if(i<tr$n && window_dims[2] > 1)
 			if(is.list(r))
@@ -628,8 +703,7 @@ focal_hpc_pixel_processing <- function(tr,chunkArgs)
 	list2env(chunkArgs,envir=environment())
 	chunkID <- seq(tr$n)
 	foreach(chunkID=chunkID, .packages=c("rgdal","raster","spatial.tools","mmap"),.verbose=verbose) %dopar% 
-			#		spatial.tools:::
-			focal_hpc_pixelChunkFunction(chunkID,tr,x,chunk_format,fun,args,layer_names,outbands,
+			spatial.tools:::focal_hpc_pixelChunkFunction(chunkID,tr,x,chunk_format,fun,args,layer_names,outbands,
 					filename)
 }
 
@@ -768,21 +842,21 @@ focal_hpc <- function(x,
 	}
 	# Prechecks.
 	list2env(
-			# spatial.tools:::
-			focal_hpc_precheck(x,window_dims,window_center,processing_unit,verbose),envir=environment())
+			spatial.tools:::focal_hpc_precheck(x,window_dims,window_center,processing_unit,verbose),envir=environment())
 	
 	# Test focal_hpc and determine the number of outbands.
 	if(is.null(outbands))
 	{
 		outbands <- 
-				#	spatial.tools:::
-				focal_hpc_test(x,fun,window_center,window_dims,args,layer_names,
-						startrow_offset,endrow_offset,processing_unit,chunk_format,verbose)
+		#		spatial.tools:::
+		focal_hpc_test(x,fun,window_center,window_dims,args,layer_names,
+						startrow_offset,endrow_offset,
+						processing_mode,processing_unit,chunk_format,
+						verbose)
 	}
 	# Set up chunking parameters.
 	list2env(
-			#		spatial.tools:::
-			focal_hpc_chunk_setup(
+			spatial.tools:::focal_hpc_chunk_setup(
 					x=x,window_dims=window_dims,window_center=window_center,
 					chunk_nrows=chunk_nrows,startrow_offset=startrow_offset,
 					endrow_offset=endrow_offset,
@@ -791,11 +865,16 @@ focal_hpc <- function(x,
 					verbose=verbose),
 			envir=environment())
 	
+	# print(class(x))
+	
 	# Create blank image file.
+	if(!is.list(x)) reference_raster <- x else reference_raster <- x[[1]]
+	
+	
 	out <- create_blank_raster(filename=filename,
 			format="raster",dataType="FLT8S",bandorder="BSQ",
 			nlayers=outbands,
-			create_header=TRUE,reference_raster=x[[1]],
+			create_header=TRUE,reference_raster=reference_raster,
 			overwrite=overwrite,verbose=verbose)
 	
 	# Create chunk arguments.
@@ -813,13 +892,11 @@ focal_hpc <- function(x,
 	{
 		#	if(is.list(x)) stop("x as list not yet supported for window functions.  Stay tuned.")
 #	browser()
-		#spatial.tools:::
-		focal_hpc_focal_processing(tr,texture_tr,chunkArgs)
+		spatial.tools:::focal_hpc_focal_processing(tr,texture_tr,chunkArgs)
 	} else
 	{
 		# We need to create a more efficient pixel-based processor
-		#spatial.tools:::
-		focal_hpc_pixel_processing(tr,chunkArgs)
+		spatial.tools:::focal_hpc_pixel_processing(tr,chunkArgs)
 	}
 	
 	return(brick(out))
