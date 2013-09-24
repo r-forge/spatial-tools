@@ -8,8 +8,8 @@ Author: Jonathan Asher Greenberg
 Description: Spatial functions meant to enhance the core functionality of the
     package "raster", including a parallel processing engine for use with
     rasters.
-Version: 1.1.3
-Date: 2013-08-30
+Version: 1.1.4
+Date: 2013-09-24
 Depends:
     raster,
     rgdal,
@@ -20,7 +20,7 @@ Depends:
     foreach,
     doParallel,
     rgeos,
-    R (>= 2.15.3)
+    R (>= 3.0.0)
 Collate:
     'spatial_sync_vector.R'
     'tahoe_highrez_data.R'
