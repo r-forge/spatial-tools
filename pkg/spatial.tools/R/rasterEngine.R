@@ -12,9 +12,14 @@ rasterEngine <- function(x,
 		verbose=FALSE,...) 
 {
 	additional_vars <- list(...)
+	if(length(additional_vars)>0)
+	{
 	additional_vars_isRaster <- sapply(additional_vars,is.Raster)
 	additional_vars_Raster <- additional_vars[additional_vars_isRaster]
-	
+	} else
+	{
+		additional_vars_Raster <- NULL
+	}
 	# Need to add processing unit processing_unit
 	if(is.na(processing_unit))
 	{
@@ -33,6 +38,7 @@ rasterEngine <- function(x,
 		x <- additional_vars_Raster
 	} else
 	{
+#		if(class(x) != "list")
 		x <- c(x,additional_vars_Raster)
 		names(x)[[1]] <- "x"
 	}
