@@ -156,7 +156,3 @@ extract_enhanced <- function(x,y,
 	
 	return(extracted_data_list)
 }
-#require("spatial.tools")
-#x <- brick(system.file("external/tahoe_highrez.tif", package="spatial.tools"))
-#y <- readOGR(dsn=system.file("external", package="spatial.tools"),layer="tahoe_highrez_training_points_utm")
-#extract_enhanced_core(raster=x,vector=y)
