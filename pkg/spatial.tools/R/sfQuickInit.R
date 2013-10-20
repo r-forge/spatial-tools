@@ -9,17 +9,19 @@
 #' @examples 
 #' sfQuickInit(cpus=2)
 #' sfQuickStop()
+#' @import parallel
+#' @import doParallel
 #' @export
 
 sfQuickInit <- function(cpus,methods=FALSE,...)
 {
 	if(missing("cpus"))
 	{
-		cpus <- floor(detectCores()/2)
+		cpus <- floor(parallel::detectCores()/2)
 	}
 	
-	cl <- makeCluster(spec=cpus,type="PSOCK",methods=methods)
-	setDefaultCluster(cl=cl)
+	cl <- parallel::makeCluster(spec=cpus,type="PSOCK",methods=methods)
+	parallel::setDefaultCluster(cl=cl)
 	registerDoParallel(cl)
 	return(cl)
 }

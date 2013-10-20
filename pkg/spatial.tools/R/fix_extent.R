@@ -14,6 +14,7 @@
 #' tahoe_highrez_fixed <- fix_extent(tahoe_highrez,tahoe_highrez_broken)
 #' tahoe_highrez_fixed
 #' 
+#' @import raster
 #' @export
 
 

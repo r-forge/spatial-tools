@@ -19,6 +19,7 @@
 #' # Add two rows to the top and left of the raster, and fill with the value 100.
 #' tahoe_highrez_expand <- modify_raster_margins(x=tahoe_highrez,extent_delta=c(2,0,2,0),value=100)
 #' dim(tahoe_highrez_expand)
+#' @import raster
 #' @export
 
 modify_raster_margins <- function(x,extent_delta=c(0,0,0,0),value=NA)

@@ -23,6 +23,8 @@
 #' list.raster.files(path=search_folder,return_rasters=TRUE)
 #' # sfQuickStop() 
 #' }
+#' @import raster
+#' @import foreach
 #' @export
 
 list.raster.files <- function(path=".",pattern=NULL,recursive=FALSE,return_rasters=FALSE)

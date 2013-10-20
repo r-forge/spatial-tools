@@ -19,6 +19,7 @@
 #' dim(mychunk)
 #' mychunk_raster <- getValuesBlock_enhanced(tahoe_highrez,r1=100,r2=110,c1=20,c2=50,format="raster")
 #' mychunk_raster
+#' @import raster
 #' @export
 
 getValuesBlock_enhanced=function(x,r1=1,r2=nrow(x),c1=1,c2=ncol(x),lyrs=seq(nlayers(x)),format="array",...)

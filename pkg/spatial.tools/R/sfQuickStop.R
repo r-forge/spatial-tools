@@ -8,13 +8,15 @@
 #' @examples
 #' sfQuickInit(cpus=2)
 #' sfQuickStop()
+#' @import parallel
+#' @import foreach
 #' @export
 
 sfQuickStop <- function(kill=FALSE,...)
 {
 	cl <- parallel:::defaultCluster()
 	registerDoSEQ()
-	stopCluster(cl)
+	parallel::stopCluster(cl)
 	
 	if(kill)
 	{

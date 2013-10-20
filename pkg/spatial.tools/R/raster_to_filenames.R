@@ -16,6 +16,7 @@
 #' nodata <- raster()
 #' raster_to_filenames(nodata)
 #' }
+#' @import raster
 #' @export
 
 raster_to_filenames <- function(x,unique=FALSE)

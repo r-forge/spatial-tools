@@ -8,19 +8,19 @@ Author: Jonathan Asher Greenberg
 Description: Spatial functions meant to enhance the core functionality of the
     package "raster", including a parallel processing engine for use with
     rasters.
-Version: 1.1.6
+Version: 1.1.7
 Date: 2013-10-20
 Depends:
-    sp,
-    raster,
+    parallel,
+    iterators,
     rgdal,
+    raster,
+    foreach,
+    R (>= 3.0.2)
+Imports:
     mmap,
     abind,
-    parallel,
-    foreach,
-    doParallel,
-    rgeos,
-    R (>= 3.0.2)
+    doParallel
 Collate:
     'spatial_sync_vector.R'
     'tahoe_highrez_data.R'
@@ -47,7 +47,5 @@ Collate:
     'getValuesBlock_stackfix.R'
     'modify_raster_margins.R'
     'projectRaster_rigorous.R'
-    'rasterMinMax.R'
-    'rotate_enhanced.R'
     'rasterEngine.R'
     'list.raster.files.R'

@@ -39,6 +39,6 @@ bbox_to_SpatialPolygons(tahoe_highrez_bbox,
   Jonathan A. Greenberg
 }
 \seealso{
-  \code{\link{bbox}}, \code{\link{extent}}
+  \code{\link[sp]{bbox}}, \code{\link{extent}}
 }
 

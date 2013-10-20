@@ -31,6 +31,7 @@
 #' setMinMax(blank_raster)
 #' plot(raster(blank_raster,layer=1))
 #' }
+#' @import mmap
 #' @export
 
 binary_image_write=function(filename,mode=real64(),image_dims,interleave="BSQ",
@@ -78,7 +79,7 @@ binary_image_write=function(filename,mode=real64(),image_dims,interleave="BSQ",
 	} 
 		
 	
-	out = mmap(filename, mode=mode)
+	out = mmap::mmap(filename, mode=mode)
 	out[cell_position] <- as.numeric(data)
 	munmap(out)	
 }

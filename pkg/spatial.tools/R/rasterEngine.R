@@ -1,22 +1,22 @@
 #' Engine for performing fast, easy-to-develop pixel and focal raster calculations with parallel processing capability.
-#' @param x Raster*. A Raster* used as the input into the function.
-#' @param fun function. A focal function to be applied to the image. See Details.
-#' @param args list. Arguments to pass to the function (see ?mapply).  Note that the 'fun' should explicitly name the variables.
+#' @param x Raster*. A Raster* used as the input into the function.  This is optional, as long as some Raster* was defined in "..."
+#' @param fun Function. A focal function to be applied to the image. See Details.
+#' @param args List. Arguments to pass to the function (see ?mapply).  Note that the 'fun' should explicitly name the variables.
 #' @param window_dims Vector. The size of a processing window in col x row order.  Be default, a single pixel (c(1,1).
-#' @param window_center Vector. The local coordinate of the center of a processing window.  By default the middle of the processing window.  UNSUPPORTED.
-#' @param filename character. Filename of the output raster.
-#' @param overwrite logical. Allow files to be overwritten? Default is FALSE.
-#' @param outformat character. Outformat of the raster. Must be a format usable by hdr(). Default is 'raster'. CURRENTLY UNSUPPORTED.
+#' @param window_center Vector. The local coordinate of the center of a processing window.  By default the middle of the processing window.  CURRENTLY UNSUPPORTED.
+#' @param filename Character. Filename of the output raster.
+#' @param overwrite Logical. Allow files to be overwritten? Default is FALSE.
+#' @param outformat Character. Outformat of the raster. Must be a format usable by hdr(). Default is 'raster'. CURRENTLY UNSUPPORTED.
 #' @param chunk_format Character. The format to send the chunk to the function.  Can be "array" (default) or "raster".
 #' @param minblocks Numeric. The minimum number of chunks to divide the raster into for processing.  Defaults to 1.
 #' @param blocksize Numeric. The size (in rows) for a block of data.  If unset, rasterEngine will attempt to figure out an optimal blocksize.
 #' @param outbands Numeric. If known, how many bands in the output file?  Assigning this will allow rasterEngine to skip the pre-check.
-#' @param processing_unit Character. ("single"|"chunk") Will be auto-set if not specified ("chunk" for pixel-processing, "single" for focal processing).  See Description.
-#' @param verbose logical. Enable verbose execution? Default is FALSE.  
-#' @param ... Raster*s. Named variables pointing to Raster* objects.  See Description.
+#' @param processing_unit Character. ("single"|"chunk") Will be auto-set if not specified ("chunk" for pixel-processing, "single" for focal processing).  See Details.
+#' @param verbose Logical. Enable verbose execution? Default is FALSE.  
+#' @param ... Raster*s. Named variables pointing to Raster* objects.  See Details.
 #' @author Jonathan A. Greenberg (\email{spatial.tools@@estarcion.net})
 #' @seealso \code{\link{focal_hpc}}, \code{\link{foreach}}, \code{\link{mmap}}, \code{\link{dataType}}, \code{\link{hdr}} 
-#' @details rasterEngine is designed to execute a function on a Raster* object using foreach, to
+#' @details rasterEngine is designed to execute a function on one or multiple Raster* object(s) using foreach, to
 #' achieve parallel reads, executions and writes. Parallel random writes are achieved through the use of
 #' mmap, so individual image chunks can finish and write their outputs without having to wait for
 #' all nodes in the cluster to finish and then perform sequential writing.  On Windows systems,

@@ -12,12 +12,13 @@
 }
 \arguments{
   \item{x}{Raster*. A Raster* used as the input into the
-  function.}
+  function.  This is optional, as long as some Raster* was
+  defined in "..."}
 
-  \item{fun}{function. A focal function to be applied to
+  \item{fun}{Function. A focal function to be applied to
   the image. See Details.}
 
-  \item{args}{list. Arguments to pass to the function (see
+  \item{args}{List. Arguments to pass to the function (see
   ?mapply).  Note that the 'fun' should explicitly name the
   variables.}
 
@@ -27,15 +28,15 @@
 
   \item{window_center}{Vector. The local coordinate of the
   center of a processing window.  By default the middle of
-  the processing window.  UNSUPPORTED.}
+  the processing window.  CURRENTLY UNSUPPORTED.}
 
-  \item{filename}{character. Filename of the output
+  \item{filename}{Character. Filename of the output
   raster.}
 
-  \item{overwrite}{logical. Allow files to be overwritten?
+  \item{overwrite}{Logical. Allow files to be overwritten?
   Default is FALSE.}
 
-  \item{outformat}{character. Outformat of the raster. Must
+  \item{outformat}{Character. Outformat of the raster. Must
   be a format usable by hdr(). Default is 'raster'.
   CURRENTLY UNSUPPORTED.}
 
@@ -57,13 +58,13 @@
   \item{processing_unit}{Character. ("single"|"chunk") Will
   be auto-set if not specified ("chunk" for
   pixel-processing, "single" for focal processing).  See
-  Description.}
+  Details.}
 
-  \item{verbose}{logical. Enable verbose execution? Default
+  \item{verbose}{Logical. Enable verbose execution? Default
   is FALSE.}
 
   \item{...}{Raster*s. Named variables pointing to Raster*
-  objects.  See Description.}
+  objects.  See Details.}
 }
 \description{
   Engine for performing fast, easy-to-develop pixel and
@@ -71,19 +72,19 @@
   capability.
 }
 \details{
-  rasterEngine is designed to execute a function on a
-  Raster* object using foreach, to achieve parallel reads,
-  executions and writes. Parallel random writes are
-  achieved through the use of mmap, so individual image
-  chunks can finish and write their outputs without having
-  to wait for all nodes in the cluster to finish and then
-  perform sequential writing.  On Windows systems, random
-  writes are possible but apparently not parallel writes.
-  rasterEngine solves this by trying to write to a portion
-  of the image file, and if it finds an error (a race
-  condition occurs), it will simply retry the writes until
-  it successfully finishes.  On Unix-alikes, truly parallel
-  writes should be possible.
+  rasterEngine is designed to execute a function on one or
+  multiple Raster* object(s) using foreach, to achieve
+  parallel reads, executions and writes. Parallel random
+  writes are achieved through the use of mmap, so
+  individual image chunks can finish and write their
+  outputs without having to wait for all nodes in the
+  cluster to finish and then perform sequential writing.
+  On Windows systems, random writes are possible but
+  apparently not parallel writes.  rasterEngine solves this
+  by trying to write to a portion of the image file, and if
+  it finds an error (a race condition occurs), it will
+  simply retry the writes until it successfully finishes.
+  On Unix-alikes, truly parallel writes should be possible.
 
   rasterEngine is a convienence wrapper for focal_hpc and,
   in general, should be used instead of focal_hpc directly.
