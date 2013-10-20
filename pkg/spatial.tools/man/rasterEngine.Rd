@@ -86,8 +86,9 @@
   simply retry the writes until it successfully finishes.
   On Unix-alikes, truly parallel writes should be possible.
 
-  rasterEngine is a convienence wrapper for focal_hpc and,
-  in general, should be used instead of focal_hpc directly.
+  rasterEngine is a convienence wrapper for
+  \code{\link{focal_hpc}} and, in general, should be used
+  instead of focal_hpc directly.
 
   rasterEngine operates in two modes, which have different
   input and outputs to the function:
@@ -130,54 +131,55 @@
   running sfQuickStop(), rasterEngine will run in
   sequential mode.
 
-  A fuller tutorial is availabler at
+  A fuller tutorial is available at
   \url{http://publish.illinois.edu/jgrn/software-and-datasets/rasterengine-tutorial/}
 }
 \examples{
 # Pixel-based processing on one band:
-	apply_multiplier <- function(inraster,multiplier,...) # Always include the ellipses
-	{
-		# Note that inraster is received by this function as a 3-d array (col,row,band)
-		multiplied_raster <- inraster * multiplier
-		return(multiplied_raster)
-	}
- tahoe_lidar_highesthit <-
- 	setMinMax(raster(system.file(
-		"external/tahoe_lidar_highesthit.tif", package="spatial.tools")))
- # Note that you can use any parallel backend that can be registered with foreach.
- # sfQuickInit() will spawn a PSOCK cluster using the parallel package.
-	sfQuickInit(cpus=2)
- tahoe_lidar_highesthit_multiplied <- rasterEngine(
-		inraster=tahoe_lidar_highesthit,
-		fun=apply_multiplier,
-		args=list(multiplier=3.28084))
-	sfQuickStop()
+apply_multiplier <- function(inraster,multiplier,...) # Always include the ellipses
+{
+	# Note that inraster is received by this function as a 3-d array (col,row,band)
+	multiplied_raster <- inraster * multiplier
+	return(multiplied_raster)
+}
+
+tahoe_lidar_highesthit <-
+	setMinMax(raster(system.file(
+	"external/tahoe_lidar_highesthit.tif", package="spatial.tools")))
+
+# Note that you can use any parallel backend that can be registered with foreach.
+# sfQuickInit() will spawn a PSOCK cluster using the parallel package.
+sfQuickInit(cpus=2)
+tahoe_lidar_highesthit_multiplied <- rasterEngine(
+	inraster=tahoe_lidar_highesthit,
+	fun=apply_multiplier,
+	args=list(multiplier=3.28084))
+sfQuickStop()
 
 \dontrun{
 # Pixel-based processing on more than one band:
 ndvi <- function(GRNIR_image,...)
 {
-# The input array will have dim(GRNIR_image)[3] equal
-# to 3, because the input image has three bands.
-# Note: the following two lines return an array,
-# so we don't need to manually set the dim(ndvi) at the
-# end.  If we didn't use drop=FALSE, we'd need to
-# coerce the output into a 3-d array before returning it.
+	# The input array will have dim(GRNIR_image)[3] equal
+	# to 3, because the input image has three bands.
+	# Note: the following two lines return an array,
+	# so we don't need to manually set the dim(ndvi) at the
+	# end.  If we didn't use drop=FALSE, we'd need to
+	# coerce the output into a 3-d array before returning it.
 	red_band <- GRNIR_image[,,2,drop=FALSE]
 	nir_band <- GRNIR_image[,,3,drop=FALSE]
 	ndvi <- (nir_band - red_band)/(nir_band + red_band)
-# The following is not needed in this case:
-# dim(ndvi) <- c(
-# dim(GRNIR_image)[1],
-# dim(GRNIR_image)[2],
-# 1)
+	# The following is not needed in this case:
+	# dim(ndvi) <- c(dim(GRNIR_image)[1],dim(GRNIR_image)[2],1)
 	return(ndvi)
 }
 
 tahoe_highrez <- setMinMax(
 	brick(system.file("external/tahoe_highrez.tif", package="spatial.tools")))
 
+sfQuickInit(cpus=2)
 tahoe_ndvi <- rasterEngine(GRNIR_image=tahoe_highrez,fun=ndvi_nodrop)
+sfQuickStop()
 
 # Focal-based processing:
 mean_smoother <- function(inraster,...) # Always include the ellipses
