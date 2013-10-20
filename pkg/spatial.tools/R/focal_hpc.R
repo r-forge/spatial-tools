@@ -50,6 +50,9 @@ focal_hpc_test <- function(x,fun,window_center,window_dims,args,
 		processing_mode,processing_unit,chunk_format,
 		verbose)
 {
+	
+	window_index <- NULL # Why is this here?
+	
 	if(verbose) { message("Checking the function on a small chunk of data.") }
 	
 	# Add additional info to the args.
@@ -144,9 +147,6 @@ focal_hpc_test <- function(x,fun,window_center,window_dims,args,
 					},window_dims=window_dims,chunk_format=chunk_format,simplify=FALSE)
 		} else
 		{
-#			r_check <- getValuesBlock_enhanced(x, r1=1, r2=1, 
-#					c1=1,c2=2,
-#					format=chunk_format)
 			
 			test_chunk <- getValuesBlock_enhanced(x, 
 					r1=1, r2=window_dims[2], c1=1,c2=(window_dims[1]+1),
@@ -337,7 +337,7 @@ focal_hpc_focalChunkFunction <- function(chunk,chunkArgs)
 {	
 	
 #	browser()
-	# Create some blank variables:
+	# Create some blank variables (to avoid R CMD CHECK errors):
 	x <- NULL
 	layer_names <- NULL
 	fun <- NULL
@@ -346,6 +346,7 @@ focal_hpc_focalChunkFunction <- function(chunk,chunkArgs)
 	outbands <- NULL
 	window_center <- NULL
 	processing_unit <- NULL
+	verbose <- NULL
 	
 	#
 	e <- list2env(chunkArgs,envir=environment())
@@ -719,6 +720,7 @@ focal_hpc_pixel_processing <- function(tr,chunkArgs)
 #' @param filename character. Filename of the output raster.
 #' @param outformat character. Outformat of the raster. Must be a format usable by hdr(). Default is 'raster'. CURRENTLY UNSUPPORTED.
 #' @param overwrite logical. Allow files to be overwritten? Default is FALSE.
+#' @param processing_unit Character. ("single"|"chunk") Will be auto-set if not specified ("chunk" for pixel-processing, "single" for focal processing).  See Description.
 #' @param outbands Numeric. If known, how many bands in the output file?  Assigning this will allow focal_hpc to skip the pre-check.
 #' @param verbose logical. Enable verbose execution? Default is FALSE.  
 #' @author Jonathan A. Greenberg (\email{spatial.tools@@estarcion.net})
@@ -761,6 +763,9 @@ focal_hpc_pixel_processing <- function(tr,chunkArgs)
 #' and may, indeed, be slower than a sequential execution (e.g. with calc() ), 
 #' particularly on smaller files.  Note that by simply running sfQuickStop(), focal_hpc
 #' will run in sequential mode.
+#' 
+#' Note that rasterEngine is a convienence wrapper for focal_hpc and, in general, should be used instead
+#' of focal_hpc directly.  
 #' 
 #' @examples
 

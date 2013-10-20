@@ -8,19 +8,19 @@ Author: Jonathan Asher Greenberg
 Description: Spatial functions meant to enhance the core functionality of the
     package "raster", including a parallel processing engine for use with
     rasters.
-Version: 1.1.5
-Date: 2013-10-3
+Version: 1.1.6
+Date: 2013-10-20
 Depends:
+    sp,
     raster,
     rgdal,
-    sp,
     mmap,
     abind,
     parallel,
     foreach,
     doParallel,
     rgeos,
-    R (>= 3.0.0)
+    R (>= 3.0.2)
 Collate:
     'spatial_sync_vector.R'
     'tahoe_highrez_data.R'
@@ -35,31 +35,19 @@ Collate:
     'binary_image_write.R'
     'focal_hpc.R'
     'getValuesBlock_enhanced.R'
-    'fillNA.R'
     'which_simple.R'
     'subset_raster_by_names.R'
     'sfQuickInit.R'
-    'raster_to_tile.R'
     'create_blank_raster.R'
     'sfQuickStop.R'
-    'get_gdal_installation.R'
-    'extract_enhanced.R'
-    'extract_raster_overlap.R'
     'is.Raster.R'
     'raster_to_filenames.R'
     'bbox_to_SpatialPolygons.R'
-    'arithmetic_fhf.R'
     'brickstack_to_raster_list.R'
-    'fillNA_fhf.R'
     'getValuesBlock_stackfix.R'
     'modify_raster_margins.R'
-    'modis_hdf4_subdatasets.R'
-    'ncep_to_grid.R'
     'projectRaster_rigorous.R'
     'rasterMinMax.R'
     'rotate_enhanced.R'
-    'spSplit.R'
-    'Rgdal_translate.R'
-    'by.Raster.R'
     'rasterEngine.R'
-    'rasterEngine_prestack.R'
+    'list.raster.files.R'

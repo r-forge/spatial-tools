@@ -1,0 +1,54 @@
+\name{list.raster.files}
+\alias{list.raster.files}
+\title{Spiders a directory for raster files.}
+\usage{
+  list.raster.files(path = ".", pattern = NULL,
+    recursive = FALSE, return_rasters = FALSE)
+}
+\arguments{
+  \item{path}{Character. The path to search for raster
+  files.}
+
+  \item{pattern}{Character. A regular expression to limit
+  the files that are tested/returned.}
+
+  \item{recursive}{Logical. Search nested subdirectories
+  within the path?}
+
+  \item{return_rasters}{Logical. Return all proper files as
+  RasterBrick objects (TRUE) or as filenames (FALSE).}
+}
+\value{
+  A list of filenames (return_rasters=FALSE) or a list of
+  RasterBricks (return_rasters=TRUE).
+}
+\description{
+  Spiders a directory for raster files.
+}
+\details{
+  This function searches through a path (potentially
+  recursively), and returns the filename and/or a brick for
+  each file that can be coerced safely to a RasterBrick
+  object.  Note that given different flavors of GDAL, this
+  may return different results for the same directory on
+  different computers.  If a foreach parallel backend has
+  been registered, the spidering will use parallel
+  processing to check each file, potentially speeding it
+  up.
+}
+\examples{
+{
+search_folder <- system.file("external/", package="spatial.tools")
+# sfQuickInit() # To potentially speed the search up.
+list.raster.files(path=search_folder)
+list.raster.files(path=search_folder,return_rasters=TRUE)
+# sfQuickStop()
+}
+}
+\author{
+  Jonathan A. Greenberg
+}
+\seealso{
+  \code{\link[raster]{brick}},\code{\link[base]{list.files}}
+}
+
