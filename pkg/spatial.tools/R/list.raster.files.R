@@ -4,8 +4,9 @@
 #' @param pattern Character. A regular expression to limit the files that are tested/returned.
 #' @param recursive Logical. Search nested subdirectories within the path?
 #' @param return_rasters Logical. Return all proper files as RasterBrick objects (TRUE) or as filenames (FALSE).
-#' 
-#' @return A list of filenames (return_rasters=FALSE) or a list of RasterBricks (return_rasters=TRUE).
+#' @param return_bbox Logical. Return a SpatialPolygonsDataFrame with the bounding box geometry and the filenames as data.frame attributes.
+#' @param bbox_CRS CRS. If return_bbox==TRUE, the CRS that the output bbox SpatialPolygonsDataFrame should be in.
+#' @return A list of filenames (return_rasters=FALSE) or a list of RasterBricks (return_rasters=TRUE) and/or a SpatialPolygonsDataFrame of the bounding boxes (return_bbox==TRUE).
 #' @author Jonathan A. Greenberg
 #' @seealso \code{\link[raster]{brick}},\code{\link[base]{list.files}}
 #' 
@@ -31,6 +32,7 @@ list.raster.files <- function(path=".",pattern=NULL,recursive=FALSE,return_raste
 		return_bbox=TRUE,bbox_CRS=CRS("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"))
 {
 	i <- NULL # To pass R CMD CHECK
+	rowID <- NULL
 	
 	# List all files
 	all_files <- list.files(path=path,pattern=pattern,recursive=recursive,
@@ -48,10 +50,11 @@ list.raster.files <- function(path=".",pattern=NULL,recursive=FALSE,return_raste
 				}
 			}
 	
-	
+		
 	raster_files <- raster_files[!sapply(raster_files, is.null)]
-	
+		
 	output <- list(raster_files=raster_files)
+
 	
 	if(return_bbox)
 	{
@@ -60,11 +63,13 @@ list.raster.files <- function(path=".",pattern=NULL,recursive=FALSE,return_raste
 						rowID=rowIDs,.packages="spatial.tools",
 						.combine=rbind) %dopar%
 				{
+					if(class(raster)=="character") { raster <- brick(raster) }
+					
 					bbox_poly <- bbox_to_SpatialPolygons(raster)
 					bbox_poly <- spTransform(bbox_poly,bbox_CRS)
 					
-					if(return_rasters) rasterfname <- normalizePath(path.expand(filename(raster)))
-					else rasterfname <- normalizePath(path.expand(raster))
+					rasterfname <- normalizePath(path.expand(filename(raster)))
+										
 					bbox_df <- data.frame(filename=rasterfname,stringsAsFactors=FALSE)
 					rownames(bbox_df) <- as.character(rowID)
 					
@@ -73,13 +78,10 @@ list.raster.files <- function(path=".",pattern=NULL,recursive=FALSE,return_raste
 					
 					
 					return(bbox_poly_df)
-				}
-		
+				}		
 		output$bbox <- bbox_list
 	}
 	
 	return(output)
 	
 }
-
-# search_folder <- system.file("external/", package="spatial.tools")

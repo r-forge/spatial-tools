@@ -19,10 +19,19 @@
 
   \item{return_rasters}{Logical. Return all proper files as
   RasterBrick objects (TRUE) or as filenames (FALSE).}
+
+  \item{return_bbox}{Logical. Return a
+  SpatialPolygonsDataFrame with the bounding box geometry
+  and the filenames as data.frame attributes.}
+
+  \item{bbox_CRS}{CRS. If return_bbox==TRUE, the CRS that
+  the output bbox SpatialPolygonsDataFrame should be in.}
 }
 \value{
   A list of filenames (return_rasters=FALSE) or a list of
-  RasterBricks (return_rasters=TRUE).
+  RasterBricks (return_rasters=TRUE) and/or a
+  SpatialPolygonsDataFrame of the bounding boxes
+  (return_bbox==TRUE).
 }
 \description{
   Spiders a directory for raster files.
