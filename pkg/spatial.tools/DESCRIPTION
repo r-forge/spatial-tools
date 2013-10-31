@@ -13,9 +13,9 @@ Date: 2013-10-20
 Depends:
     parallel,
     iterators,
+    foreach,
     rgdal,
     raster,
-    foreach,
     R (>= 3.0.2)
 Imports:
     mmap,
