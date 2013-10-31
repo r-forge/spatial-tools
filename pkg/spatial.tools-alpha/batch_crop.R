@@ -1,4 +1,5 @@
 
+#' @import rgeos
 
 batch_crop <- function(rasters,vector,each.vector=TRUE,preproject=TRUE,skip_no_projection=TRUE,
 		output_directory,file_prefix="raster_crop_",format="GTiff")
@@ -10,14 +11,16 @@ batch_crop <- function(rasters,vector,each.vector=TRUE,preproject=TRUE,skip_no_p
 		
 	if(preproject)
 	{
-		unique_projections <- unique(foreach(raster=rasters,.packages="raster",.combine=c,.inorder=FALSE) %dopar%
+		unique_projections <- unique(foreach(raster=rasters,.packages=c("raster","rgdal"),.combine=c,.inorder=FALSE) %dopar%
 						{
 							raster_proj <- projection(raster)
 							if(raster_proj=="NA") return(NULL) else return(raster_proj)
 						})
 		
-		vector_reprojections <- foreach(unique_projection=unique_projections,.packages="rgdal") %dopar%
+		vector_reprojections <- foreach(unique_projection=unique_projections,
+			.packages=c("rgdal")) %dopar%
 				{
+					library("rgdal")
 					spTransform(vector,CRS(unique_projection))
 				}
 	}
@@ -27,11 +30,11 @@ batch_crop <- function(rasters,vector,each.vector=TRUE,preproject=TRUE,skip_no_p
 	
 	rasterEnvelopes <- foreach(raster=rasters,.packages=c("spatial.tools")) %dopar%
 			{
-				rasterEnvelope(raster)
+				bbox_to_SpatialPolygons(raster)
 			}
 	
 	rastersVectorIntersections <- foreach(rasterEnvelope=rasterEnvelopes,rasterID=seq(rasters_n),
-					.packages="rgdal",.combine=rbind) %dopar%
+					.packages=c("rgdal","rgeos"),.combine=rbind) %dopar%
 			{
 				# print(rasterEnvelope)
 				current_CRS <- projection(rasterEnvelope)

@@ -24,6 +24,12 @@
 
 bbox_to_SpatialPolygons <- function(x,proj4string=CRS(as.character(NA)))
 {	
+	if(class(x)=="character")
+	{
+		x <- brick(x)	
+	}
+	
+	
 	if(class(x)=="RasterLayer" || class(x)=="RasterBrick" || class(x)=="RasterStack")
 	{
 		bbox <- bbox(x)
@@ -44,6 +50,7 @@ bbox_to_SpatialPolygons <- function(x,proj4string=CRS(as.character(NA)))
 	{
 		bbox <- x
 	}
+	
 	
 	coords <- rbind(
 			c(bbox[1,1],bbox[2,1]),
