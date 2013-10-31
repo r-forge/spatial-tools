@@ -17,11 +17,11 @@ sfQuickInit <- function(cpus,methods=FALSE,...)
 {
 	if(missing("cpus"))
 	{
-		cpus <- floor(parallel::detectCores()/2)
+		cpus <- floor(detectCores()/2)
 	}
 	
-	cl <- parallel::makeCluster(spec=cpus,type="PSOCK",methods=methods)
-	parallel::setDefaultCluster(cl=cl)
+	cl <- makeCluster(spec=cpus,type="PSOCK",methods=methods)
+	setDefaultCluster(cl=cl)
 	registerDoParallel(cl)
 	return(cl)
 }

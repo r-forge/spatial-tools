@@ -289,7 +289,7 @@ focal_hpc_focal_getChunk <- function(x,tr,format,r,i,r_old,chunkArgs)
 	{
 		# Add top cap
 		if((1-(tr$row[1]+startrow_offset))>0)
-			r=abind::abind(
+			r=abind(
 					array(data=NA,dim=c(ncol(x),(1-(tr$row[1]+startrow_offset)),nlayers(x))),
 					r,
 					along=2)
@@ -299,7 +299,7 @@ focal_hpc_focal_getChunk <- function(x,tr,format,r,i,r_old,chunkArgs)
 	{
 		# Add bottom cap
 		if(nrow(x)-tr$row2[tr$n]+endrow_offset>0)
-			r=abind::abind(r,
+			r=abind(r,
 					array(data=NA,dim=c(ncol(x),(nrow(x)-tr$row2[tr$n]+endrow_offset),nlayers(x))),
 					along=2)
 	}
@@ -311,7 +311,7 @@ focal_hpc_focal_getChunk <- function(x,tr,format,r,i,r_old,chunkArgs)
 	if(left_cap>0)
 	{
 		# Add left cap.
-		r=abind::abind(
+		r=abind(
 				array(data=NA,dim=c(left_cap,dim(r)[2],dim(r)[3])),
 				r,
 				along=1)
@@ -320,7 +320,7 @@ focal_hpc_focal_getChunk <- function(x,tr,format,r,i,r_old,chunkArgs)
 	if(right_cap>0)
 	{
 		# Add right cap.
-		r=abind::abind(
+		r=abind(
 				r,
 				array(data=NA,dim=c(right_cap,dim(r)[2],dim(r)[3])),
 				along=1)
@@ -328,7 +328,7 @@ focal_hpc_focal_getChunk <- function(x,tr,format,r,i,r_old,chunkArgs)
 	
 	if(i>1 && window_dims[2]>1)
 	{
-		r <- abind::abind(r_old,r,along=2)
+		r <- abind(r_old,r,along=2)
 	}
 	return(r)	
 }

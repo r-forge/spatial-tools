@@ -1,6 +1,5 @@
 #' Quickly stops a parallel snowfall cluster and deregisters it from foreach.
 #' 
-#' @param kill Logical. Force-kill parallel cluster.
 #' @param ... parameters to pass to sfStop()
 #' @author Jonathan A. Greenberg
 #' @details (Even more) quickly stop a snowfall cluster and sets foreach back
@@ -12,18 +11,11 @@
 #' @import foreach
 #' @export
 
-sfQuickStop <- function(kill=FALSE,...)
+sfQuickStop <- function(...)
 {
-	cl <- parallel:::defaultCluster()
+	cl <- defaultCluster()
 	registerDoSEQ()
-	parallel::stopCluster(cl)
-	
-	if(kill)
-	{
-		
-		
-	}
-	
+	stopCluster(cl)
 }
 
 
