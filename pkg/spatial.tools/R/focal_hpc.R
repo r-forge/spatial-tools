@@ -1,3 +1,124 @@
+#' Engine for performing fast, easy-to-develop pixel and focal raster calculations with parallel processing capability.
+#' @param x Raster*. A Raster* used as the input into the function.  Multiple inputs should be stack()'ed or list()'ed together.
+#' @param fun function. A focal function to be applied to the image. See Details.
+#' @param args list. Arguments to pass to the function (see ?mapply).  Note that the 'fun' should explicitly name the variables.
+#' @param window_dims Vector. The size of a processing window in col x row order.  Be default, a single pixel (c(1,1).
+#' @param window_center Vector. The local coordinate of the center of a processing window.  By default the middle of the processing window.  UNSUPPORTED.
+#' @param chunk_format Character. The format to send the chunk to the function.  Can be "array" (default) or "raster".
+#' @param minblocks Numeric. The minimum number of chunks to divide the raster into for processing.  Defaults to 1.
+#' @param blocksize Numeric. The size (in rows) for a block of data.  If unset, focal_hpc will attempt to figure out an optimal blocksize.
+#' @param filename character. Filename of the output raster.
+#' @param outformat character. Outformat of the raster. Must be a format usable by hdr(). Default is 'raster'. CURRENTLY UNSUPPORTED.
+#' @param overwrite logical. Allow files to be overwritten? Default is FALSE.
+#' @param processing_unit Character. ("single"|"chunk") Will be auto-set if not specified ("chunk" for pixel-processing, "single" for focal processing).  See Description.
+#' @param outbands Numeric. If known, how many bands in the output file?  Assigning this will allow focal_hpc to skip the pre-check.
+#' @param debugmode Logical.  If TRUE, the function will enter debug mode during the test phase.  Note the inputs will be an array of size 2 columns, 1 row, and how ever many input bands.
+#' @param verbose logical. Enable verbose execution? Default is FALSE.  
+#' @author Jonathan A. Greenberg (\email{spatial.tools@@estarcion.net})
+#' @seealso \code{\link{rasterEngine}}, \code{\link{foreach}}, \code{\link{mmap}}, \code{\link{dataType}}, \code{\link{hdr}} 
+#' @details focal_hpc is designed to execute a function on a Raster* object using foreach, to
+#' achieve parallel reads, executions and writes. Parallel random writes are achieved through the use of
+#' mmap, so individual image chunks can finish and write their outputs without having to wait for
+#' all nodes in the cluster to finish and then perform sequential writing.  On Windows systems,
+#' random writes are possible but apparently not parallel writes.  focal_hpc solves this by trying to
+#' write to a portion of the image file, and if it finds an error (a race condition occurs), it will
+#' simply retry the writes until it successfully finishes.  On Unix-alikes, truly parallel writes
+#' should be possible.
+#' 
+#' Note that \code{\link{rasterEngine}} is a convienence wrapper for focal_hpc and, in general, should be used instead
+#' of focal_hpc directly.  
+#'
+#' focal_hpc operates in two modes, which have different input and outputs to the function:
+#' 
+#' Pixel based processing:
+#' 
+#' 1) If chunk_format=="array" (default), the input to the function should assume an array of dimensions 
+#' x,y,z where x = the number of columns in a chunk, y = the number of rows in the chunk, and 
+#' z = the number of bands in the chunk.  If chunk_format=="raster", the input to the function
+#' will be a raster subset.
+#' Note that we are ordering the array using standards for geographic data, (columns, rows, bands), 
+#' not how R usually thinks of arrays (rows, columns, bands).
+#' 
+#' 2) The output of the function should always be an array with the x and y dimensions matching
+#' the input, and an arbitrary number of band outputs.  Remember to order the dimensions as
+#' columns, rows, bands (x,y,z).
+#' 
+#' Local window processing:
+#' 
+#' 1) The function should be written to process a SINGLE window at a time, given the dimensions
+#' of window_dims, so the input to the function should assume a window of dimensions window_dims 
+#' with a local center defined by window_center.  As with before, the input can be passed to 
+#' the function as an array (suggested) or a small raster.
+#' 
+#' 2) The output should be a single pixel value, so can either be a single value, or a vector
+#' (which is assumed to be multiple bands of a single pixel).
+#' 
+#' The speed of the execution when running in parallel will vary based on the specific setup, 
+#' and may, indeed, be slower than a sequential execution (e.g. with calc() ), 
+#' particularly on smaller files.  Note that by simply running sfQuickStop(), focal_hpc
+#' will run in sequential mode.
+#' 
+#' @examples
+
+#'  tahoe_highrez <- brick(system.file("external/tahoe_highrez.tif", package="spatial.tools"))
+#' # Pixel-based processing:
+#'ndvi_function <- function(x,...)
+#'{
+#'	# Note that x is received by the function as a 3-d array:
+#'	red_band <- x[,,2]
+#'	nir_band <- x[,,3]
+#'	ndvi <- (nir_band - red_band)/(nir_band + red_band)
+#'	# The output of the function should also be a 3-d array,
+#'	# even if it is a single band:
+#'	ndvi <- array(ndvi,dim=c(dim(x)[1],dim(x)[2],1))
+#'	return(ndvi)
+#'}
+#' 
+#'sfQuickInit(cpus=2)
+#'tahoe_ndvi <- focal_hpc(x=tahoe_highrez,fun=ndvi_function)
+#'sfQuickStop()
+#' 
+#' \dontrun{ 
+#'# Focal-based processing:
+#'local_smoother <- function(x,...)
+#'{
+#'	# Assumes a 3-d array representing
+#'	# a single local window, and return
+#'	# a single value or a vector of values.
+#'	smoothed <- apply(x,3,mean)
+#'	return(smoothed)
+#'}
+#' 
+#' # Apply the function to a 3x3 window:
+#' sfQuickInit(cpus=2)
+#' tahoe_3x3_smoothed <- focal_hpc(x=tahoe_highrez,fun=local_smoother,window_dims=c(3,3))
+#' sfQuickStop()
+#' 
+#' # Example with 7 x 7 window in full parallel mode:
+#' sfQuickInit()
+#' tahoe_7x7_smoothed <- focal_hpc(x=tahoe_highrez,fun=local_smoother,window_dims=c(7,7))
+#' sfQuickStop()
+#' }
+#' 
+#' @importFrom abind abind
+#' @import iterators
+#' @import foreach
+#' @import mmap
+#' @import raster
+#' 
+#' @export
+
+focal_hpc <- function(x,
+		fun,args=NULL, 
+		window_dims=c(1,1), 
+		window_center=c(ceiling(window_dims[1]/2),ceiling(window_dims[2]/2)),
+		filename=NULL, overwrite=FALSE,outformat="raster",
+		chunk_format="array",minblocks="max",blocksize=NULL,
+		processing_unit="chunk",
+		outbands=NULL,
+		debugmode=FALSE,
+		verbose=FALSE) 
+{
 # focal_hpc helper functions
 
 focal_hpc_precheck <- function(x,window_dims,window_center,processing_unit,verbose)
@@ -522,7 +643,7 @@ focal_hpc_focal_processing <- function(tr,texture_tr,chunkArgs)
 			r <- mapply(FUN=function(X,tr,format,i,r_old,chunkArgs)
 					{
 						chunkArgs$x <- X
-						spatial.tools:::focal_hpc_focal_getChunk(x=X,tr=tr,format=format,i=i,r_old=r_old,
+						focal_hpc_focal_getChunk(x=X,tr=tr,format=format,i=i,r_old=r_old,
 								chunkArgs=chunkArgs)	
 					},X=x,r_old=r_old,
 					MoreArgs=list(tr=tr,format=chunk_format,i=i,chunkArgs=chunkArgs),
@@ -531,7 +652,7 @@ focal_hpc_focal_processing <- function(tr,texture_tr,chunkArgs)
 		} else
 		{
 			r <- 
-					spatial.tools:::focal_hpc_focal_getChunk(x=x,tr=tr,format=chunk_format,i=i,r_old=r_old,
+					focal_hpc_focal_getChunk(x=x,tr=tr,format=chunk_format,i=i,r_old=r_old,
 							chunkArgs=chunkArgs)
 			
 		}
@@ -582,7 +703,7 @@ focal_hpc_focal_processing <- function(tr,texture_tr,chunkArgs)
 		
 		foreach(chunk=chunkList, .packages=c("rgdal","raster","spatial.tools","mmap"),
 						.verbose=verbose) %dopar% 
-				spatial.tools:::focal_hpc_focalChunkFunction(chunk,chunkArgs)
+				focal_hpc_focalChunkFunction(chunk,chunkArgs)
 		
 		if(i<tr$n && window_dims[2] > 1)
 			if(is.list(r))
@@ -704,131 +825,11 @@ focal_hpc_pixel_processing <- function(tr,chunkArgs)
 	list2env(chunkArgs,envir=environment())
 	chunkID <- seq(tr$n)
 	foreach(chunkID=chunkID, .packages=c("rgdal","raster","spatial.tools","mmap"),.verbose=verbose) %dopar% 
-			spatial.tools:::focal_hpc_pixelChunkFunction(chunkID,tr,x,chunk_format,fun,args,layer_names,outbands,
+			focal_hpc_pixelChunkFunction(chunkID,tr,x,chunk_format,fun,args,layer_names,outbands,
 					filename)
 }
 
-#' Engine for performing fast, easy-to-develop pixel and focal raster calculations with parallel processing capability.
-#' @param x Raster*. A Raster* used as the input into the function.  Multiple inputs should be stack()'ed or list()'ed together.
-#' @param fun function. A focal function to be applied to the image. See Details.
-#' @param args list. Arguments to pass to the function (see ?mapply).  Note that the 'fun' should explicitly name the variables.
-#' @param window_dims Vector. The size of a processing window in col x row order.  Be default, a single pixel (c(1,1).
-#' @param window_center Vector. The local coordinate of the center of a processing window.  By default the middle of the processing window.  UNSUPPORTED.
-#' @param chunk_format Character. The format to send the chunk to the function.  Can be "array" (default) or "raster".
-#' @param minblocks Numeric. The minimum number of chunks to divide the raster into for processing.  Defaults to 1.
-#' @param blocksize Numeric. The size (in rows) for a block of data.  If unset, focal_hpc will attempt to figure out an optimal blocksize.
-#' @param filename character. Filename of the output raster.
-#' @param outformat character. Outformat of the raster. Must be a format usable by hdr(). Default is 'raster'. CURRENTLY UNSUPPORTED.
-#' @param overwrite logical. Allow files to be overwritten? Default is FALSE.
-#' @param processing_unit Character. ("single"|"chunk") Will be auto-set if not specified ("chunk" for pixel-processing, "single" for focal processing).  See Description.
-#' @param outbands Numeric. If known, how many bands in the output file?  Assigning this will allow focal_hpc to skip the pre-check.
-#' @param debugmode Logical.  If TRUE, the function will enter debug mode during the test phase.  Note the inputs will be an array of size 2 columns, 1 row, and how ever many input bands.
-#' @param verbose logical. Enable verbose execution? Default is FALSE.  
-#' @author Jonathan A. Greenberg (\email{spatial.tools@@estarcion.net})
-#' @seealso \code{\link{rasterEngine}}, \code{\link{foreach}}, \code{\link{mmap}}, \code{\link{dataType}}, \code{\link{hdr}} 
-#' @details focal_hpc is designed to execute a function on a Raster* object using foreach, to
-#' achieve parallel reads, executions and writes. Parallel random writes are achieved through the use of
-#' mmap, so individual image chunks can finish and write their outputs without having to wait for
-#' all nodes in the cluster to finish and then perform sequential writing.  On Windows systems,
-#' random writes are possible but apparently not parallel writes.  focal_hpc solves this by trying to
-#' write to a portion of the image file, and if it finds an error (a race condition occurs), it will
-#' simply retry the writes until it successfully finishes.  On Unix-alikes, truly parallel writes
-#' should be possible.
-#' 
-#' Note that \code{\link{rasterEngine}} is a convienence wrapper for focal_hpc and, in general, should be used instead
-#' of focal_hpc directly.  
-#'
-#' focal_hpc operates in two modes, which have different input and outputs to the function:
-#' 
-#' Pixel based processing:
-#' 
-#' 1) If chunk_format=="array" (default), the input to the function should assume an array of dimensions 
-#' x,y,z where x = the number of columns in a chunk, y = the number of rows in the chunk, and 
-#' z = the number of bands in the chunk.  If chunk_format=="raster", the input to the function
-#' will be a raster subset.
-#' Note that we are ordering the array using standards for geographic data, (columns, rows, bands), 
-#' not how R usually thinks of arrays (rows, columns, bands).
-#' 
-#' 2) The output of the function should always be an array with the x and y dimensions matching
-#' the input, and an arbitrary number of band outputs.  Remember to order the dimensions as
-#' columns, rows, bands (x,y,z).
-#' 
-#' Local window processing:
-#' 
-#' 1) The function should be written to process a SINGLE window at a time, given the dimensions
-#' of window_dims, so the input to the function should assume a window of dimensions window_dims 
-#' with a local center defined by window_center.  As with before, the input can be passed to 
-#' the function as an array (suggested) or a small raster.
-#' 
-#' 2) The output should be a single pixel value, so can either be a single value, or a vector
-#' (which is assumed to be multiple bands of a single pixel).
-#' 
-#' The speed of the execution when running in parallel will vary based on the specific setup, 
-#' and may, indeed, be slower than a sequential execution (e.g. with calc() ), 
-#' particularly on smaller files.  Note that by simply running sfQuickStop(), focal_hpc
-#' will run in sequential mode.
-#' 
-#' @examples
 
-#'  tahoe_highrez <- brick(system.file("external/tahoe_highrez.tif", package="spatial.tools"))
-#' # Pixel-based processing:
-#'ndvi_function <- function(x,...)
-#'{
-#'	# Note that x is received by the function as a 3-d array:
-#'	red_band <- x[,,2]
-#'	nir_band <- x[,,3]
-#'	ndvi <- (nir_band - red_band)/(nir_band + red_band)
-#'	# The output of the function should also be a 3-d array,
-#'	# even if it is a single band:
-#'	ndvi <- array(ndvi,dim=c(dim(x)[1],dim(x)[2],1))
-#'	return(ndvi)
-#'}
-#' 
-#'sfQuickInit(cpus=2)
-#'tahoe_ndvi <- focal_hpc(x=tahoe_highrez,fun=ndvi_function)
-#'sfQuickStop()
-#' 
-#' \dontrun{ 
-#'# Focal-based processing:
-#'local_smoother <- function(x,...)
-#'{
-#'	# Assumes a 3-d array representing
-#'	# a single local window, and return
-#'	# a single value or a vector of values.
-#'	smoothed <- apply(x,3,mean)
-#'	return(smoothed)
-#'}
-#' 
-#' # Apply the function to a 3x3 window:
-#' sfQuickInit(cpus=2)
-#' tahoe_3x3_smoothed <- focal_hpc(x=tahoe_highrez,fun=local_smoother,window_dims=c(3,3))
-#' sfQuickStop()
-#' 
-#' # Example with 7 x 7 window in full parallel mode:
-#' sfQuickInit()
-#' tahoe_7x7_smoothed <- focal_hpc(x=tahoe_highrez,fun=local_smoother,window_dims=c(7,7))
-#' sfQuickStop()
-#' }
-#' 
-#' @importFrom abind abind
-#' @import iterators
-#' @import foreach
-#' @import mmap
-#' @import raster
-#' 
-#' @export
-
-focal_hpc <- function(x,
-		fun,args=NULL, 
-		window_dims=c(1,1), 
-		window_center=c(ceiling(window_dims[1]/2),ceiling(window_dims[2]/2)),
-		filename=NULL, overwrite=FALSE,outformat="raster",
-		chunk_format="array",minblocks="max",blocksize=NULL,
-		processing_unit="chunk",
-		outbands=NULL,
-		debugmode=FALSE,
-		verbose=FALSE) 
-{
 	# Required libraries:
 #	require("raster")
 #	require("foreach")
@@ -857,7 +858,7 @@ focal_hpc <- function(x,
 	}
 	# Prechecks.
 	list2env(
-			spatial.tools:::focal_hpc_precheck(x,window_dims,window_center,processing_unit,verbose),envir=environment())
+			focal_hpc_precheck(x,window_dims,window_center,processing_unit,verbose),envir=environment())
 	
 	# Debug mode:
 	if(debugmode) debug(fun)
@@ -867,7 +868,7 @@ focal_hpc <- function(x,
 	if(is.null(outbands))
 	{
 		outbands <- 
-		spatial.tools:::focal_hpc_test(x,fun,window_center,window_dims,args,layer_names,
+		focal_hpc_test(x,fun,window_center,window_dims,args,layer_names,
 						startrow_offset,endrow_offset,
 						processing_mode,processing_unit,chunk_format,
 						verbose)
@@ -881,7 +882,7 @@ focal_hpc <- function(x,
 	
 	# Set up chunking parameters.
 	list2env(
-			spatial.tools:::focal_hpc_chunk_setup(
+			focal_hpc_chunk_setup(
 					x=x,window_dims=window_dims,window_center=window_center,
 					chunk_nrows=chunk_nrows,startrow_offset=startrow_offset,
 					endrow_offset=endrow_offset,
@@ -917,11 +918,11 @@ focal_hpc <- function(x,
 	{
 		#	if(is.list(x)) stop("x as list not yet supported for window functions.  Stay tuned.")
 #	browser()
-		spatial.tools:::focal_hpc_focal_processing(tr,texture_tr,chunkArgs)
+		focal_hpc_focal_processing(tr,texture_tr,chunkArgs)
 	} else
 	{
 		# We need to create a more efficient pixel-based processor
-		spatial.tools:::focal_hpc_pixel_processing(tr,chunkArgs)
+		focal_hpc_pixel_processing(tr,chunkArgs)
 	}
 	
 	return(brick(out))
