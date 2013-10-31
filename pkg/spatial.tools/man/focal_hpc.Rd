@@ -8,7 +8,7 @@
     outformat = "raster", chunk_format = "array",
     minblocks = "max", blocksize = NULL,
     processing_unit = "chunk", outbands = NULL,
-    verbose = FALSE)
+    debugmode = FALSE, verbose = FALSE)
 }
 \arguments{
   \item{x}{Raster*. A Raster* used as the input into the
@@ -59,6 +59,11 @@
   \item{outbands}{Numeric. If known, how many bands in the
   output file?  Assigning this will allow focal_hpc to skip
   the pre-check.}
+
+  \item{debugmode}{Logical.  If TRUE, the function will
+  enter debug mode during the test phase.  Note the inputs
+  will be an array of size 2 columns, 1 row, and how ever
+  many input bands.}
 
   \item{verbose}{logical. Enable verbose execution? Default
   is FALSE.}

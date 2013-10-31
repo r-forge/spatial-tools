@@ -14,6 +14,7 @@
 #' @param processing_unit Character. ("single"|"chunk") Will be auto-set if not specified ("chunk" for pixel-processing, "single" for focal processing).  See Details.
 #' @param verbose Logical. Enable verbose execution? Default is FALSE.  
 #' @param ... Raster*s. Named variables pointing to Raster* objects.  See Details.
+#' @param debugmode Logical.  If TRUE, the function will enter debug mode during the test phase.  Note the inputs will be an array of size 2 columns, 1 row, and how ever many input bands.
 #' @author Jonathan A. Greenberg (\email{spatial.tools@@estarcion.net})
 #' @seealso \code{\link{focal_hpc}}, \code{\link{foreach}}, \code{\link{mmap}}, \code{\link{dataType}}, \code{\link{hdr}} 
 #' @details rasterEngine is designed to execute a function on one or multiple Raster* object(s) using foreach, to
@@ -136,6 +137,7 @@ rasterEngine <- function(x,
 #		quick=TRUE,
 		outbands=NULL,
 		processing_unit=NA,
+		debugmode=FALSE,
 		verbose=FALSE,...) 
 {
 	additional_vars <- list(...)
@@ -183,5 +185,6 @@ rasterEngine <- function(x,
 			chunk_format=chunk_format,minblocks=minblocks,blocksize=blocksize,
 			outbands=outbands,
 			processing_unit=processing_unit,
+			debugmode=debugmode,
 			verbose=verbose)
 }

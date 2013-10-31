@@ -722,6 +722,7 @@ focal_hpc_pixel_processing <- function(tr,chunkArgs)
 #' @param overwrite logical. Allow files to be overwritten? Default is FALSE.
 #' @param processing_unit Character. ("single"|"chunk") Will be auto-set if not specified ("chunk" for pixel-processing, "single" for focal processing).  See Description.
 #' @param outbands Numeric. If known, how many bands in the output file?  Assigning this will allow focal_hpc to skip the pre-check.
+#' @param debugmode Logical.  If TRUE, the function will enter debug mode during the test phase.  Note the inputs will be an array of size 2 columns, 1 row, and how ever many input bands.
 #' @param verbose logical. Enable verbose execution? Default is FALSE.  
 #' @author Jonathan A. Greenberg (\email{spatial.tools@@estarcion.net})
 #' @seealso \code{\link{rasterEngine}}, \code{\link{foreach}}, \code{\link{mmap}}, \code{\link{dataType}}, \code{\link{hdr}} 
@@ -825,6 +826,7 @@ focal_hpc <- function(x,
 		chunk_format="array",minblocks="max",blocksize=NULL,
 		processing_unit="chunk",
 		outbands=NULL,
+		debugmode=FALSE,
 		verbose=FALSE) 
 {
 	# Required libraries:
@@ -857,6 +859,10 @@ focal_hpc <- function(x,
 	list2env(
 			spatial.tools:::focal_hpc_precheck(x,window_dims,window_center,processing_unit,verbose),envir=environment())
 	
+	# Debug mode:
+	if(debugmode) debug(fun)
+#	else(undebug(fun))
+	
 	# Test focal_hpc and determine the number of outbands.
 	if(is.null(outbands))
 	{
@@ -866,6 +872,13 @@ focal_hpc <- function(x,
 						processing_mode,processing_unit,chunk_format,
 						verbose)
 	}
+	
+	if(debugmode) 
+	{
+		undebug(fun)
+		stop("Debug mode finished.  Stopping run.")
+	}
+	
 	# Set up chunking parameters.
 	list2env(
 			spatial.tools:::focal_hpc_chunk_setup(

@@ -8,8 +8,8 @@ Author: Jonathan Asher Greenberg
 Description: Spatial functions meant to enhance the core functionality of the
     package "raster", including a parallel processing engine for use with
     rasters.
-Version: 1.1.7
-Date: 2013-10-20
+Version: 1.1.8
+Date: 2013-10-31
 Depends:
     parallel,
     iterators,

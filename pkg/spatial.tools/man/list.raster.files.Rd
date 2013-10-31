@@ -3,7 +3,9 @@
 \title{Spiders a directory for raster files.}
 \usage{
   list.raster.files(path = ".", pattern = NULL,
-    recursive = FALSE, return_rasters = FALSE)
+    recursive = FALSE, return_rasters = FALSE,
+    return_bbox = TRUE,
+    bbox_CRS = CRS("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"))
 }
 \arguments{
   \item{path}{Character. The path to search for raster

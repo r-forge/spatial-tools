@@ -8,7 +8,8 @@
     filename = NULL, overwrite = FALSE,
     outformat = "raster", chunk_format = "array",
     minblocks = "max", blocksize = NULL, outbands = NULL,
-    processing_unit = NA, verbose = FALSE, ...)
+    processing_unit = NA, debugmode = FALSE,
+    verbose = FALSE, ...)
 }
 \arguments{
   \item{x}{Raster*. A Raster* used as the input into the
@@ -65,6 +66,11 @@
 
   \item{...}{Raster*s. Named variables pointing to Raster*
   objects.  See Details.}
+
+  \item{debugmode}{Logical.  If TRUE, the function will
+  enter debug mode during the test phase.  Note the inputs
+  will be an array of size 2 columns, 1 row, and how ever
+  many input bands.}
 }
 \description{
   Engine for performing fast, easy-to-develop pixel and
