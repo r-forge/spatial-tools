@@ -2,11 +2,9 @@
 \alias{sfQuickStop}
 \title{Quickly stops a parallel snowfall cluster and deregisters it from foreach.}
 \usage{
-  sfQuickStop(kill = FALSE, ...)
+  sfQuickStop(...)
 }
 \arguments{
-  \item{kill}{Logical. Force-kill parallel cluster.}
-
   \item{...}{parameters to pass to sfStop()}
 }
 \description{

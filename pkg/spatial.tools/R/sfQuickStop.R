@@ -13,7 +13,7 @@
 
 sfQuickStop <- function(...)
 {
-	cl <- defaultCluster()
+	cl <- parallel:::defaultCluster()
 	registerDoSEQ()
 	stopCluster(cl)
 }
