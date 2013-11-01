@@ -13,6 +13,8 @@
 #' @import doParallel
 #' @export
 
+# TODO: What to do if a cluster is already running
+
 sfQuickInit <- function(cpus,methods=FALSE,...)
 {
 	if(missing("cpus"))
@@ -20,7 +22,11 @@ sfQuickInit <- function(cpus,methods=FALSE,...)
 		cpus <- floor(detectCores()/2)
 	}
 	
+	if(!is.null(getOption("spatial.tools.current.cl"))) sfQuickStop()
+	
 	cl <- makeCluster(spec=cpus,type="PSOCK",methods=methods)
+	
+	options(spatial.tools.current.cl=cl)	
 	setDefaultCluster(cl=cl)
 	registerDoParallel(cl)
 	return(cl)
