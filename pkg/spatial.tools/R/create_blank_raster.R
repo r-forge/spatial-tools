@@ -75,7 +75,12 @@ create_blank_raster <- function(filename=NULL,
 		if(verbose) { message("Setting up output header.") }
 		if(nlayers > 1) 
 		{ 
-			reference_raster=brick(raster(reference_raster,layer=1),nl=nlayers) 
+#			if(nlayers(reference_raster) > 1) { 
+			reference_raster=brick(raster(reference_raster),nl=nlayers) 
+#			} else
+#			{
+#				reference_raster <- brick(raster(reference_raster),nl=nlayers) 
+#			}
 		} else
 		{
 			if(nlayers(reference_raster) > 1) { 
