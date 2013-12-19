@@ -43,8 +43,8 @@ build_raster_header <- function(x_filename,reference_raster,out_nlayers,
 	outraster@file@name <- x_filename
 	outraster@file@datanotation <- dataType
 	outraster@file@bandorder <- bandorder
-	if(setMinMax) outraster@data@haveminmax=TRUE	
-	else outraster@data@haveminmax=FALSE
+	if(setMinMax) outraster@data@haveminmax <- TRUE	
+	else outraster@data@haveminmax <- FALSE
 	
 	try(outhdr <- hdr(outraster, format=format),silent=TRUE)
 
@@ -57,5 +57,6 @@ build_raster_header <- function(x_filename,reference_raster,out_nlayers,
 	}
 	
 	if(setMinMax) outraster <- setMinMax(outraster)
+	else outraster@data@haveminmax <- FALSE
 	return(outraster)
 }

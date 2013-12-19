@@ -924,7 +924,10 @@ focal_hpc <- function(x,
 		spatial.tools:::focal_hpc_pixel_processing(tr,chunkArgs)
 	}
 	
-	return(brick(out))
+	focal_out <- brick(out)
+	focal_out@data@haveminmax <- FALSE
+	
+	return(focal_out)
 	
 }
 
