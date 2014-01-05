@@ -4,17 +4,20 @@
 #' @param args List. Arguments to pass to the function (see ?mapply).  Note that the 'fun' should explicitly name the variables.
 #' @param window_dims Vector. The size of a processing window in col x row order.  Be default, a single pixel (c(1,1).
 #' @param window_center Vector. The local coordinate of the center of a processing window.  By default the middle of the processing window.  CURRENTLY UNSUPPORTED.
-#' @param filename Character. Filename of the output raster.
+#' @param filename Character. Filename(s) of the output raster.
 #' @param overwrite Logical. Allow files to be overwritten? Default is FALSE.
 #' @param outformat Character. Outformat of the raster. Must be a format usable by hdr(). Default is 'raster'. CURRENTLY UNSUPPORTED.
+#' @param processing_unit Character. ("single"|"chunk") Will be auto-set if not specified ("chunk" for pixel-processing, "single" for focal processing).  See Details.
 #' @param chunk_format Character. The format to send the chunk to the function.  Can be "array" (default) or "raster".
 #' @param minblocks Numeric. The minimum number of chunks to divide the raster into for processing.  Defaults to 1.
 #' @param blocksize Numeric. The size (in rows) for a block of data.  If unset, rasterEngine will attempt to figure out an optimal blocksize.
-#' @param outbands Numeric. If known, how many bands in the output file?  Assigning this will allow rasterEngine to skip the pre-check.
-#' @param processing_unit Character. ("single"|"chunk") Will be auto-set if not specified ("chunk" for pixel-processing, "single" for focal processing).  See Details.
+#' @param outbands Numeric. If known, how many bands in each output file?  Assigning this and outfiles will allow focal_hpc to skip the pre-check.
+#' @param outfiles Numeric. If known, how many output files?  Assigning this and outbands will allow focal_hpc to skip the pre-check.
+#' @param setMinMax Logical. Run a setMinMax() on each output file after processing (this will slow the processing down). Default is FALSE.
+#' @param additional_header Character. Create additional output headers for use with other GIS systems (see \code{\link{hdr}}. Set to NULL to suppress.  Default is "ENVI".
+#' @param debugmode Logical.  If TRUE, the function will enter debug mode during the test phase.  Note the inputs will be an array of size 2 columns, 1 row, and how ever many input bands.
 #' @param verbose Logical. Enable verbose execution? Default is FALSE.  
 #' @param ... Raster*s. Named variables pointing to Raster* objects.  See Details.
-#' @param debugmode Logical.  If TRUE, the function will enter debug mode during the test phase.  Note the inputs will be an array of size 2 columns, 1 row, and how ever many input bands.
 #' @author Jonathan A. Greenberg (\email{spatial.tools@@estarcion.net})
 #' @seealso \code{\link{focal_hpc}}, \code{\link{foreach}}, \code{\link{mmap}}, \code{\link{dataType}}, \code{\link{hdr}} 
 #' @details rasterEngine is designed to execute a function on one or multiple Raster* object(s) using foreach, to
@@ -131,12 +134,12 @@ rasterEngine <- function(x,
 		fun=NULL,args=NULL, 
 		window_dims=c(1,1), 
 		window_center=c(ceiling(window_dims[1]/2),ceiling(window_dims[2]/2)),
-		filename=NULL, overwrite=FALSE,outformat="raster",
-		chunk_format="array",minblocks="max",blocksize=NULL,
-#		prestack=NULL,
-#		quick=TRUE,
-		outbands=NULL,
-		processing_unit=NA,
+		filename=NULL, overwrite=FALSE,
+		outformat="raster",additional_header="ENVI",
+		processing_unit=NULL,chunk_format="array",
+		minblocks="max",blocksize=NULL,
+		outbands=NULL,outfiles=NULL,
+		setMinMax=FALSE,
 		debugmode=FALSE,
 		verbose=FALSE,...) 
 {
@@ -150,16 +153,16 @@ rasterEngine <- function(x,
 		additional_vars_Raster <- NULL
 	}
 	# Need to add processing unit processing_unit
-	if(is.na(processing_unit))
-	{
-		if(sum(window_dims) > 2)
-		{
-			processing_unit="single"
-		} else
-		{
-			processing_unit="chunk"
-		}
-	}
+#	if(is.null(processing_unit))
+#	{
+#		if(sum(window_dims) > 2)
+#		{
+#			processing_unit="single"
+#		} else
+#		{
+#			processing_unit="chunk"
+#		}
+#	}
 	
 	if(missing(x))
 	{
@@ -181,10 +184,13 @@ rasterEngine <- function(x,
 	focal_hpc(x,fun=focal_hpc_multiRaster_function,args=c(list(fun=fun),args),
 			window_dims=window_dims, 
 			window_center=window_center,
-			filename=filename, overwrite=overwrite,outformat=outformat,
-			chunk_format=chunk_format,minblocks=minblocks,blocksize=blocksize,
-			outbands=outbands,
+			filename=filename, overwrite=overwrite,
+			outformat=outformat,additional_header=additional_header,
 			processing_unit=processing_unit,
+			chunk_format=chunk_format,
+			minblocks=minblocks,blocksize=blocksize,
+			outbands=outbands,outfiles=outfiles,
+			setMinMax=setMinMax,
 			debugmode=debugmode,
 			verbose=verbose)
 }
