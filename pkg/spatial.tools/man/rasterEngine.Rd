@@ -8,7 +8,7 @@ rasterEngine(x, fun = NULL, args = NULL, window_dims = c(1, 1),
   additional_header = "ENVI", processing_unit = NULL,
   chunk_format = "array", minblocks = "max", blocksize = NULL,
   outbands = NULL, outfiles = NULL, setMinMax = FALSE,
-  debugmode = FALSE, verbose = FALSE, ...)
+  compileFunction = FALSE, debugmode = FALSE, verbose = FALSE, ...)
 }
 \arguments{
   \item{x}{Raster*. A Raster* used as the input into the
@@ -73,6 +73,11 @@ rasterEngine(x, fun = NULL, args = NULL, window_dims = c(1, 1),
   \code{\link{hdr}}. Set to NULL to suppress.  Default is
   "ENVI".}
 
+  \item{compileFunction}{Logical. Runs a byte-code
+  compilation on the user function before running. Setting
+  this to TRUE may speed up the execution.  Default is
+  FALSE.}
+
   \item{debugmode}{Logical.  If TRUE, the function will
   enter debug mode during the test phase.  Note the inputs
   will be an array of size 2 columns, 1 row, and how ever
@@ -121,10 +126,17 @@ raster subset. Note that we are ordering the array using
 standards for geographic data, (columns, rows, bands), not
 how R usually thinks of arrays (rows, columns, bands).
 
-2) The output of the function should always be an array
-with the x and y dimensions matching the input, and an
-arbitrary number of band outputs.  Remember to order the
-dimensions as columns, rows, bands (x,y,z).
+2) If a single file is to be output from rasterEngine, the
+output of the function should always be an array with the x
+and y dimensions matching the input, and an arbitrary
+number of band outputs.  Remember to order the dimensions
+as columns, rows, bands (x,y,z).
+
+If a multiple file output is required, the output of the
+function should return a list of arrays each with an
+equivalent number of columns and rows.  The first element
+of the list will be assigned to the first filename (if
+provided).
 
 Local window processing:
 
@@ -192,13 +204,13 @@ tahoe_highrez <- setMinMax(
 	brick(system.file("external/tahoe_highrez.tif", package="spatial.tools")))
 
 sfQuickInit(cpus=2)
-tahoe_ndvi <- rasterEngine(GRNIR_image=tahoe_highrez,fun=ndvi_nodrop)
+tahoe_ndvi <- rasterEngine(GRNIR_image=tahoe_highrez,fun=ndvi)
 sfQuickStop()
 
 # Focal-based processing:
 mean_smoother <- function(inraster,...) # Always include the ellipses
 {
-	smoothed <- mean(inraster)
+	smoothed <- apply(inraster,3,mean)
 	return(smoothed)
 }
 

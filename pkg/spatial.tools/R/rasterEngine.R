@@ -15,6 +15,7 @@
 #' @param outfiles Numeric. If known, how many output files?  Assigning this and outbands will allow focal_hpc to skip the pre-check.
 #' @param setMinMax Logical. Run a setMinMax() on each output file after processing (this will slow the processing down). Default is FALSE.
 #' @param additional_header Character. Create additional output headers for use with other GIS systems (see \code{\link{hdr}}. Set to NULL to suppress.  Default is "ENVI".
+#' @param compileFunction Logical. Runs a byte-code compilation on the user function before running. Setting this to TRUE may speed up the execution.  Default is FALSE.
 #' @param debugmode Logical.  If TRUE, the function will enter debug mode during the test phase.  Note the inputs will be an array of size 2 columns, 1 row, and how ever many input bands.
 #' @param verbose Logical. Enable verbose execution? Default is FALSE.  
 #' @param ... Raster*s. Named variables pointing to Raster* objects.  See Details.
@@ -43,9 +44,13 @@
 #' Note that we are ordering the array using standards for geographic data, (columns, rows, bands), 
 #' not how R usually thinks of arrays (rows, columns, bands).
 #' 
-#' 2) The output of the function should always be an array with the x and y dimensions matching
-#' the input, and an arbitrary number of band outputs.  Remember to order the dimensions as
-#' columns, rows, bands (x,y,z).
+#' 2) If a single file is to be output from rasterEngine, the output of the function should 
+#' always be an array with the x and y dimensions matching the input, and an arbitrary number 
+#' of band outputs.  Remember to order the dimensions as columns, rows, bands (x,y,z).
+#' 
+#' If a multiple file output is required, the output of the function should return a list of arrays 
+#' each with an equivalent number of columns and rows.  The first element of the list will be assigned to
+#' the first filename (if provided).  
 #' 
 #' Local window processing:
 #' 
@@ -108,13 +113,13 @@
 #'	brick(system.file("external/tahoe_highrez.tif", package="spatial.tools")))
 #' 
 #'sfQuickInit(cpus=2)
-#'tahoe_ndvi <- rasterEngine(GRNIR_image=tahoe_highrez,fun=ndvi_nodrop)
+#'tahoe_ndvi <- rasterEngine(GRNIR_image=tahoe_highrez,fun=ndvi)
 #'sfQuickStop()
 #' 
 #'# Focal-based processing:
 #'mean_smoother <- function(inraster,...) # Always include the ellipses
 #'{
-#'	smoothed <- mean(inraster)
+#'	smoothed <- apply(inraster,3,mean)
 #'	return(smoothed)
 #'}
 #' 
@@ -140,6 +145,7 @@ rasterEngine <- function(x,
 		minblocks="max",blocksize=NULL,
 		outbands=NULL,outfiles=NULL,
 		setMinMax=FALSE,
+		compileFunction=FALSE,
 		debugmode=FALSE,
 		verbose=FALSE,...) 
 {
@@ -181,6 +187,13 @@ rasterEngine <- function(x,
 		return(out)
 	}
 	
+	if(compileFunction)
+	{
+		library(compiler)
+		enableJIT(3)
+		focal_hpc_multiRaster_function <- cmpfun(focal_hpc_multiRaster_function)
+	}
+	
 	focal_hpc(x,fun=focal_hpc_multiRaster_function,args=c(list(fun=fun),args),
 			window_dims=window_dims, 
 			window_center=window_center,
@@ -193,4 +206,9 @@ rasterEngine <- function(x,
 			setMinMax=setMinMax,
 			debugmode=debugmode,
 			verbose=verbose)
+	
+	if(compileFunction)
+	{
+		enableJIT(0)
+	}
 }
