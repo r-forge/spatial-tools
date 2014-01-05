@@ -189,7 +189,7 @@ rasterEngine <- function(x,
 	
 	if(compileFunction)
 	{
-		library(compiler)
+	#	library(compiler)
 		enableJIT(3)
 		focal_hpc_multiRaster_function <- cmpfun(focal_hpc_multiRaster_function)
 	}
