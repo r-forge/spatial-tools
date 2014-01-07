@@ -194,7 +194,9 @@ rasterEngine <- function(x,
 		focal_hpc_multiRaster_function <- cmpfun(focal_hpc_multiRaster_function)
 	}
 	
-	focal_hpc(x,fun=focal_hpc_multiRaster_function,args=c(list(fun=fun),args),
+#	browser()
+	
+	rasterEngine_out <- focal_hpc(x,fun=focal_hpc_multiRaster_function,args=c(list(fun=fun),args),
 			window_dims=window_dims, 
 			window_center=window_center,
 			filename=filename, overwrite=overwrite,
@@ -211,4 +213,6 @@ rasterEngine <- function(x,
 	{
 		enableJIT(0)
 	}
+	
+	return(rasterEngine_out)
 }

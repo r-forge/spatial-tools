@@ -108,31 +108,47 @@ focal_hpc_test <- function(x,fun,window_center,window_dims,args,
 						{
 							x_off <- (1:window_dims[1])-ceiling(window_dims[1]/2)
 							y_off <- (1:window_dims[2]) 
-							z_off <- 1:dim(test_chunk[[1]])[3]
+							#						z_off <- 1:dim(test_chunk[[1]])[3]
+							z_off <- 1:dim(test_chunk)[3]
 							xyz_off <- as.data.frame(t(expand.grid(x_off,y_off,z_off)))
-							central_index <- (1:(dim(test_chunk[[1]])[1]
+							#						central_index <- (1:(dim(test_chunk[[1]])[1]
+							central_index <- (1:(dim(test_chunk)[1]
 											-(window_dims[1]-1)))+(ceiling(window_dims[1]/2))-1
 							
-							focal_shifted_array <- mapply(
-									FUN=function(chunk,layer_names,window_index,window_dims,xyz_off,central_index)
+#							focal_shifted_array <- mapply(
+#									FUN=function(chunk,layer_names,window_index,window_dims,xyz_off,central_index)
+#									{
+#										focal_shifted_array <- sapply(X=xyz_off,
+#												FUN=function(X,chunk,central_index)
+#												{						
+#													central_index_off <- central_index+X[1]
+#													outchunk <- chunk[central_index_off,X[2],X[3],drop=FALSE]
+#													outchunk <- aperm(outchunk,c(2,1,3))
+#													return(outchunk)
+#												},chunk=chunk,central_index=central_index)
+#										#		browser()
+#										dim(focal_shifted_array) <- c(length(central_index),prod(window_dims),dim(chunk)[3])
+#										dimnames(focal_shifted_array) <- vector(mode="list",length=3)
+#										if(!is.null(layer_names)) dimnames(focal_shifted_array)[[3]]=layer_names # [as.numeric(xyz_off[3,])]
+#										return(focal_shifted_array)
+#									},chunk=test_chunk,layer_name=layer_names,
+#									MoreArgs=list(window_index=window_index,window_dims=window_dims,
+#											xyz_off=xyz_off,central_index=central_index),
+#									SIMPLIFY=FALSE)
+							
+							focal_shifted_array <- sapply(X=xyz_off,FUN=
+											function(X,chunk,central_index)
 									{
-										focal_shifted_array <- sapply(X=xyz_off,
-												FUN=function(X,chunk,central_index)
-												{						
-													central_index_off <- central_index+X[1]
-													outchunk <- chunk[central_index_off,X[2],X[3],drop=FALSE]
-													outchunk <- aperm(outchunk,c(2,1,3))
-													return(outchunk)
-												},chunk=chunk,central_index=central_index)
-										#		browser()
-										dim(focal_shifted_array) <- c(length(central_index),prod(window_dims),dim(chunk)[3])
-										dimnames(focal_shifted_array) <- vector(mode="list",length=3)
-										if(!is.null(layer_names)) dimnames(focal_shifted_array)[[3]]=layer_names # [as.numeric(xyz_off[3,])]
-										return(focal_shifted_array)
-									},chunk=test_chunk,layer_name=layer_names,
-									MoreArgs=list(window_index=window_index,window_dims=window_dims,
-											xyz_off=xyz_off,central_index=central_index),
-									SIMPLIFY=FALSE)
+										central_index_off <- central_index+X[1]
+										outchunk <- chunk[central_index_off,X[2],X[3],drop=FALSE]
+										outchunk <- aperm(outchunk,c(2,1,3))
+										return(outchunk)
+									},chunk=test_chunk,central_index=central_index)	
+							dim(focal_shifted_array) <- c(length(central_index),
+									prod(window_dims),dim(test_chunk)[3])
+							dimnames(focal_shifted_array) <- vector(mode="list",length=3)
+							if(!is.null(layer_names)) { dimnames(focal_shifted_array)[[3]] <- names(X) }
+										#layer_names }	
 							return(focal_shifted_array)
 						} else
 						{
@@ -141,7 +157,6 @@ focal_hpc_test <- function(x,fun,window_center,window_dims,args,
 					},window_dims=window_dims,chunk_format=chunk_format,simplify=FALSE)
 		} else
 		{
-			
 			test_chunk <- getValuesBlock_enhanced(x, 
 					r1=1, r2=window_dims[2], c1=1,c2=(window_dims[1]+1),
 					format=chunk_format)
@@ -1053,6 +1068,8 @@ focal_hpc <- function(x,
 	{
 		spatial.tools:::focal_hpc_pixel_processing(tr,chunkArgs)
 	}
+	
+# browser()
 	
 	focal_out <- sapply(X=as.list(out),FUN=function(X,additional_header,setMinMax)
 			{
