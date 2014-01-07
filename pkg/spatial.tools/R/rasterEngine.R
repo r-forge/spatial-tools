@@ -14,7 +14,7 @@
 #' @param outbands Numeric. If known, how many bands in each output file?  Assigning this and outfiles will allow focal_hpc to skip the pre-check.
 #' @param outfiles Numeric. If known, how many output files?  Assigning this and outbands will allow focal_hpc to skip the pre-check.
 #' @param setMinMax Logical. Run a setMinMax() on each output file after processing (this will slow the processing down). Default is FALSE.
-#' @param additional_header Character. Create additional output headers for use with other GIS systems (see \code{\link{hdr}}. Set to NULL to suppress.  Default is "ENVI".
+#' @param additional_header Character. Create additional output headers for use with other GIS systems (see \code{\link{hdr}}). Set to NULL to suppress.  Default is "ENVI".
 #' @param compileFunction Logical. Runs a byte-code compilation on the user function before running. Setting this to TRUE may speed up the execution.  Default is FALSE.
 #' @param debugmode Logical.  If TRUE, the function will enter debug mode during the test phase.  Note the inputs will be an array of size 2 columns, 1 row, and how ever many input bands.
 #' @param verbose Logical. Enable verbose execution? Default is FALSE.  

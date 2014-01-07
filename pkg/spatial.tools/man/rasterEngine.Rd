@@ -70,7 +70,7 @@ rasterEngine(x, fun = NULL, args = NULL, window_dims = c(1, 1),
 
   \item{additional_header}{Character. Create additional
   output headers for use with other GIS systems (see
-  \code{\link{hdr}}. Set to NULL to suppress.  Default is
+  \code{\link{hdr}}). Set to NULL to suppress.  Default is
   "ENVI".}
 
   \item{compileFunction}{Logical. Runs a byte-code
