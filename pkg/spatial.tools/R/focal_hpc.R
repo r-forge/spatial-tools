@@ -1074,8 +1074,7 @@ focal_hpc <- function(x,
 	focal_out <- sapply(X=as.list(out),FUN=function(X,additional_header,setMinMax)
 			{
 				focal_out <- brick(X)
-				focal_out@data@haveminmax <- FALSE
-				if(setMinMax) focal_out <- setMinMax(focal_out)
+				if(setMinMax) focal_out <- setMinMax(focal_out) else focal_out@data@haveminmax <- FALSE
 				if(!is.null(additional_header))
 					hdr(focal_out,additional_header)
 				return(focal_out)
