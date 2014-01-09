@@ -8,7 +8,7 @@ focal_hpc(x, fun, args = NULL, window_dims = c(1, 1),
   additional_header = "ENVI", processing_unit = NULL,
   chunk_format = "array", minblocks = "max", blocksize = NULL,
   outbands = NULL, outfiles = NULL, setMinMax = FALSE,
-  debugmode = FALSE, verbose = FALSE)
+  debugmode = FALSE, verbose = FALSE, ...)
 }
 \arguments{
   \item{x}{Raster*. A Raster* used as the input into the
@@ -73,13 +73,18 @@ focal_hpc(x, fun, args = NULL, window_dims = c(1, 1),
   \code{\link{hdr}}). Set to NULL to suppress.  Default is
   "ENVI".}
 
-  \item{debugmode}{Logical.  If TRUE, the function will
-  enter debug mode during the test phase.  Note the inputs
-  will be an array of size 2 columns, 1 row, and how ever
-  many input bands.}
+  \item{debugmode}{Logical or Numeric.  If TRUE or 1, the
+  function will enter debug mode during the test phase.  If
+  debugmode equals 2, the function will stop after the test
+  phase, but won't explicitly enter debug mode.  This is
+  useful if the user function has a browser() statement
+  within it.  Note the inputs will be an array of size 2
+  columns, 1 row, and how ever many input bands.}
 
   \item{verbose}{logical. Enable verbose execution? Default
   is FALSE.}
+
+  \item{...}{Additional parameters (none at present).}
 }
 \description{
 Engine for performing fast, easy-to-develop pixel and focal

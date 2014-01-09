@@ -149,6 +149,8 @@ rasterEngine <- function(x,
 		debugmode=FALSE,
 		verbose=FALSE,...) 
 {
+	if(debugmode) debugmode <- 2
+	
 	additional_vars <- list(...)
 	if(length(additional_vars)>0)
 	{
@@ -180,8 +182,9 @@ rasterEngine <- function(x,
 		names(x)[[1]] <- "x"
 	}
 	
-	focal_hpc_multiRaster_function <- function(x,fun,...)
+	focal_hpc_multiRaster_function <- function(x,fun,debugmode,...)
 	{
+		if(debugmode==2) debug(fun)
 		function_vars <- c(x,list(...))
 		out <- do.call(fun,function_vars)
 		return(out)
@@ -196,7 +199,7 @@ rasterEngine <- function(x,
 	
 #	browser()
 	
-	rasterEngine_out <- focal_hpc(x,fun=focal_hpc_multiRaster_function,args=c(list(fun=fun),args),
+	rasterEngine_out <- focal_hpc(x,fun=focal_hpc_multiRaster_function,args=c(list(fun=fun,debugmode=debugmode),args),
 			window_dims=window_dims, 
 			window_center=window_center,
 			filename=filename, overwrite=overwrite,

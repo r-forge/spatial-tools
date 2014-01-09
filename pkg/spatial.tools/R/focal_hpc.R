@@ -856,8 +856,9 @@ focal_hpc_pixel_processing <- function(tr,chunkArgs)
 #' @param outfiles Numeric. If known, how many output files?  Assigning this and outbands will allow focal_hpc to skip the pre-check.
 #' @param setMinMax Logical. Run a setMinMax() on each output file after processing (this will slow the processing down). Default is FALSE.
 #' @param additional_header Character. Create additional output headers for use with other GIS systems (see \code{\link{hdr}}). Set to NULL to suppress.  Default is "ENVI".
-#' @param debugmode Logical.  If TRUE, the function will enter debug mode during the test phase.  Note the inputs will be an array of size 2 columns, 1 row, and how ever many input bands.
+#' @param debugmode Logical or Numeric.  If TRUE or 1, the function will enter debug mode during the test phase.  If debugmode equals 2, the function will stop after the test phase, but won't explicitly enter debug mode.  This is useful if the user function has a browser() statement within it.  Note the inputs will be an array of size 2 columns, 1 row, and how ever many input bands.
 #' @param verbose logical. Enable verbose execution? Default is FALSE.  
+#' @param ... Additional parameters (none at present).
 #' @author Jonathan A. Greenberg (\email{spatial.tools@@estarcion.net})
 #' @seealso \code{\link{rasterEngine}}, \code{\link{foreach}}, \code{\link{mmap}}, \code{\link{dataType}}, \code{\link{hdr}} 
 #' @details focal_hpc is designed to execute a function on a Raster* object using foreach, to
@@ -963,7 +964,8 @@ focal_hpc <- function(x,
 		outbands=NULL,outfiles=NULL,
 		setMinMax=FALSE,
 		debugmode=FALSE,
-		verbose=FALSE) 
+		verbose=FALSE,
+		...) 
 {
 	# Required libraries:
 #	require("raster")
@@ -996,7 +998,7 @@ focal_hpc <- function(x,
 			spatial.tools:::focal_hpc_precheck(x,window_dims,window_center,processing_unit,verbose),envir=environment())
 	
 	# Debug mode:
-	if(debugmode) debug(fun)
+	if(debugmode==TRUE) debug(fun)
 #	else(undebug(fun))
 	
 #	browser()
@@ -1012,7 +1014,7 @@ focal_hpc <- function(x,
 		outfiles=outbands_and_files$outfiles
 	}
 	
-	if(debugmode) 
+	if(debugmode==TRUE || debugmode==2) 
 	{
 		undebug(fun)
 		stop("Debug mode finished.  Stopping run.")
