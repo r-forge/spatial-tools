@@ -448,10 +448,14 @@ focal_hpc_focalChunkFunction <- function(chunk,chunkArgs)
 		outbands_numeric <- unlist(outbands)
 		outbands_end <- cumsum(outbands_numeric)
 		outbands_start <- c(1,(outbands_end+1)[-length(filename)])
+
+		if(class(r_out)=="numeric") dim(r_out) <- c(1,length(r_out))
 		
+#		browser()
 		r_out <- mapply(function(outbands_start,outbands_end,r_out,ncol_x) 
 				{
-					subarray <- array(t(r_out[(outbands_start:outbands_end),]),dim=c(ncol_x,1,(outbands_end-outbands_start+1)))
+#					browser()
+					subarray <- array(t(r_out[(outbands_start:outbands_end),,drop=FALSE]),dim=c(ncol_x,1,(outbands_end-outbands_start+1)))
 					return(subarray)
 				}
 				,
