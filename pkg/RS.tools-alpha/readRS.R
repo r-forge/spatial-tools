@@ -1,6 +1,6 @@
 # LEDAPS LANDSAT CLIMATE DATA RECORD (CDR) SURFACE REFLECTANCE 
 # Landsat 4-5 TM, 7 ETM+
-lndsr.driver <- function(infile,outfile,of="GTiff",spectral_only=FALSE,output_Raster=FALSE,...)
+lndsr.driver <- function(infile,outfile,of="GTiff",spectral_only=FALSE,output_Raster=FALSE,verbose=FALSE,...)
 {
 	infile <- normalizePath(infile)
 	
@@ -41,14 +41,14 @@ lndsr.driver <- function(infile,outfile,of="GTiff",spectral_only=FALSE,output_Ra
 		layer_tiffs <- foreach(layer=layer_indices,.packages="gdalUtils",.combine=rbind) %dopar%
 			{
 				temptiff <- paste(tempfile(),".tif",sep="")
-				gdal_translate(infile,temptiff,sd_index=layer,verbose=TRUE)
+				gdal_translate(infile,temptiff,sd_index=layer,verbose=verbose)
 				return(temptiff)
 			}
 	
 	# Combine layers:
 	tempvrt <- paste(tempfile(),".vrt",sep="")
-	gdalbuildvrt(layer_tiffs,tempvrt,separate=TRUE)
-	gdal_translate(tempvrt,outfile,of=of)
+	gdalbuildvrt(layer_tiffs,tempvrt,separate=TRUE,verbose=verbose)
+	gdal_translate(tempvrt,outfile,of=of,verbose=verbose)
 	if(output_Raster)
 	{
 		out <- brick(outfile)
