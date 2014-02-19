@@ -149,7 +149,7 @@ sfQuickStop(), focal_hpc will run in sequential mode.
 \examples{
 tahoe_highrez <- brick(system.file("external/tahoe_highrez.tif", package="spatial.tools"))
 # Pixel-based processing:
-ndvi_function <- function(x,...)
+ndvi_function <- function(x)
 {
 	# Note that x is received by the function as a 3-d array:
 	red_band <- x[,,2]
@@ -167,7 +167,7 @@ sfQuickStop()
 
 \dontrun{
 # Focal-based processing:
-local_smoother <- function(x,...)
+local_smoother <- function(x)
 {
 	# Assumes a 3-d array representing
 	# a single local window, and return

@@ -911,7 +911,7 @@ focal_hpc_pixel_processing <- function(tr,chunkArgs)
 
 #'  tahoe_highrez <- brick(system.file("external/tahoe_highrez.tif", package="spatial.tools"))
 #' # Pixel-based processing:
-#'ndvi_function <- function(x,...)
+#'ndvi_function <- function(x)
 #'{
 #'	# Note that x is received by the function as a 3-d array:
 #'	red_band <- x[,,2]
@@ -929,7 +929,7 @@ focal_hpc_pixel_processing <- function(tr,chunkArgs)
 #' 
 #' \dontrun{ 
 #'# Focal-based processing:
-#'local_smoother <- function(x,...)
+#'local_smoother <- function(x)
 #'{
 #'	# Assumes a 3-d array representing
 #'	# a single local window, and return
@@ -1000,6 +1000,11 @@ focal_hpc <- function(x,
 	# Prechecks.
 	list2env(
 			spatial.tools:::focal_hpc_precheck(x,window_dims,window_center,processing_unit,verbose),envir=environment())
+	
+	# Fix missing ellipses in function.  Thanks to Ista Zahn for the solution.
+	# http://r.789695.n4.nabble.com/Checking-for-and-adding-arguments-to-a-function-tp4685450p4685452.html
+	f <- c(formals(fun), unlist(alist(... = )))
+	formals(fun) <- f[!duplicated(names(f))]
 	
 	# Debug mode:
 	if(debugmode==TRUE) debug(fun)

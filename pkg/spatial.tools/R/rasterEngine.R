@@ -71,7 +71,7 @@
 #' 
 #' @examples
 #' # Pixel-based processing on one band:
-#'apply_multiplier <- function(inraster,multiplier,...) # Always include the ellipses
+#'apply_multiplier <- function(inraster,multiplier)
 #'{
 #'	# Note that inraster is received by this function as a 3-d array (col,row,band)
 #'	multiplied_raster <- inraster * multiplier
@@ -93,7 +93,7 @@
 #'  
 #'\dontrun{ 
 #'# Pixel-based processing on more than one band: 
-#'ndvi <- function(GRNIR_image,...)
+#'ndvi <- function(GRNIR_image)
 #'{
 #'	# The input array will have dim(GRNIR_image)[3] equal
 #'	# to 3, because the input image has three bands.
@@ -117,7 +117,7 @@
 #'sfQuickStop()
 #' 
 #'# Focal-based processing:
-#'mean_smoother <- function(inraster,...) # Always include the ellipses
+#'mean_smoother <- function(inraster)
 #'{
 #'	smoothed <- apply(inraster,3,mean)
 #'	return(smoothed)
@@ -181,6 +181,11 @@ rasterEngine <- function(x,
 		x <- c(x,additional_vars_Raster)
 		names(x)[[1]] <- "x"
 	}
+	
+	# Fix missing ellipses in function.  Thanks to Ista Zahn for the solution.
+	# http://r.789695.n4.nabble.com/Checking-for-and-adding-arguments-to-a-function-tp4685450p4685452.html
+	f <- c(formals(fun), unlist(alist(... = )))
+	formals(fun) <- f[!duplicated(names(f))]
 	
 	focal_hpc_multiRaster_function <- function(x,fun,debugmode,...)
 	{

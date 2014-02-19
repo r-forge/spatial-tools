@@ -162,7 +162,7 @@ A fuller tutorial is available at
 }
 \examples{
 # Pixel-based processing on one band:
-apply_multiplier <- function(inraster,multiplier,...) # Always include the ellipses
+apply_multiplier <- function(inraster,multiplier)
 {
 	# Note that inraster is received by this function as a 3-d array (col,row,band)
 	multiplied_raster <- inraster * multiplier
@@ -184,7 +184,7 @@ sfQuickStop()
 
 \dontrun{
 # Pixel-based processing on more than one band:
-ndvi <- function(GRNIR_image,...)
+ndvi <- function(GRNIR_image)
 {
 	# The input array will have dim(GRNIR_image)[3] equal
 	# to 3, because the input image has three bands.
@@ -208,7 +208,7 @@ tahoe_ndvi <- rasterEngine(GRNIR_image=tahoe_highrez,fun=ndvi)
 sfQuickStop()
 
 # Focal-based processing:
-mean_smoother <- function(inraster,...) # Always include the ellipses
+mean_smoother <- function(inraster)
 {
 	smoothed <- apply(inraster,3,mean)
 	return(smoothed)
