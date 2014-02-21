@@ -9,7 +9,7 @@
 #' 
 #' @param filename Character. The output base filename of the blank file.  Will use tempfile() if nothing is provided.
 #' @param format Character.  Output format.  Currently only supports "raster".
-#' @param dataType Character.  Output number type.  See ?dataType. Currently only supports "FLT8S".  
+#' @param dataType Character.  Output number type.  See ?dataType.  Default is "FLT8S".  
 #' @param bandorder Character.  Output band interleave.  Currently only supports "BSQ".
 #' @param nrow Numeric. Number of rows of the output raster. Defaults to nrow(reference_raster).
 #' @param ncol Numeric. Number of columns of the output raster. Defaults to ncol(reference_raster).
@@ -60,7 +60,10 @@ create_blank_raster <- function(filename=NULL,
 		if(!file.exists(tempdir())) dir.create(tempdir())
 	} 
 	
-	if(dataType=="FLT8S") numBytes = 8
+	numBytes = substr(dataType,4,4)
+	
+#	if(dataType=="FLT4S") numBytes = 4 # Single Precision Floating Point
+#	if(dataType=="FLT8S") numBytes = 8 # Double Precision Floating Point
 	
 	# I've been warned about using seek on Windows, but this appears to work...
 	if(verbose) { message("Creating empty file.") }

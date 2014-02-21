@@ -16,7 +16,7 @@ create_blank_raster(filename = NULL, format = "raster",
   supports "raster".}
 
   \item{dataType}{Character.  Output number type.  See
-  ?dataType. Currently only supports "FLT8S".}
+  ?dataType.  Default is "FLT8S".}
 
   \item{bandorder}{Character.  Output band interleave.
   Currently only supports "BSQ".}

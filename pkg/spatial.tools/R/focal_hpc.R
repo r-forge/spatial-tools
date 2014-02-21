@@ -954,6 +954,7 @@ focal_hpc_pixel_processing <- function(tr,chunkArgs)
 #' @import foreach
 #' @import mmap
 #' @import raster
+#' @import compiler
 #' 
 #' @export
 
