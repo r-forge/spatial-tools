@@ -39,6 +39,7 @@
 #' }
 #' @import raster
 #' @export
+
 create_blank_raster <- function(filename=NULL,
 	format="raster",dataType="FLT8S",bandorder="BSQ",
 	nrow=NULL,ncol=NULL,nlayers=NULL,

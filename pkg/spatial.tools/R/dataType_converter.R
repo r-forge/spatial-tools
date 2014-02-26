@@ -1,4 +1,4 @@
-#' @export
+##' @export
 
 dataType_converter <- function(from,fromFormat="raster",toFormat="mmap")
 {
