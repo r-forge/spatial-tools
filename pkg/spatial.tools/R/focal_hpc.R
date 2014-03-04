@@ -368,6 +368,9 @@ focal_hpc_focal_getChunk <- function(x,tr,format,r,i,r_old,chunkArgs)
 
 focal_hpc_focalChunkFunction <- function(chunk,chunkArgs)
 {	
+	# TODO: as.numeric() the outputs of the functions.
+	
+	
 	# Create some blank variables (to avoid R CMD CHECK errors):
 	x <- NULL
 	layer_names <- NULL

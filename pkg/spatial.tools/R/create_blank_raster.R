@@ -60,8 +60,10 @@ create_blank_raster <- function(filename=NULL,
 		if(verbose) { message(paste("No output file given, using a tempfile name:",filename,sep=" ")) }
 		if(!file.exists(tempdir())) dir.create(tempdir())
 	} 
+
+	numBytes = dataSize(dataType)
 	
-	numBytes = substr(dataType,4,4)
+#	numBytes = substr(dataType,4,4)
 	
 #	if(dataType=="FLT4S") numBytes = 4 # Single Precision Floating Point
 #	if(dataType=="FLT8S") numBytes = 8 # Double Precision Floating Point
