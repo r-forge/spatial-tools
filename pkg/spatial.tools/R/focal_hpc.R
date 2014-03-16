@@ -1005,9 +1005,13 @@ focal_hpc <- function(x,
 	list2env(
 			spatial.tools:::focal_hpc_precheck(x,window_dims,window_center,processing_unit,verbose),envir=environment())
 	
+	# Add in new formals to the function if args doesn't match the function:
+	
+	
 	# Fix missing ellipses in function.  Thanks to Ista Zahn for the solution.
 	# http://r.789695.n4.nabble.com/Checking-for-and-adding-arguments-to-a-function-tp4685450p4685452.html
-	f <- c(formals(fun), unlist(alist(... = )))
+#	f <- c(formals(fun), unlist(alist(... = )))
+	f <- c(formals(fun), unlist(args),unlist(alist(... = )))
 	formals(fun) <- f[!duplicated(names(f))]
 	
 	# Debug mode:
