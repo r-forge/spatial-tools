@@ -1016,6 +1016,11 @@ focal_hpc <- function(x,
 	
 	f <- vector(mode="list",length=(length(formals(fun))+length(args)+1))
 	names(f) <- c(names(formals(fun)),names(args),"...")
+	formals(fun) <- f[!duplicated(names(f))]
+	
+	f <- vector(mode="list",length=(length(formals(fun))+length(args)+1))
+	names(f) <- c(names(formals(fun)),names(args),"...")
+	formals(fun) <- f[!duplicated(names(f))]
 	
 	# Debug mode:
 	if(debugmode==TRUE) debug(fun)

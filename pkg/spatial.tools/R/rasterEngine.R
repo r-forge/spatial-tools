@@ -189,15 +189,16 @@ rasterEngine <- function(x,
 	
 	f <- vector(mode="list",length=(length(formals(fun))+length(args)+1))
 	names(f) <- c(names(formals(fun)),names(args),"...")
-	
-	
-#	f <- c(formals(fun), unlist(alist(... = )))
 	formals(fun) <- f[!duplicated(names(f))]
 	
 	focal_hpc_multiRaster_function <- function(x,fun,debugmode,...)
 	{
+		local_objects <- ls()
+		model_parameters <- setdiff(local_objects,c("x","fun","debugmode"))
+		
 		if(debugmode==2) debug(fun)
-		function_vars <- c(x,list(...))
+		function_vars <- c(x,mget(model_parameters))
+#		function_vars <- c(x,list(...))
 		out <- do.call(fun,function_vars)
 		return(out)
 	}
@@ -211,7 +212,8 @@ rasterEngine <- function(x,
 	
 #	browser()
 	
-	rasterEngine_out <- focal_hpc(x,fun=focal_hpc_multiRaster_function,args=c(list(fun=fun,debugmode=debugmode),args),
+	rasterEngine_out <- focal_hpc(x,fun=focal_hpc_multiRaster_function,
+			args=c(list(fun=fun,debugmode=debugmode),args),
 			window_dims=window_dims, 
 			window_center=window_center,
 			filename=filename, overwrite=overwrite,
