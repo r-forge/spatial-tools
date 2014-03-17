@@ -1,3 +1,5 @@
+
+
 # focal_hpc helper functions
 
 focal_hpc_precheck <- function(x,window_dims,window_center,processing_unit,verbose)
@@ -148,7 +150,7 @@ focal_hpc_test <- function(x,fun,window_center,window_dims,args,
 									prod(window_dims),dim(test_chunk)[3])
 							dimnames(focal_shifted_array) <- vector(mode="list",length=3)
 							if(!is.null(layer_names)) { dimnames(focal_shifted_array)[[3]] <- names(X) }
-										#layer_names }	
+							#layer_names }	
 							return(focal_shifted_array)
 						} else
 						{
@@ -451,7 +453,7 @@ focal_hpc_focalChunkFunction <- function(chunk,chunkArgs)
 		outbands_numeric <- unlist(outbands)
 		outbands_end <- cumsum(outbands_numeric)
 		outbands_start <- c(1,(outbands_end+1)[-length(filename)])
-
+		
 		if(class(r_out)=="numeric") dim(r_out) <- c(1,length(r_out))
 		
 #		browser()
