@@ -1011,8 +1011,11 @@ focal_hpc <- function(x,
 	# Fix missing ellipses in function.  Thanks to Ista Zahn for the solution.
 	# http://r.789695.n4.nabble.com/Checking-for-and-adding-arguments-to-a-function-tp4685450p4685452.html
 #	f <- c(formals(fun), unlist(alist(... = )))
-	f <- c(formals(fun), unlist(args),unlist(alist(... = )))
-	formals(fun) <- f[!duplicated(names(f))]
+#	f <- c(formals(fun), unlist(args),unlist(alist(... = )))
+#	formals(fun) <- f[!duplicated(names(f))]
+	
+	f <- vector(mode="list",length=(length(formals(fun))+length(args)+1))
+	names(f) <- c(names(formals(fun)),names(args),"...")
 	
 	# Debug mode:
 	if(debugmode==TRUE) debug(fun)

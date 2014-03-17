@@ -184,7 +184,13 @@ rasterEngine <- function(x,
 	
 	# Fix missing ellipses in function.  Thanks to Ista Zahn for the solution.
 	# http://r.789695.n4.nabble.com/Checking-for-and-adding-arguments-to-a-function-tp4685450p4685452.html
-	f <- c(formals(fun), unlist(args),unlist(alist(... = )))	
+	
+#	f <- c(formals(fun), unlist(alist(args=)),unlist(alist(... = )))	
+	
+	f <- vector(mode="list",length=(length(formals(fun))+length(args)+1))
+	names(f) <- c(names(formals(fun)),names(args),"...")
+	
+	
 #	f <- c(formals(fun), unlist(alist(... = )))
 	formals(fun) <- f[!duplicated(names(f))]
 	
