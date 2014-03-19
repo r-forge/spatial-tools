@@ -17,6 +17,7 @@
 #' @param additional_header Character. Create additional output headers for use with other GIS systems (see \code{\link{hdr}}). Set to NULL to suppress.  Default is "ENVI".
 #' @param compileFunction Logical. Runs a byte-code compilation on the user function before running. Setting this to TRUE may speed up the execution.  Default is FALSE.
 #' @param debugmode Logical.  If TRUE, the function will enter debug mode during the test phase.  Note the inputs will be an array of size 2 columns, 1 row, and how ever many input bands.
+#' @param .packages Character. A character vector of package names needed by the function (parallel mode only).
 #' @param verbose Logical. Enable verbose execution? Default is FALSE.  
 #' @param ... Raster*s. Named variables pointing to Raster* objects.  See Details.
 #' @author Jonathan A. Greenberg (\email{spatial.tools@@estarcion.net})
@@ -147,6 +148,7 @@ rasterEngine <- function(x,
 		setMinMax=FALSE,
 		compileFunction=FALSE,
 		debugmode=FALSE,
+		.packages=NULL,
 		verbose=FALSE,...) 
 {
 	if(debugmode) debugmode <- 2
@@ -185,19 +187,29 @@ rasterEngine <- function(x,
 	# Fix missing ellipses in function.  Thanks to Ista Zahn for the solution.
 	# http://r.789695.n4.nabble.com/Checking-for-and-adding-arguments-to-a-function-tp4685450p4685452.html
 	
-#	f <- c(formals(fun), unlist(alist(args=)),unlist(alist(... = )))	
+	base_formals <- formals(fun)
+	base_formals_names <- names(base_formals)
+	# Add in args if missing
+	missing_formals_names <- setdiff(names(args),base_formals_names)
+	missing_formals <- args[names(args) %in% missing_formals_names]
 	
-	f <- vector(mode="list",length=(length(formals(fun))+length(args)+1))
-	names(f) <- c(names(formals(fun)),names(args),"...")
-	formals(fun) <- f[!duplicated(names(f))]
+	new_formals <- c(
+			unlist(base_formals[base_formals_names != "..."],recursive=FALSE),
+			#		unlist(missing_formals,recursive=FALSE),
+			missing_formals,
+			alist(...=)
+	)
+	
+	formals(fun) <- new_formals
 	
 	focal_hpc_multiRaster_function <- function(x,fun,debugmode,...)
 	{
+	#	browser()
 		local_objects <- ls()
-		model_parameters <- setdiff(local_objects,c("x","fun","debugmode"))
+		function_vars <- setdiff(local_objects,c("x","fun","debugmode"))
 		
 		if(debugmode==2) debug(fun)
-		function_vars <- c(x,mget(model_parameters))
+		function_vars <- c(x,mget(function_vars))
 #		function_vars <- c(x,list(...))
 		out <- do.call(fun,function_vars)
 		return(out)
@@ -224,6 +236,7 @@ rasterEngine <- function(x,
 			outbands=outbands,outfiles=outfiles,
 			setMinMax=setMinMax,
 			debugmode=debugmode,
+			.packages=.packages,
 			verbose=verbose)
 	
 	if(compileFunction)

@@ -614,6 +614,7 @@ focal_hpc_focal_processing <- function(tr,texture_tr,chunkArgs)
 	chunk_format <- NULL
 	chunk <- NULL
 	window_dims <- NULL
+	.packages <- NULL
 	
 	list2env(chunkArgs,envir=environment())
 	
@@ -692,7 +693,7 @@ focal_hpc_focal_processing <- function(tr,texture_tr,chunkArgs)
 				,j,MoreArgs=list(r=r,texture_tr=texture_tr,row_centers=row_centers,chunk_format=chunk_format),
 				SIMPLIFY=FALSE)
 		
-		foreach(chunk=chunkList, .packages=c("rgdal","raster","spatial.tools","mmap"),
+		foreach(chunk=chunkList, .packages=c("rgdal","raster","spatial.tools","mmap",.packages),
 						.verbose=verbose) %dopar% 
 				spatial.tools:::focal_hpc_focalChunkFunction(chunk,chunkArgs)
 		
@@ -840,10 +841,11 @@ focal_hpc_pixel_processing <- function(tr,chunkArgs)
 	layer_names <- NULL
 	outbands <- NULL
 	verbose <- NULL
+	.packages <- NULL
 	
 	list2env(chunkArgs,envir=environment())
 	chunkID <- seq(tr$n)
-	foreach(chunkID=chunkID, .packages=c("rgdal","raster","spatial.tools","mmap"),.verbose=verbose) %dopar% 
+	foreach(chunkID=chunkID, .packages=c("rgdal","raster","spatial.tools","mmap",.packages),.verbose=verbose) %dopar% 
 			spatial.tools:::focal_hpc_pixelChunkFunction(chunkID,tr,x,chunk_format,fun,args,layer_names,outbands,
 					filename)
 }
@@ -866,6 +868,7 @@ focal_hpc_pixel_processing <- function(tr,chunkArgs)
 #' @param setMinMax Logical. Run a setMinMax() on each output file after processing (this will slow the processing down). Default is FALSE.
 #' @param additional_header Character. Create additional output headers for use with other GIS systems (see \code{\link{hdr}}). Set to NULL to suppress.  Default is "ENVI".
 #' @param debugmode Logical or Numeric.  If TRUE or 1, the function will enter debug mode during the test phase.  If debugmode equals 2, the function will stop after the test phase, but won't explicitly enter debug mode.  This is useful if the user function has a browser() statement within it.  Note the inputs will be an array of size 2 columns, 1 row, and how ever many input bands.
+#' @param .packages Character. A character vector of package names needed by the function (parallel mode only).
 #' @param verbose logical. Enable verbose execution? Default is FALSE.  
 #' @param ... Additional parameters (none at present).
 #' @author Jonathan A. Greenberg (\email{spatial.tools@@estarcion.net})
@@ -974,6 +977,7 @@ focal_hpc <- function(x,
 		outbands=NULL,outfiles=NULL,
 		setMinMax=FALSE,
 		debugmode=FALSE,
+		.packages=NULL,
 		verbose=FALSE,
 		...) 
 {
@@ -1012,17 +1016,23 @@ focal_hpc <- function(x,
 	
 	# Fix missing ellipses in function.  Thanks to Ista Zahn for the solution.
 	# http://r.789695.n4.nabble.com/Checking-for-and-adding-arguments-to-a-function-tp4685450p4685452.html
-#	f <- c(formals(fun), unlist(alist(... = )))
-#	f <- c(formals(fun), unlist(args),unlist(alist(... = )))
-#	formals(fun) <- f[!duplicated(names(f))]
 	
-	f <- vector(mode="list",length=(length(formals(fun))+length(args)+1))
-	names(f) <- c(names(formals(fun)),names(args),"...")
-	formals(fun) <- f[!duplicated(names(f))]
+	base_formals <- formals(fun)
+	base_formals_names <- names(base_formals)
+	# Add in args if missing
+	missing_formals_names <- setdiff(names(args),base_formals_names)
+	missing_formals <- args[names(args) %in% missing_formals_names]
 	
-	f <- vector(mode="list",length=(length(formals(fun))+length(args)+1))
-	names(f) <- c(names(formals(fun)),names(args),"...")
-	formals(fun) <- f[!duplicated(names(f))]
+	
+	new_formals <- c(
+			unlist(base_formals[base_formals_names != "..."],recursive=FALSE),
+	#		unlist(missing_formals,recursive=FALSE),
+			missing_formals,
+			alist(...=)
+	)
+	
+	formals(fun) <- new_formals
+	
 	
 	# Debug mode:
 	if(debugmode==TRUE) debug(fun)
@@ -1086,7 +1096,8 @@ focal_hpc <- function(x,
 			args=args,filename=out,
 			outbands=outbands,processing_unit=processing_unit,
 			verbose=verbose,layer_names=layer_names,
-			chunk_format=chunk_format)
+			chunk_format=chunk_format,
+			.packages=.packages)
 	
 	# Processing:
 # 	browser()

@@ -8,7 +8,7 @@ focal_hpc(x, fun, args = NULL, window_dims = c(1, 1),
   additional_header = "ENVI", processing_unit = NULL,
   chunk_format = "array", minblocks = "max", blocksize = NULL,
   outbands = NULL, outfiles = NULL, setMinMax = FALSE,
-  debugmode = FALSE, verbose = FALSE, ...)
+  debugmode = FALSE, .packages = NULL, verbose = FALSE, ...)
 }
 \arguments{
   \item{x}{Raster*. A Raster* used as the input into the
@@ -80,6 +80,9 @@ focal_hpc(x, fun, args = NULL, window_dims = c(1, 1),
   useful if the user function has a browser() statement
   within it.  Note the inputs will be an array of size 2
   columns, 1 row, and how ever many input bands.}
+
+  \item{.packages}{Character. A character vector of package
+  names needed by the function (parallel mode only).}
 
   \item{verbose}{logical. Enable verbose execution? Default
   is FALSE.}
