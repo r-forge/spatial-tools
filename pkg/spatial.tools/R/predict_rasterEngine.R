@@ -27,35 +27,20 @@ predict_rasterEngine <- function(object,...)
 		{
 			predict.rasterEngine_function <- function(newdata,object,...)
 			{
-			#	browser()
 				# Determine all parameters that are not newdata and object:
 				local_objects <- ls()
 				model_parameters <- setdiff(local_objects,c("newdata","object"))
-				
-				#	library(plyr)
-				# Receives the chunk as an array, needs to coerce it to data.frame
-				# This can probably be a LOT more efficient.
 				
 				newdata_dim <- dim(newdata)
 				
 				predictor_names <- dimnames(newdata)[3][[1]]
 				
-	#			newdata <- t(newdata)
-	#			dim(newdata) <- c(dim(newdata)[3],prod(dim(newdata)[1:2]))
-	#			newdata <- as.data.frame()
 				newdata <- aperm(newdata,c(3,1,2))
 				dim(newdata) <- c(newdata_dim[3],prod(newdata_dim[1:2]))
 				newdata <- t(newdata)
 				
-	#			newdata <- t(aperm(newdata,c(3,1,2))[,,1])
 				newdata_df <- as.data.frame(newdata)
 				names(newdata_df) <- predictor_names
-				
-				
-#				newdata_matrix <- aperm(newdata,c(3,2,1))
-#				dim(newdata_matrix) <- c(dim(newdata)[3],prod(dim(newdata)[1:2]))
-#				newdata_df <- as.data.frame(t(newdata_matrix))
-#				names(newdata_df) <- dimnames(newdata)[3][[1]]
 				
 				predict_output <- predict(object=object,newdata=newdata_df,mget(model_parameters))
 				
@@ -81,5 +66,5 @@ predict_rasterEngine <- function(object,...)
 			return(output)
 		}
 	}
-	return(base:::predict(object,...))
+	return(predict(object,...))
 }
