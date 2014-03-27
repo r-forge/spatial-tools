@@ -151,6 +151,8 @@ rasterEngine <- function(x,
 		.packages=NULL,
 		verbose=FALSE,...) 
 {
+	loaded_packages <- lapply(.packages, require, character.only=T)
+	
 	if(debugmode) debugmode <- 2
 	
 	additional_vars <- list(...)

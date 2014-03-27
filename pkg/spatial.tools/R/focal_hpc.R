@@ -1003,6 +1003,9 @@ focal_hpc <- function(x,
 	processing_mode <- NULL
 	texture_tr <- NULL
 	
+# 	Make sure all the packages are loaded.
+	loaded_packages <- lapply(.packages, require, character.only=T)
+	
 #	if(!is.list(x)) { x <- list(x) }
 	
 	# Register a sequential backend if one is not already registered:
