@@ -19,10 +19,7 @@ getValuesBlock_enhanced(x, r1 = 1, r2 = nrow(x), c1 = 1, c2 = ncol(x),
   \item{lyrs}{Numeric. Vector of layer IDs.  Defaults to
   all layers (1:nlayers(x)).}
 
-  \item{format}{Character. If "array" (default), the chunk
-  will be returned in a 3-d array with dimensions
-  representing column,row,and layer.  If "raster", the
-  chunk will be returned as a Raster* object.}
+  \item{format}{Character. See Details.}
 
   \item{...}{Other parameters.}
 }
@@ -32,6 +29,19 @@ An array or raster object.
 \description{
 Easier-to-use function for grabbing a block of data out of
 a Raster*.
+}
+\details{
+This allows for a larger number of output formats to be
+generated when extracting chunks of data from a Raster*
+object.  If format="array" (default), the chunk will be
+returned in a 3-d array with dimensions representing
+column,row,and layer. If "raster", the chunk will be
+returned as a Raster* object.  If "data.frame", it will be
+returned as a data.frame.  If "data.frame.dims", it will
+return a list, where the first component (named "values")
+is the same as the data.frame when using
+format="data.frame", and the second component (named "dim")
+is the dimensions of the extracted chunk.
 }
 \examples{
 tahoe_highrez <- brick(system.file("external/tahoe_highrez.tif", package="spatial.tools"))

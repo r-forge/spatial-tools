@@ -6,8 +6,16 @@
 #' @param c1 Numeric. The start column of the chunk.
 #' @param c2 Numeric. The end row of the chunk.
 #' @param lyrs Numeric. Vector of layer IDs.  Defaults to all layers (1:nlayers(x)).
-#' @param format Character. If "array" (default), the chunk will be returned in a 3-d array with dimensions representing column,row,and layer.  If "raster", the chunk will be returned as a Raster* object.
+#' @param format Character. See Details. 
 #' @param ... Other parameters.
+#' 
+#' @details This allows for a larger number of output formats to be generated
+#' when extracting chunks of data from a Raster* object.  If format="array" (default), 
+#' the chunk will be returned in a 3-d array with dimensions representing column,row,and layer.  
+#' If "raster", the chunk will be returned as a Raster* object.  If "data.frame", it will
+#' be returned as a data.frame.  If "data.frame.dims", it will return a list, where the first
+#' component (named "values") is the same as the data.frame when using format="data.frame", and
+#' the second component (named "dim") is the dimensions of the extracted chunk.
 #' 
 #' @return An array or raster object.
 #' @author Jonathan A. Greenberg
