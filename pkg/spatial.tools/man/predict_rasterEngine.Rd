@@ -2,11 +2,15 @@
 \alias{predict_rasterEngine}
 \title{Model predictions (including Raster* objects)}
 \usage{
-predict_rasterEngine(object, ...)
+predict_rasterEngine(object, na.rm.mode = TRUE, ...)
 }
 \arguments{
   \item{object}{a model object for which prediction is
   desired.}
+
+  \item{na.rm.mode}{Logical. Attempt to fix missing data,
+  even if the model object doesn't support na.rm?  Default
+  is TRUE.}
 
   \item{...}{additional arguments affecting the predictions
   produced.}
