@@ -1,6 +1,6 @@
-# For tauboa:
+## For tauboa:
 package_dir <- "/Users/jgrn307/Documents/workspace/spatial-tools/pkg/spatial.tools"
-package_dir <- "D:\\Users\\jgrn\\workspace\\spatial-tools\\pkg\\spatial.tools"
+#package_dir <- "D:\\Users\\jgrn\\workspace\\spatial-tools\\pkg\\spatial.tools"
 
 setwd(package_dir)
 
