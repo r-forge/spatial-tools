@@ -17,10 +17,11 @@
 #' @param create_header Logical. Create a properly formatted header for the blank file?
 #' @param reference_raster Raster*. Reference raster to derive other information, e.g. resolution, projection, datum.
 #' @param return_filename Logical. Return filename of the binary file (if TRUE, default) or the Raster* itself (if FALSE).
+#' @param additional_header Character. Create additional output headers for use with other GIS systems (see \code{\link{hdr}}). Set to NULL (default) to suppress.
 #' @param overwrite Logical. Overwrite an existing file with the same name?
 #' @param verbose Logical. Enable verbose execution? Default is FALSE.  
 #' @return A character vector (return_filename==TRUE) or as Raster* object (return_filename==TRUE)
-#' 
+#' @seealso \code{\link{hdr}}
 #' @details create_blank_raster is designed to quickly create a binary file of the appropriate
 #' size using tricks with seek()/writeBin(). A large file can be created in a fraction of a second
 #' using this function. This file could, for example, be used with mmap to realize asynchronous
@@ -45,6 +46,7 @@ create_blank_raster <- function(filename=NULL,
 	nrow=NULL,ncol=NULL,nlayers=NULL,
 	create_header=TRUE,reference_raster=NULL,
 	return_filename=TRUE,
+	additional_header=NULL,
 	overwrite=FALSE,verbose=FALSE)
 {
 	if(is.null(nrow)&!is.null(reference_raster)) nrow=nrow(reference_raster)
@@ -103,7 +105,7 @@ create_blank_raster <- function(filename=NULL,
 		outraster <- build_raster_header(x_filename=filename,
 				reference_raster=reference_raster,
 				out_nlayers=nlayers,dataType=dataType,format=format,
-				bandorder=bandorder)
+				bandorder=bandorder,additional_header=additional_header)
 	}
 	if(return_filename) return(filename) else
 		return(outraster)

@@ -1093,6 +1093,7 @@ focal_hpc <- function(x,
 						format="raster",dataType="FLT8S",bandorder="BSQ",
 						nlayers=outbands,
 						create_header=TRUE,reference_raster=reference_raster,
+						additional_header=additional_header,
 						overwrite=overwrite,verbose=verbose)
 			},filename=filename,outbands=outbands,
 			MoreArgs=list(reference_raster=reference_raster,overwrite=overwrite,verbose=verbose)

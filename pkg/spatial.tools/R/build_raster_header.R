@@ -6,6 +6,7 @@
 #' @param bandorder Character. The bandorder ('BIP','BIL','BSQ') of the file. Default is 'BSQ'.
 #' @param format Character. The format of the header.  See ?hdr for valid entries.  Default is 'raster'.  CURRENTLY UNSUPPORTED.
 #' @param setMinMax Logical. Set the min/max for the file (will take longer to execute)?  Default=FALSE.
+#' @param additional_header Character. Create additional output headers for use with other GIS systems (see \code{\link{hdr}}). Set to NULL (default) to suppress.
 #' @param verbose logical. Enable verbose execution? Default is FALSE.  
 #' @author Jonathan A. Greenberg and Robert Hijimans (\email{spatial.tools@@estarcion.net})
 #' @seealso \code{\link{hdr}},\code{\link{dataType}}
@@ -24,6 +25,7 @@
 
 build_raster_header <- function(x_filename,reference_raster,out_nlayers,
 		dataType='FLT8S',format='raster',bandorder="BSQ",setMinMax=FALSE,
+		additional_header=NULL,
 		verbose=FALSE)
 {
 #	require("raster")
@@ -58,5 +60,11 @@ build_raster_header <- function(x_filename,reference_raster,out_nlayers,
 	
 	if(setMinMax) outraster <- setMinMax(outraster)
 	else outraster@data@haveminmax <- FALSE
+	
+	if(!is.null(additional_header))
+	{
+		hdr(outraster,format=additional_header)
+	}
+	
 	return(outraster)
 }
