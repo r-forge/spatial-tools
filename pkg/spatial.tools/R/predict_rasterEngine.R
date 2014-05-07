@@ -71,7 +71,7 @@
 #' # sfQuickStop()
 #' @export
 
-predict_rasterEngine <- function(object,na.rm.mode=TRUE,...)
+predict_rasterEngine <- function(object,na.rm.mode=TRUE,debugmode=FALSE,...)
 {
 	list2env(list(...),envir=environment())
 	if("newdata" %in% ls())
@@ -158,12 +158,17 @@ predict_rasterEngine <- function(object,na.rm.mode=TRUE,...)
 					predict_output <- predict(object=object,newdata=newdata_df)
 				}
 				
-				nbands_output <- length(predict_output)/prod(newdata_dim[1:2])
+				nbands_output <- prod(dim(predict_output))/prod(newdata_dim[1:2])
 				
-				if("factor" %in% class(predict_output))
-				{
-					predict_output <- as.numeric(predict_output)
-				}
+				# Mixed class data frame:
+				factor_columns <- sapply(predict_output,class)=="factor"
+				
+				predict_output[,factor_columns] <- as.numeric(predict_output[,factor_columns])
+				
+#				if("factor" %in% class(predict_output))
+#				{
+#					predict_output <- as.numeric(predict_output)
+#				}
 				
 				if(!is.null(newdata_complete))
 				{
@@ -177,7 +182,8 @@ predict_rasterEngine <- function(object,na.rm.mode=TRUE,...)
 					
 				}
 				
-				predict_output_array <- array(predict_output,dim=c(newdata_dim[1:2],nbands_output))
+				predict_output_array <- as.matrix(predict_output)
+				dim(predict_output_array) <- c(newdata_dim[1:2],nbands_output)
 				
 				return(predict_output_array)
 			}
@@ -186,12 +192,12 @@ predict_rasterEngine <- function(object,na.rm.mode=TRUE,...)
 			factor_layers <- is.factor(newdata)
 			
 			additional_args <- list(...)
-			additional_args$newdata <- NULL
 			additional_args <- c(list(object=object,na.rm.mode=na.rm.mode),
 					unlist(additional_args,recursive=FALSE))
+			additional_args$newdata <- NULL
 			
 			output <- rasterEngine(newdata=newdata,fun=predict.rasterEngine_function,
-					args=additional_args,.packages=(.packages()),debugmode=FALSE,chunk_format="data.frame.dims")
+					args=additional_args,.packages=(.packages()),debugmode=debugmode,chunk_format="data.frame.dims")
 			
 			return(output)
 		}

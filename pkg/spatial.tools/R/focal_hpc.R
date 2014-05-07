@@ -263,8 +263,10 @@ focal_hpc_chunk_setup <- function(x,window_dims,window_center,
 		nlayers_x <- nlayers(x)
 	}
 	
+	blocksize_reduction=4
+	
 	if(is.null(blocksize))
-		tr=blockSize(x,n=nlayers_x,minrows=window_dims[2],minblocks=minblocks)
+		tr=blockSize(x,n=nlayers_x*blocksize_reduction,minrows=window_dims[2],minblocks=minblocks)
 	else
 		tr=blockSize(x,chunksize=ncol(x)*blocksize*nlayers_x,
 				n=nlayers_x,minrows=window_dims[2],minblocks=minblocks)
@@ -664,6 +666,8 @@ focal_hpc_focal_processing <- function(tr,texture_tr,chunkArgs)
 								{
 									if(chunk_format=="array")
 									{
+										# Something is wrong with j
+									#	print(j)
 										processing_chunk=X[,texture_tr$row[j]:texture_tr$row2[j],,drop=FALSE]
 									}
 									if(chunk_format=="raster")
@@ -700,6 +704,8 @@ focal_hpc_focal_processing <- function(tr,texture_tr,chunkArgs)
 		#		spatial.tools:::
 		focal_hpc_focalChunkFunction(chunk,chunkArgs)
 		
+	#	browser()
+
 		if(i<tr$n && window_dims[2] > 1)
 			if(is.list(r))
 			{
