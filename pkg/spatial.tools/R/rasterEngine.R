@@ -18,6 +18,7 @@
 #' @param compileFunction Logical. Runs a byte-code compilation on the user function before running. Setting this to TRUE may speed up the execution.  Default is FALSE.
 #' @param debugmode Logical.  If TRUE, the function will enter debug mode during the test phase.  Note the inputs will be an array of size 2 columns, 1 row, and how ever many input bands.
 #' @param .packages Character. A character vector of package names needed by the function (parallel mode only).
+#' @param clearworkers Logical. Force the workers to clear all objects upon completing (releasing memory)?  Default=TRUE.
 #' @param verbose Logical. Enable verbose execution? Default is FALSE.  
 #' @param ... Raster*s. Named variables pointing to Raster* objects.  See Details.
 #' @author Jonathan A. Greenberg (\email{spatial.tools@@estarcion.net})
@@ -149,6 +150,7 @@ rasterEngine <- function(x,
 		compileFunction=FALSE,
 		debugmode=FALSE,
 		.packages=NULL,
+		clearworkers=TRUE,
 		verbose=FALSE,...) 
 {
 	loaded_packages <- lapply(.packages, require, character.only=T)
@@ -239,6 +241,7 @@ rasterEngine <- function(x,
 			setMinMax=setMinMax,
 			debugmode=debugmode,
 			.packages=.packages,
+			clearworkers=TRUE,
 			verbose=verbose)
 	
 	if(compileFunction)

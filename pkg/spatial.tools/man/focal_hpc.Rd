@@ -9,7 +9,8 @@ focal_hpc(x, fun, args = NULL, window_dims = c(1, 1),
   additional_header = "ENVI", processing_unit = NULL,
   chunk_format = "array", minblocks = "max", blocksize = NULL,
   outbands = NULL, outfiles = NULL, setMinMax = FALSE,
-  debugmode = FALSE, .packages = NULL, verbose = FALSE, ...)
+  debugmode = FALSE, .packages = NULL, clearworkers = TRUE,
+  verbose = FALSE, ...)
 }
 \arguments{
 \item{x}{Raster*. A Raster* used as the input into the function.  Multiple inputs should be stack()'ed or list()'ed together.}

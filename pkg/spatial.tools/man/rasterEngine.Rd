@@ -10,7 +10,7 @@ rasterEngine(x, fun = NULL, args = NULL, window_dims = c(1, 1),
   chunk_format = "array", minblocks = "max", blocksize = NULL,
   outbands = NULL, outfiles = NULL, setMinMax = FALSE,
   compileFunction = FALSE, debugmode = FALSE, .packages = NULL,
-  verbose = FALSE, ...)
+  clearworkers = TRUE, verbose = FALSE, ...)
 }
 \arguments{
 \item{x}{Raster*. A Raster* used as the input into the function.  This is optional, as long as some Raster* was defined in "..."}
@@ -50,6 +50,8 @@ rasterEngine(x, fun = NULL, args = NULL, window_dims = c(1, 1),
 \item{debugmode}{Logical.  If TRUE, the function will enter debug mode during the test phase.  Note the inputs will be an array of size 2 columns, 1 row, and how ever many input bands.}
 
 \item{.packages}{Character. A character vector of package names needed by the function (parallel mode only).}
+
+\item{clearworkers}{Logical. Force the workers to clear all objects upon completing (releasing memory)?  Default=TRUE.}
 
 \item{verbose}{Logical. Enable verbose execution? Default is FALSE.}
 

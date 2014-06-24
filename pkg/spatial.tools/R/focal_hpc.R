@@ -879,6 +879,7 @@ focal_hpc_pixel_processing <- function(tr,chunkArgs)
 #' @param additional_header Character. Create additional output headers for use with other GIS systems (see \code{\link{hdr}}). Set to NULL to suppress.  Default is "ENVI".
 #' @param debugmode Logical or Numeric.  If TRUE or 1, the function will enter debug mode during the test phase.  If debugmode equals 2, the function will stop after the test phase, but won't explicitly enter debug mode.  This is useful if the user function has a browser() statement within it.  Note the inputs will be an array of size 2 columns, 1 row, and how ever many input bands.
 #' @param .packages Character. A character vector of package names needed by the function (parallel mode only).
+#' @param clearworkers Logical. Force the workers to clear all objects upon completing (releasing memory)?  Default=TRUE.
 #' @param verbose logical. Enable verbose execution? Default is FALSE.  
 #' @param ... Additional parameters (none at present).
 #' @author Jonathan A. Greenberg (\email{spatial.tools@@estarcion.net})
@@ -988,6 +989,7 @@ focal_hpc <- function(x,
 		setMinMax=FALSE,
 		debugmode=FALSE,
 		.packages=NULL,
+		clearworkers=TRUE,
 		verbose=FALSE,
 		...) 
 {
@@ -1130,6 +1132,17 @@ focal_hpc <- function(x,
 	
 # browser()
 	
+# Flush the workers.
+
+	if(clearworkers)
+	{
+		cleared <- foreach(nworkers=seq(getDoParWorkers())) %dopar%
+				{
+					rm(list=ls(all=TRUE))
+					return(TRUE)
+				}
+	}
+
 	focal_out <- sapply(X=as.list(out),FUN=function(X,additional_header,setMinMax)
 			{
 				focal_out <- brick(X)
