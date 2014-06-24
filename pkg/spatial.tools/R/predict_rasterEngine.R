@@ -1,6 +1,7 @@
 #' Model predictions (including Raster* objects)
 #' @param object a model object for which prediction is desired.
 #' @param na.rm.mode Logical. Attempt to fix missing data, even if the model object doesn't support na.rm?  Default is TRUE.
+#' @param debugmode Logical. Internal debugging for the code, will be removed eventually. Default is FALSE.
 #' @param ... additional arguments affecting the predictions produced.
 #' @author Jonathan A. Greenberg (\email{spatial.tools@@estarcion.net})
 #' @seealso \code{\link{predict}}
@@ -156,6 +157,12 @@ predict_rasterEngine <- function(object,na.rm.mode=TRUE,debugmode=FALSE,...)
 				} else
 				{
 					predict_output <- predict(object=object,newdata=newdata_df)
+				}
+				
+				# This needs to be made more "secure"
+				if(class(predict_output)=="numeric")
+				{
+					predict_output <- t(predict_output)
 				}
 				
 				nbands_output <- prod(dim(predict_output))/prod(newdata_dim[1:2])
