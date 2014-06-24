@@ -7,20 +7,17 @@ projectRaster_rigorous(from, to, method = "mode", na.rm = FALSE,
   verbose = FALSE, ...)
 }
 \arguments{
-  \item{from}{Raster* The sources raster to be resampled.}
+\item{from}{Raster* The sources raster to be resampled.}
 
-  \item{to}{Raster* A target raster that the from will be
-  resampled to (extent, resolution, projection).}
+\item{to}{Raster* A target raster that the from will be resampled to (extent, resolution, projection).}
 
-  \item{method}{Character. Default is "mode". See details.}
+\item{method}{Character. Default is "mode". See details.}
 
-  \item{na.rm}{Logical. Remove NAs before calculating cell
-  stats?}
+\item{na.rm}{Logical. Remove NAs before calculating cell stats?}
 
-  \item{verbose}{logical. Enable verbose execution? Default
-  is FALSE.}
+\item{verbose}{logical. Enable verbose execution? Default is FALSE.}
 
-  \item{...}{Currently unsupported.}
+\item{...}{Currently unsupported.}
 }
 \description{
 Performs an area-weighted resampling of raster datasets.

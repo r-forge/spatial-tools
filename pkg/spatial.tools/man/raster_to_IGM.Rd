@@ -6,8 +6,7 @@
 raster_to_IGM(x)
 }
 \arguments{
-  \item{x}{Raster* The raster containing the geographic
-  information to be used as the basis for the IGM.}
+\item{x}{Raster* The raster containing the geographic information to be used as the basis for the IGM.}
 }
 \description{
 Creates an input geometry (IGM) file from a raster

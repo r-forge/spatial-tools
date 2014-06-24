@@ -6,13 +6,11 @@
 modify_raster_margins(x, extent_delta = c(0, 0, 0, 0), value = NA)
 }
 \arguments{
-  \item{x}{A Raster* object.}
+\item{x}{A Raster* object.}
 
-  \item{extent_delta}{Numeric vector. How many rows/columns
-  to add/subtract to the left,right,top, and bottom of an
-  image.  Default is c(0,0,0,0) (no change).}
+\item{extent_delta}{Numeric vector. How many rows/columns to add/subtract to the left,right,top, and bottom of an image.  Default is c(0,0,0,0) (no change).}
 
-  \item{value}{Value to fill in when adding rows/columns.}
+\item{value}{Value to fill in when adding rows/columns.}
 }
 \value{
 A Raster* object.

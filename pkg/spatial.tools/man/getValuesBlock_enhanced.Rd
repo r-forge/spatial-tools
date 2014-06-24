@@ -7,22 +7,21 @@ getValuesBlock_enhanced(x, r1 = 1, r2 = nrow(x), c1 = 1, c2 = ncol(x),
   lyrs = seq(nlayers(x)), format = "array", ...)
 }
 \arguments{
-  \item{x}{Raster* Some input Raster* object.}
+\item{x}{Raster* Some input Raster* object.}
 
-  \item{r1}{Numeric. The start row of the chunk.}
+\item{r1}{Numeric. The start row of the chunk.}
 
-  \item{r2}{Numeric. The end row of the chunk.}
+\item{r2}{Numeric. The end row of the chunk.}
 
-  \item{c1}{Numeric. The start column of the chunk.}
+\item{c1}{Numeric. The start column of the chunk.}
 
-  \item{c2}{Numeric. The end row of the chunk.}
+\item{c2}{Numeric. The end row of the chunk.}
 
-  \item{lyrs}{Numeric. Vector of layer IDs.  Defaults to
-  all layers (1:nlayers(x)).}
+\item{lyrs}{Numeric. Vector of layer IDs.  Defaults to all layers (1:nlayers(x)).}
 
-  \item{format}{Character. See Details.}
+\item{format}{Character. See Details.}
 
-  \item{...}{Other parameters.}
+\item{...}{Other parameters.}
 }
 \value{
 An array or raster object.

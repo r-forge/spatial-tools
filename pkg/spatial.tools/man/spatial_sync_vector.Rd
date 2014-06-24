@@ -6,12 +6,11 @@
 spatial_sync_vector(unsynced, reference, verbose = TRUE)
 }
 \arguments{
-  \item{unsynced}{The vector to be projected.}
+\item{unsynced}{The vector to be projected.}
 
-  \item{reference}{A raster or vector object who's
-  projection the unsynced will be matched to.}
+\item{reference}{A raster or vector object who's projection the unsynced will be matched to.}
 
-  \item{verbose}{Logical. Verbose logging?}
+\item{verbose}{Logical. Verbose logging?}
 }
 \description{
 Matches a vector's projection to another vector or raster object's projection.

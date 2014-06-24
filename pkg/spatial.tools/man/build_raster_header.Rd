@@ -8,36 +8,23 @@ build_raster_header(x_filename, reference_raster, out_nlayers,
   setMinMax = FALSE, additional_header = NULL, verbose = FALSE)
 }
 \arguments{
-  \item{x_filename}{Character. The filename of the input
-  binary file.}
+\item{x_filename}{Character. The filename of the input binary file.}
 
-  \item{reference_raster}{Raster*. A Raster* object
-  containing the header information to be used.}
+\item{reference_raster}{Raster*. A Raster* object containing the header information to be used.}
 
-  \item{out_nlayers}{Numeric. The number of layers in the
-  flat binary file (defaults to
-  nlayers(reference_raster)).}
+\item{out_nlayers}{Numeric. The number of layers in the flat binary file (defaults to nlayers(reference_raster)).}
 
-  \item{dataType}{Character. The dataType of the flat
-  binary file.  See ?dataType for available datatypes.
-  Default is 'FLT8S'.}
+\item{dataType}{Character. The dataType of the flat binary file.  See ?dataType for available datatypes.  Default is 'FLT8S'.}
 
-  \item{bandorder}{Character. The bandorder
-  ('BIP','BIL','BSQ') of the file. Default is 'BSQ'.}
+\item{bandorder}{Character. The bandorder ('BIP','BIL','BSQ') of the file. Default is 'BSQ'.}
 
-  \item{format}{Character. The format of the header.  See
-  ?hdr for valid entries.  Default is 'raster'.  CURRENTLY
-  UNSUPPORTED.}
+\item{format}{Character. The format of the header.  See ?hdr for valid entries.  Default is 'raster'.  CURRENTLY UNSUPPORTED.}
 
-  \item{setMinMax}{Logical. Set the min/max for the file
-  (will take longer to execute)?  Default=FALSE.}
+\item{setMinMax}{Logical. Set the min/max for the file (will take longer to execute)?  Default=FALSE.}
 
-  \item{additional_header}{Character. Create additional
-  output headers for use with other GIS systems (see
-  \code{\link{hdr}}). Set to NULL (default) to suppress.}
+\item{additional_header}{Character. Create additional output headers for use with other GIS systems (see \code{\link{hdr}}). Set to NULL (default) to suppress.}
 
-  \item{verbose}{logical. Enable verbose execution? Default
-  is FALSE.}
+\item{verbose}{logical. Enable verbose execution? Default is FALSE.}
 }
 \description{
 Builds a raster header for a flat binary file.

@@ -6,7 +6,7 @@
 is.Raster(x)
 }
 \arguments{
-  \item{x}{an R Object.}
+\item{x}{an R Object.}
 }
 \value{
 A logical vector.

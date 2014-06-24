@@ -6,11 +6,9 @@
 raster_to_filenames(x, unique = FALSE)
 }
 \arguments{
-  \item{x}{Raster*.  A Raster* object (even one without
-  values/in memory) to determine the filename(s).}
+\item{x}{Raster*.  A Raster* object (even one without values/in memory) to determine the filename(s).}
 
-  \item{unique}{Logical. Only return unique filenames?  If
-  FALSE, one filename per layer.}
+\item{unique}{Logical. Only return unique filenames?  If FALSE, one filename per layer.}
 }
 \value{
 Character vector of filenames.

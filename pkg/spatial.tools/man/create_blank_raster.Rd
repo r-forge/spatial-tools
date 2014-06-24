@@ -10,48 +10,31 @@ create_blank_raster(filename = NULL, format = "raster",
   verbose = FALSE)
 }
 \arguments{
-  \item{filename}{Character. The output base filename of
-  the blank file.  Will use tempfile() if nothing is
-  provided.}
+\item{filename}{Character. The output base filename of the blank file.  Will use tempfile() if nothing is provided.}
 
-  \item{format}{Character.  Output format.  Currently only
-  supports "raster".}
+\item{format}{Character.  Output format.  Currently only supports "raster".}
 
-  \item{dataType}{Character.  Output number type.  See
-  ?dataType.  Default is "FLT8S".}
+\item{dataType}{Character.  Output number type.  See ?dataType.  Default is "FLT8S".}
 
-  \item{bandorder}{Character.  Output band interleave.
-  Currently only supports "BSQ".}
+\item{bandorder}{Character.  Output band interleave.  Currently only supports "BSQ".}
 
-  \item{nrow}{Numeric. Number of rows of the output raster.
-  Defaults to nrow(reference_raster).}
+\item{nrow}{Numeric. Number of rows of the output raster. Defaults to nrow(reference_raster).}
 
-  \item{ncol}{Numeric. Number of columns of the output
-  raster. Defaults to ncol(reference_raster).}
+\item{ncol}{Numeric. Number of columns of the output raster. Defaults to ncol(reference_raster).}
 
-  \item{nlayers}{Numeric. Number of layers of the output
-  raster Defaults to nlayer(reference_raster).}
+\item{nlayers}{Numeric. Number of layers of the output raster Defaults to nlayer(reference_raster).}
 
-  \item{create_header}{Logical. Create a properly formatted
-  header for the blank file?}
+\item{create_header}{Logical. Create a properly formatted header for the blank file?}
 
-  \item{reference_raster}{Raster*. Reference raster to
-  derive other information, e.g. resolution, projection,
-  datum.}
+\item{reference_raster}{Raster*. Reference raster to derive other information, e.g. resolution, projection, datum.}
 
-  \item{return_filename}{Logical. Return filename of the
-  binary file (if TRUE, default) or the Raster* itself (if
-  FALSE).}
+\item{return_filename}{Logical. Return filename of the binary file (if TRUE, default) or the Raster* itself (if FALSE).}
 
-  \item{additional_header}{Character. Create additional
-  output headers for use with other GIS systems (see
-  \code{\link{hdr}}). Set to NULL (default) to suppress.}
+\item{additional_header}{Character. Create additional output headers for use with other GIS systems (see \code{\link{hdr}}). Set to NULL (default) to suppress.}
 
-  \item{overwrite}{Logical. Overwrite an existing file with
-  the same name?}
+\item{overwrite}{Logical. Overwrite an existing file with the same name?}
 
-  \item{verbose}{Logical. Enable verbose execution? Default
-  is FALSE.}
+\item{verbose}{Logical. Enable verbose execution? Default is FALSE.}
 }
 \value{
 A character vector (return_filename==TRUE) or as Raster* object (return_filename==TRUE)

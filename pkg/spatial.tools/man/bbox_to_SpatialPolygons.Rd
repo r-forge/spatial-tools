@@ -6,10 +6,9 @@
 bbox_to_SpatialPolygons(x, proj4string = CRS(as.character(NA)))
 }
 \arguments{
-  \item{x}{Raster*, extent, bbox or matrix. See Details.}
+\item{x}{Raster*, extent, bbox or matrix. See Details.}
 
-  \item{proj4string}{CRS object. Used to define the CRS if
-  it is missing from x.}
+\item{proj4string}{CRS object. Used to define the CRS if it is missing from x.}
 }
 \value{
 A SpatialPolygons object.

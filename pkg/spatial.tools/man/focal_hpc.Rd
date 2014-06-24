@@ -12,83 +12,45 @@ focal_hpc(x, fun, args = NULL, window_dims = c(1, 1),
   debugmode = FALSE, .packages = NULL, verbose = FALSE, ...)
 }
 \arguments{
-  \item{x}{Raster*. A Raster* used as the input into the
-  function.  Multiple inputs should be stack()'ed or
-  list()'ed together.}
+\item{x}{Raster*. A Raster* used as the input into the function.  Multiple inputs should be stack()'ed or list()'ed together.}
 
-  \item{fun}{function. A focal function to be applied to
-  the image. See Details.}
+\item{fun}{function. A focal function to be applied to the image. See Details.}
 
-  \item{args}{list. Arguments to pass to the function (see
-  ?mapply).  Note that the 'fun' should explicitly name the
-  variables.}
+\item{args}{list. Arguments to pass to the function (see ?mapply).  Note that the 'fun' should explicitly name the variables.}
 
-  \item{window_dims}{Vector. The size of a processing
-  window in col x row order.  Be default, a single pixel
-  (c(1,1).}
+\item{window_dims}{Vector. The size of a processing window in col x row order.  Be default, a single pixel (c(1,1).}
 
-  \item{window_center}{Vector. The local coordinate of the
-  center of a processing window.  By default the middle of
-  the processing window.  UNSUPPORTED.}
+\item{window_center}{Vector. The local coordinate of the center of a processing window.  By default the middle of the processing window.  UNSUPPORTED.}
 
-  \item{chunk_format}{Character. The format to send the
-  chunk to the function.  Can be "array" (default) or
-  "raster".}
+\item{chunk_format}{Character. The format to send the chunk to the function.  Can be "array" (default) or "raster".}
 
-  \item{minblocks}{Numeric. The minimum number of chunks to
-  divide the raster into for processing.  Defaults to 1.}
+\item{minblocks}{Numeric. The minimum number of chunks to divide the raster into for processing.  Defaults to 1.}
 
-  \item{blocksize}{Numeric. The size (in rows) for a block
-  of data.  If unset, focal_hpc will attempt to figure out
-  an optimal blocksize.}
+\item{blocksize}{Numeric. The size (in rows) for a block of data.  If unset, focal_hpc will attempt to figure out an optimal blocksize.}
 
-  \item{filename}{Character. Filename(s) of the output
-  raster.}
+\item{filename}{Character. Filename(s) of the output raster.}
 
-  \item{outformat}{Character. Outformat of the raster. Must
-  be a format usable by hdr(). Default is 'raster'.
-  CURRENTLY UNSUPPORTED.}
+\item{outformat}{Character. Outformat of the raster. Must be a format usable by hdr(). Default is 'raster'. CURRENTLY UNSUPPORTED.}
 
-  \item{overwrite}{Logical. Allow files to be overwritten?
-  Default is FALSE.}
+\item{overwrite}{Logical. Allow files to be overwritten? Default is FALSE.}
 
-  \item{processing_unit}{Character. ("single"|"chunk") Will
-  be auto-set if not specified ("chunk" for
-  pixel-processing, "single" for focal processing).  See
-  Description.}
+\item{processing_unit}{Character. ("single"|"chunk") Will be auto-set if not specified ("chunk" for pixel-processing, "single" for focal processing).  See Description.}
 
-  \item{outbands}{Numeric. If known, how many bands in each
-  output file?  Assigning this and outfiles will allow
-  focal_hpc to skip the pre-check.}
+\item{outbands}{Numeric. If known, how many bands in each output file?  Assigning this and outfiles will allow focal_hpc to skip the pre-check.}
 
-  \item{outfiles}{Numeric. If known, how many output files?
-  Assigning this and outbands will allow focal_hpc to skip
-  the pre-check.}
+\item{outfiles}{Numeric. If known, how many output files?  Assigning this and outbands will allow focal_hpc to skip the pre-check.}
 
-  \item{setMinMax}{Logical. Run a setMinMax() on each
-  output file after processing (this will slow the
-  processing down). Default is FALSE.}
+\item{setMinMax}{Logical. Run a setMinMax() on each output file after processing (this will slow the processing down). Default is FALSE.}
 
-  \item{additional_header}{Character. Create additional
-  output headers for use with other GIS systems (see
-  \code{\link{hdr}}). Set to NULL to suppress.  Default is
-  "ENVI".}
+\item{additional_header}{Character. Create additional output headers for use with other GIS systems (see \code{\link{hdr}}). Set to NULL to suppress.  Default is "ENVI".}
 
-  \item{debugmode}{Logical or Numeric.  If TRUE or 1, the
-  function will enter debug mode during the test phase.  If
-  debugmode equals 2, the function will stop after the test
-  phase, but won't explicitly enter debug mode.  This is
-  useful if the user function has a browser() statement
-  within it.  Note the inputs will be an array of size 2
-  columns, 1 row, and how ever many input bands.}
+\item{debugmode}{Logical or Numeric.  If TRUE or 1, the function will enter debug mode during the test phase.  If debugmode equals 2, the function will stop after the test phase, but won't explicitly enter debug mode.  This is useful if the user function has a browser() statement within it.  Note the inputs will be an array of size 2 columns, 1 row, and how ever many input bands.}
 
-  \item{.packages}{Character. A character vector of package
-  names needed by the function (parallel mode only).}
+\item{.packages}{Character. A character vector of package names needed by the function (parallel mode only).}
 
-  \item{verbose}{logical. Enable verbose execution? Default
-  is FALSE.}
+\item{verbose}{logical. Enable verbose execution? Default is FALSE.}
 
-  \item{...}{Additional parameters (none at present).}
+\item{...}{Additional parameters (none at present).}
 }
 \description{
 Engine for performing fast, easy-to-develop pixel and focal raster calculations with parallel processing capability.

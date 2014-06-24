@@ -6,11 +6,9 @@
 sfQuickStop(kill = FALSE, ...)
 }
 \arguments{
-  \item{kill}{Logical.  If TRUE, attempt to force-quit
-  cluster if you get an out-of-control situation.
-  Default=FALSE.}
+\item{kill}{Logical.  If TRUE, attempt to force-quit cluster if you get an out-of-control situation.  Default=FALSE.}
 
-  \item{...}{parameters to pass to sfStop()}
+\item{...}{parameters to pass to sfStop()}
 }
 \description{
 Quickly stops a parallel snowfall cluster and deregisters it from foreach.

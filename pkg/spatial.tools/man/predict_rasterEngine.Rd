@@ -3,18 +3,16 @@
 \alias{predict_rasterEngine}
 \title{Model predictions (including Raster* objects)}
 \usage{
-predict_rasterEngine(object, na.rm.mode = TRUE, ...)
+predict_rasterEngine(object, na.rm.mode = TRUE, debugmode = FALSE, ...)
 }
 \arguments{
-  \item{object}{a model object for which prediction is
-  desired.}
+\item{object}{a model object for which prediction is desired.}
 
-  \item{na.rm.mode}{Logical. Attempt to fix missing data,
-  even if the model object doesn't support na.rm?  Default
-  is TRUE.}
+\item{na.rm.mode}{Logical. Attempt to fix missing data, even if the model object doesn't support na.rm?  Default is TRUE.}
 
-  \item{...}{additional arguments affecting the predictions
-  produced.}
+\item{debugmode}{Logical. Internal debugging for the code, will be removed eventually. Default is FALSE.}
+
+\item{...}{additional arguments affecting the predictions produced.}
 }
 \description{
 Model predictions (including Raster* objects)

@@ -6,13 +6,11 @@
 sfQuickInit(cpus, methods = FALSE, ...)
 }
 \arguments{
-  \item{cpus}{Number of cpus.  Will default to the max
-  available cpus.}
+\item{cpus}{Number of cpus.  Will default to the max available cpus.}
 
-  \item{methods}{Logical. Load the methods package? (if
-  FALSE, faster startup). Default=FALSE.}
+\item{methods}{Logical. Load the methods package? (if FALSE, faster startup). Default=FALSE.}
 
-  \item{...}{parameters to pass to sfInit()}
+\item{...}{parameters to pass to sfInit()}
 }
 \description{
 Quickly initializes a parallel cluster and registers it with foreach.

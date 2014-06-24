@@ -7,22 +7,17 @@ getValuesBlock_stackfix(x, row = 1, nrows = 1, col = 1, ncols = (ncol(x)
   - col + 1), lyrs = (1:nlayers(x)))
 }
 \arguments{
-  \item{x}{Raster* object}
+\item{x}{Raster* object}
 
-  \item{row}{positive integer. Row number to start from,
-  should be between 1 and nrow(x)}
+\item{row}{positive integer. Row number to start from, should be between 1 and nrow(x)}
 
-  \item{nrows}{postive integer. How many rows? Default is
-  1}
+\item{nrows}{postive integer. How many rows? Default is 1}
 
-  \item{col}{postive integer. Column number to start from,
-  should be between 1 and ncol(x)}
+\item{col}{postive integer. Column number to start from, should be between 1 and ncol(x)}
 
-  \item{ncols}{postive integer. How many columns? Default
-  is the number of colums left after the start column}
+\item{ncols}{postive integer. How many columns? Default is the number of colums left after the start column}
 
-  \item{lyrs}{integer (vector). Which layers? Default is
-  all layers (1:nlayers(x))}
+\item{lyrs}{integer (vector). Which layers? Default is all layers (1:nlayers(x))}
 }
 \value{
 matrix or vector (if (x=RasterLayer), unless format='matrix')

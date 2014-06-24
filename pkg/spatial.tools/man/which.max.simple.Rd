@@ -6,16 +6,14 @@
 which.max.simple(x, na.rm = TRUE, tie_value = "NA")
 }
 \arguments{
-  \item{x}{a numeric object}
+\item{x}{a numeric object}
 
-  \item{na.rm}{a logical indicating whether missing values
-  should be removed.}
+\item{na.rm}{a logical indicating whether missing values should be removed.}
 
-  \item{tie_value}{A character indicating how to deal with
-  ties.  Can be "NA" (returns an NA if a tie is found) or
-  "random" (returns a single randomly chosen member of the
-  ties if a tie is found) or "first" (returns the first
-  class found).}
+\item{tie_value}{A character indicating how to deal with ties.  Can be "NA"
+(returns an NA if a tie is found) or "random" (returns a single randomly
+chosen member of the ties if a tie is found) or "first" (returns the first
+class found).}
 }
 \value{
 An integer of length 1 giving the index of the maximum of x or NA if

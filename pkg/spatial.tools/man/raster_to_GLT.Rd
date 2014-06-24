@@ -6,8 +6,7 @@
 raster_to_GLT(x)
 }
 \arguments{
-  \item{x}{Raster* The raster containing the geographic
-  information to be used as the basis for the GLT.}
+\item{x}{Raster* The raster containing the geographic information to be used as the basis for the GLT.}
 }
 \description{
 Creates a geometry lookup (GLT) file from a raster

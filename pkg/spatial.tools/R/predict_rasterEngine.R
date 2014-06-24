@@ -82,11 +82,15 @@ predict_rasterEngine <- function(object,na.rm.mode=TRUE,debugmode=FALSE,...)
 		{
 			predict.rasterEngine_function <- function(newdata,object,na.rm.mode,...)
 			{
+				
 				# Determine all parameters that are not newdata and object:
 				local_objects <- ls()
 				model_parameters <- setdiff(local_objects,c("newdata","object","na.rm.mode"))
 				
 				newdata_dim <- newdata$dim
+				
+#				if(sum(newdata_dim[1:2]) > 3) browser()
+				
 				newdata_df <- newdata$values
 				
 #				if(is.null(coercion.function))
@@ -149,8 +153,6 @@ predict_rasterEngine <- function(object,na.rm.mode=TRUE,debugmode=FALSE,...)
 					}
 				}
 				
-				
-				
 				if(length(model_parameters)>0)
 				{
 					predict_output <- predict(object=object,newdata=newdata_df,mget(model_parameters))
@@ -162,7 +164,8 @@ predict_rasterEngine <- function(object,na.rm.mode=TRUE,debugmode=FALSE,...)
 				# This needs to be made more "secure"
 				if(class(predict_output)=="numeric")
 				{
-					predict_output <- t(predict_output)
+				#	dim(predict_output) <- c(newdata_dim[1:2])
+					predict_output <- as.data.frame(predict_output)
 				}
 				
 				nbands_output <- prod(dim(predict_output))/prod(newdata_dim[1:2])

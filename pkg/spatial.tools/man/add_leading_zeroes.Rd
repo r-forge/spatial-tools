@@ -6,12 +6,11 @@
 add_leading_zeroes(number, number_length, max_number)
 }
 \arguments{
-  \item{number}{A numeric vector.}
+\item{number}{A numeric vector.}
 
-  \item{number_length}{The length of the output string.}
+\item{number_length}{The length of the output string.}
 
-  \item{max_number}{A number to base the length of the
-  output string on.}
+\item{max_number}{A number to base the length of the output string on.}
 }
 \value{
 A character vector.

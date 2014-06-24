@@ -13,86 +13,47 @@ rasterEngine(x, fun = NULL, args = NULL, window_dims = c(1, 1),
   verbose = FALSE, ...)
 }
 \arguments{
-  \item{x}{Raster*. A Raster* used as the input into the
-  function.  This is optional, as long as some Raster* was
-  defined in "..."}
+\item{x}{Raster*. A Raster* used as the input into the function.  This is optional, as long as some Raster* was defined in "..."}
 
-  \item{fun}{Function. A focal function to be applied to
-  the image. See Details.}
+\item{fun}{Function. A focal function to be applied to the image. See Details.}
 
-  \item{args}{List. Arguments to pass to the function (see
-  ?mapply).  Note that the 'fun' should explicitly name the
-  variables.}
+\item{args}{List. Arguments to pass to the function (see ?mapply).  Note that the 'fun' should explicitly name the variables.}
 
-  \item{window_dims}{Vector. The size of a processing
-  window in col x row order.  Be default, a single pixel
-  (c(1,1).}
+\item{window_dims}{Vector. The size of a processing window in col x row order.  Be default, a single pixel (c(1,1).}
 
-  \item{window_center}{Vector. The local coordinate of the
-  center of a processing window.  By default the middle of
-  the processing window.  CURRENTLY UNSUPPORTED.}
+\item{window_center}{Vector. The local coordinate of the center of a processing window.  By default the middle of the processing window.  CURRENTLY UNSUPPORTED.}
 
-  \item{filename}{Character. Filename(s) of the output
-  raster.}
+\item{filename}{Character. Filename(s) of the output raster.}
 
-  \item{overwrite}{Logical. Allow files to be overwritten?
-  Default is FALSE.}
+\item{overwrite}{Logical. Allow files to be overwritten? Default is FALSE.}
 
-  \item{outformat}{Character. Outformat of the raster. Must
-  be a format usable by hdr(). Default is 'raster'.
-  CURRENTLY UNSUPPORTED.}
+\item{outformat}{Character. Outformat of the raster. Must be a format usable by hdr(). Default is 'raster'. CURRENTLY UNSUPPORTED.}
 
-  \item{processing_unit}{Character. ("single"|"chunk") Will
-  be auto-set if not specified ("chunk" for
-  pixel-processing, "single" for focal processing).  See
-  Details.}
+\item{processing_unit}{Character. ("single"|"chunk") Will be auto-set if not specified ("chunk" for pixel-processing, "single" for focal processing).  See Details.}
 
-  \item{chunk_format}{Character. The format to send the
-  chunk to the function.  Can be "array" (default) or
-  "raster".}
+\item{chunk_format}{Character. The format to send the chunk to the function.  Can be "array" (default) or "raster".}
 
-  \item{minblocks}{Numeric. The minimum number of chunks to
-  divide the raster into for processing.  Defaults to 1.}
+\item{minblocks}{Numeric. The minimum number of chunks to divide the raster into for processing.  Defaults to 1.}
 
-  \item{blocksize}{Numeric. The size (in rows) for a block
-  of data.  If unset, rasterEngine will attempt to figure
-  out an optimal blocksize.}
+\item{blocksize}{Numeric. The size (in rows) for a block of data.  If unset, rasterEngine will attempt to figure out an optimal blocksize.}
 
-  \item{outbands}{Numeric. If known, how many bands in each
-  output file?  Assigning this and outfiles will allow
-  focal_hpc to skip the pre-check.}
+\item{outbands}{Numeric. If known, how many bands in each output file?  Assigning this and outfiles will allow focal_hpc to skip the pre-check.}
 
-  \item{outfiles}{Numeric. If known, how many output files?
-  Assigning this and outbands will allow focal_hpc to skip
-  the pre-check.}
+\item{outfiles}{Numeric. If known, how many output files?  Assigning this and outbands will allow focal_hpc to skip the pre-check.}
 
-  \item{setMinMax}{Logical. Run a setMinMax() on each
-  output file after processing (this will slow the
-  processing down). Default is FALSE.}
+\item{setMinMax}{Logical. Run a setMinMax() on each output file after processing (this will slow the processing down). Default is FALSE.}
 
-  \item{additional_header}{Character. Create additional
-  output headers for use with other GIS systems (see
-  \code{\link{hdr}}). Set to NULL to suppress.  Default is
-  "ENVI".}
+\item{additional_header}{Character. Create additional output headers for use with other GIS systems (see \code{\link{hdr}}). Set to NULL to suppress.  Default is "ENVI".}
 
-  \item{compileFunction}{Logical. Runs a byte-code
-  compilation on the user function before running. Setting
-  this to TRUE may speed up the execution.  Default is
-  FALSE.}
+\item{compileFunction}{Logical. Runs a byte-code compilation on the user function before running. Setting this to TRUE may speed up the execution.  Default is FALSE.}
 
-  \item{debugmode}{Logical.  If TRUE, the function will
-  enter debug mode during the test phase.  Note the inputs
-  will be an array of size 2 columns, 1 row, and how ever
-  many input bands.}
+\item{debugmode}{Logical.  If TRUE, the function will enter debug mode during the test phase.  Note the inputs will be an array of size 2 columns, 1 row, and how ever many input bands.}
 
-  \item{.packages}{Character. A character vector of package
-  names needed by the function (parallel mode only).}
+\item{.packages}{Character. A character vector of package names needed by the function (parallel mode only).}
 
-  \item{verbose}{Logical. Enable verbose execution? Default
-  is FALSE.}
+\item{verbose}{Logical. Enable verbose execution? Default is FALSE.}
 
-  \item{...}{Raster*s. Named variables pointing to Raster*
-  objects.  See Details.}
+\item{...}{Raster*s. Named variables pointing to Raster* objects.  See Details.}
 }
 \description{
 Engine for performing fast, easy-to-develop pixel and focal raster calculations with parallel processing capability.

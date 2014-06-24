@@ -8,24 +8,17 @@ list.raster.files(path = ".", pattern = NULL, recursive = FALSE,
   bbox_CRS = CRS("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"))
 }
 \arguments{
-  \item{path}{Character. The path to search for raster
-  files.}
+\item{path}{Character. The path to search for raster files.}
 
-  \item{pattern}{Character. A regular expression to limit
-  the files that are tested/returned.}
+\item{pattern}{Character. A regular expression to limit the files that are tested/returned.}
 
-  \item{recursive}{Logical. Search nested subdirectories
-  within the path?}
+\item{recursive}{Logical. Search nested subdirectories within the path?}
 
-  \item{return_rasters}{Logical. Return all proper files as
-  RasterBrick objects (TRUE) or as filenames (FALSE).}
+\item{return_rasters}{Logical. Return all proper files as RasterBrick objects (TRUE) or as filenames (FALSE).}
 
-  \item{return_bbox}{Logical. Return a
-  SpatialPolygonsDataFrame with the bounding box geometry
-  and the filenames as data.frame attributes.}
+\item{return_bbox}{Logical. Return a SpatialPolygonsDataFrame with the bounding box geometry and the filenames as data.frame attributes.}
 
-  \item{bbox_CRS}{CRS. If return_bbox==TRUE, the CRS that
-  the output bbox SpatialPolygonsDataFrame should be in.}
+\item{bbox_CRS}{CRS. If return_bbox==TRUE, the CRS that the output bbox SpatialPolygonsDataFrame should be in.}
 }
 \value{
 A list of filenames (return_rasters=FALSE) or a list of RasterBricks (return_rasters=TRUE) and/or a SpatialPolygonsDataFrame of the bounding boxes (return_bbox==TRUE).

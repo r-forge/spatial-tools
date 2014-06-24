@@ -6,10 +6,9 @@
 remove_file_extension(filename, extension_delimiter = ".")
 }
 \arguments{
-  \item{filename}{Character. The input filename.}
+\item{filename}{Character. The input filename.}
 
-  \item{extension_delimiter}{Character. The extension or
-  extension delimiter (default ".") to remove.}
+\item{extension_delimiter}{Character. The extension or extension delimiter (default ".") to remove.}
 }
 \description{
 Strips a file extension from a filename.

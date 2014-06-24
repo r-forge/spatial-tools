@@ -6,7 +6,7 @@
 brickstack_to_raster_list(x)
 }
 \arguments{
-  \item{x}{A RasterBrick or RasterStack.}
+\item{x}{A RasterBrick or RasterStack.}
 }
 \value{
 A list of RasterLayers.
