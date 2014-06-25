@@ -15,6 +15,7 @@
 #' @param outfiles Numeric. If known, how many output files?  Assigning this and outbands will allow focal_hpc to skip the pre-check.
 #' @param setMinMax Logical. Run a setMinMax() on each output file after processing (this will slow the processing down). Default is FALSE.
 #' @param additional_header Character. Create additional output headers for use with other GIS systems (see \code{\link{hdr}}). Set to NULL to suppress.  Default is "ENVI".
+#' @param datatype Character.  Output number type.  See ?dataType.  Default is "FLT8S".  
 #' @param compileFunction Logical. Runs a byte-code compilation on the user function before running. Setting this to TRUE may speed up the execution.  Default is FALSE.
 #' @param debugmode Logical.  If TRUE, the function will enter debug mode during the test phase.  Note the inputs will be an array of size 2 columns, 1 row, and how ever many input bands.
 #' @param .packages Character. A character vector of package names needed by the function (parallel mode only).
@@ -143,6 +144,7 @@ rasterEngine <- function(x,
 		window_center=c(ceiling(window_dims[1]/2),ceiling(window_dims[2]/2)),
 		filename=NULL, overwrite=FALSE,
 		outformat="raster",additional_header="ENVI",
+		datatype="FLT8S",
 		processing_unit=NULL,chunk_format="array",
 		minblocks="max",blocksize=NULL,
 		outbands=NULL,outfiles=NULL,

@@ -9,7 +9,7 @@
 #' 
 #' @param filename Character. The output base filename of the blank file.  Will use tempfile() if nothing is provided.
 #' @param format Character.  Output format.  Currently only supports "raster".
-#' @param dataType Character.  Output number type.  See ?dataType.  Default is "FLT8S".  
+#' @param datatype Character.  Output number type.  See ?dataType.  Default is "FLT8S".  
 #' @param bandorder Character.  Output band interleave.  Currently only supports "BSQ".
 #' @param nrow Numeric. Number of rows of the output raster. Defaults to nrow(reference_raster).
 #' @param ncol Numeric. Number of columns of the output raster. Defaults to ncol(reference_raster).
@@ -42,7 +42,7 @@
 #' @export
 
 create_blank_raster <- function(filename=NULL,
-	format="raster",dataType="FLT8S",bandorder="BSQ",
+	format="raster",datatype="FLT8S",bandorder="BSQ",
 	nrow=NULL,ncol=NULL,nlayers=NULL,
 	create_header=TRUE,reference_raster=NULL,
 	return_filename=TRUE,
@@ -63,7 +63,7 @@ create_blank_raster <- function(filename=NULL,
 		if(!file.exists(tempdir())) dir.create(tempdir())
 	} 
 
-	numBytes = dataSize(dataType)
+	numBytes = dataSize(datatype)
 	
 #	numBytes = substr(dataType,4,4)
 	
@@ -104,7 +104,7 @@ create_blank_raster <- function(filename=NULL,
 		
 		outraster <- build_raster_header(x_filename=filename,
 				reference_raster=reference_raster,
-				out_nlayers=nlayers,dataType=dataType,format=format,
+				out_nlayers=nlayers,datatype=datatype,format=format,
 				bandorder=bandorder,additional_header=additional_header)
 	}
 	if(return_filename) return(filename) else
