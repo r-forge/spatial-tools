@@ -87,12 +87,12 @@
 #'
 #'# Note that you can use any parallel backend that can be registered with foreach.
 #'# sfQuickInit() will spawn a PSOCK cluster using the parallel package.
-#'sfQuickInit(cpus=2)
+#'# sfQuickInit(cpus=2)
 #'tahoe_lidar_highesthit_multiplied <- rasterEngine(
 #'	inraster=tahoe_lidar_highesthit,
 #'	fun=apply_multiplier,
 #'	args=list(multiplier=3.28084))
-#'sfQuickStop()
+#'# sfQuickStop()
 #'  
 #'\dontrun{ 
 #'# Pixel-based processing on more than one band: 
