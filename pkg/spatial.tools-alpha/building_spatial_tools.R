@@ -1,11 +1,13 @@
 ## For tauboa:
 package_dir <- "/Users/jgrn307/Documents/workspace/spatial-tools/pkg/spatial.tools"
-#package_dir <- "D:\\Users\\jgrn\\workspace\\spatial-tools\\pkg\\spatial.tools"
+package_dir <- "D:\\Users\\jgrn\\workspace\\spatial-tools\\pkg\\spatial.tools"
 
 setwd(package_dir)
 
 require("roxygen2")
-roxygenize(package.dir=package_dir,
+roxygenize(package.dir=package_dir)
+
+,
 		roxygen.dir=package_dir,
 		copy.package=FALSE,unlink.target=FALSE)
 # Writing spatial_sync_raster.Rd
