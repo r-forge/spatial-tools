@@ -1,6 +1,6 @@
 
 
-spRbind_simple <- function(spList,CRS=1)
+spRbind_simple <- function(spList,CRS=NULL,check_proj=F)
 {
 	if(is.numeric(CRS))
 	{
@@ -8,15 +8,31 @@ spRbind_simple <- function(spList,CRS=1)
 	}
 	
 	# spTransform inputs
-	
-	spList_transformed <- foreach(spObj=spList,.packages="rgdal") %dopar%
-			{
-				spTransform(spObj,base_CRS)
-			}
-	
+	if(check_proj)
+	{
+		spList_transformed <- foreach(spObj=spList,.packages="rgdal") %dopar%
+				{
+					spTransform(spObj,base_CRS)
+				}
+	} else
+	{
+		spList_transformed <- spList
+	}
 	rownames_all <- foreach(sp=spList_transformed,.packages="sp") %dopar%
 			{
-				rownames(as(sp,"data.frame"))
+				if(!is.null(sp))
+				{
+					if(class(sp) %in% c("SpatialPolygons"))
+					{
+						return(names(sp))
+					} else
+					{
+						return(rownames(as(sp,"data.frame")))
+					}
+				} else
+				{
+					return(NULL)
+				}
 				
 			}
 	

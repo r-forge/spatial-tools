@@ -112,7 +112,7 @@ predict_rasterEngine <- function(object,na.rm.mode=TRUE,debugmode=FALSE,...)
 #					}
 #				}
 				
-				if("randomForest" %in% class(object)) na.rm.mode=TRUE
+				if("randomForest" %in% class(object) || "rfsrc" %in% class(object)) na.rm.mode=TRUE
 				
 				newdata_complete <- NULL
 				
@@ -127,10 +127,10 @@ predict_rasterEngine <- function(object,na.rm.mode=TRUE,debugmode=FALSE,...)
 				if("randomForest" %in% class(object))
 				{
 					# First check for complete cases:
-				#	newdata_complete <- complete.cases(newdata_df)
+					#	newdata_complete <- complete.cases(newdata_df)
 					
 					# Placeholders:
-				#	newdata_df[is.na(newdata_df)] <- 0
+					#	newdata_df[is.na(newdata_df)] <- 0
 					
 					# Missing factors
 					xlevels <- object$forest$xlevels
@@ -162,9 +162,21 @@ predict_rasterEngine <- function(object,na.rm.mode=TRUE,debugmode=FALSE,...)
 				}
 				
 				# This needs to be made more "secure"
-				if(class(predict_output)=="numeric")
+				# Fix for rfsrc:
+				if("rfsrc" %in% class(predict_output))
 				{
-				#	dim(predict_output) <- c(newdata_dim[1:2])
+					if(predict_output$family != "class")
+					{
+						predict_output <- predict_output$predicted
+					} else
+					{
+						predict_output <- predict_output$class	
+					}
+				}	
+				
+				if(class(predict_output)=="numeric" || class(predict_output)=="factor")
+				{
+					#	dim(predict_output) <- c(newdata_dim[1:2])
 					predict_output <- as.data.frame(predict_output)
 				}
 				

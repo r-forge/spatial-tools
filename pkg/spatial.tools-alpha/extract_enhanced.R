@@ -38,6 +38,7 @@ extract_enhanced_data.frame <- function(x,y_reproj,fun,verbose)
 	extract_enhanced_one_raster <- function(raster_vector_combinations,
 			x,y_reproj,verbose)
 	{
+		# browser()
 		current_raster <- as.numeric(raster_vector_combinations[1])
 		current_vector <- as.numeric(raster_vector_combinations[2])
 		
@@ -51,9 +52,19 @@ extract_enhanced_data.frame <- function(x,y_reproj,fun,verbose)
 	}
 	
 	raster_vector_combinations <- expand.grid(list(seq(x),seq(y_reproj)))
-	extracted_data_list <- foreach(raster_vector_combinations-raster_vector_combinations,
+	raster_vector_combinations <- split(raster_vector_combinations,rownames(raster_vector_combinations))
+	
+	# browser()
+	extracted_data_list <- foreach(raster_vector_combinations=raster_vector_combinations,
 					.packages=c("raster"),.verbose=verbose) %dopar% 
-			extract_enhanced_one_raster(raster_vector_combinations,x,y_reproj,verbose)
+			{
+				output <- extract_enhanced_one_raster(raster_vector_combinations,x,y_reproj,verbose)
+				browser()
+				
+			}
+	browser()
+	# Now place the pieces back together:
+	
 	
 	return(extracted_data_list)
 	
@@ -78,7 +89,7 @@ extract_enhanced_core <- function(raster,vector,
 	}
 	
 	# Base extraction
-	if(outformat=="Spatial" | outformat=="data.frames" | outformat=="matrix")
+	if(outformat=="Spatial" | outformat=="data.frame" | outformat=="matrix")
 	{
 		if(outformat=="matrix") df=FALSE else df=TRUE
 		extracted_data <- extract(x=raster,y=vector_reproj,
@@ -92,7 +103,7 @@ extract_enhanced_core <- function(raster,vector,
 		
 		if(outformat=="matrix") return(extracted_data)
 		
-		if(outformat=="Spatial" | outformat=="data.frames")
+		if(outformat=="Spatial" | outformat=="data.frame")
 		{
 			if(class(vector_reproj)=="SpatialPointsDataFrame" |
 					class(vector_reproj)=="SpatialLinesDataFrame" |
@@ -151,7 +162,7 @@ extract_enhanced <- function(x,y,
 	y_reproj <- extract_enhanced_reproj(x,y,verbose)
 	
 	# Perform the extraction based on the outformat:
-	if(outformat=="data.frames") 
+	if(outformat=="data.frame") 
 		extracted_data_list <- extract_enhanced_data.frame(x,y_reproj,fun,verbose)
 	
 	return(extracted_data_list)
