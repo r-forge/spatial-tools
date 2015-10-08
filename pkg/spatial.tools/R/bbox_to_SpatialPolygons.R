@@ -19,7 +19,7 @@
 #' tahoe_highrez_bbox <- bbox(tahoe_highrez)
 #' bbox_to_SpatialPolygons(tahoe_highrez_bbox,
 #' 	CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
-#' @import raster
+#' @import raster rgdal sp
 #' @export
 
 bbox_to_SpatialPolygons <- function(x,proj4string=CRS(as.character(NA)))
