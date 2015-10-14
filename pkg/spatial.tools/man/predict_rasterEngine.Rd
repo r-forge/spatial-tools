@@ -4,12 +4,17 @@
 \alias{predict_rasterEngine}
 \title{Model predictions (including Raster* objects)}
 \usage{
-predict_rasterEngine(object, na.rm.mode = TRUE, debugmode = FALSE, ...)
+predict_rasterEngine(object, filename = NULL, na.rm.mode = TRUE,
+  ncores = 1, debugmode = FALSE, ...)
 }
 \arguments{
 \item{object}{a model object for which prediction is desired.}
 
+\item{filename}{Character. Output filename.  If unset, will default to a temporary file.}
+
 \item{na.rm.mode}{Logical. Attempt to fix missing data, even if the model object doesn't support na.rm?  Default is TRUE.}
+
+\item{ncores}{Numeric. Number of cores to use when predicting.  Only used with randomForestSRC for now.  Do not combine with foreach registered parallel engines (e.g. sfQuickInit())}
 
 \item{debugmode}{Logical. Internal debugging for the code, will be removed eventually. Default is FALSE.}
 
