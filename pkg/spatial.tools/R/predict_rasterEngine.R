@@ -1,6 +1,8 @@
 #' Model predictions (including Raster* objects)
 #' @param object a model object for which prediction is desired.
+#' @param filename Character. Output filename.  If unset, will default to a temporary file.
 #' @param na.rm.mode Logical. Attempt to fix missing data, even if the model object doesn't support na.rm?  Default is TRUE.
+#' @param ncores Numeric. Number of cores to use when predicting.  Only used with randomForestSRC for now.  Do not combine with foreach registered parallel engines (e.g. sfQuickInit())
 #' @param debugmode Logical. Internal debugging for the code, will be removed eventually. Default is FALSE.
 #' @param ... additional arguments affecting the predictions produced.
 #' @author Jonathan A. Greenberg (\email{spatial.tools@@estarcion.net})
@@ -72,7 +74,7 @@
 #' # sfQuickStop()
 #' @export
 
-predict_rasterEngine <- function(object,na.rm.mode=TRUE,debugmode=FALSE,...)
+predict_rasterEngine <- function(object,filename=NULL,na.rm.mode=TRUE,ncores=1,debugmode=FALSE,...)
 {
 	list2env(list(...),envir=environment())
 	if("newdata" %in% ls())
@@ -80,12 +82,18 @@ predict_rasterEngine <- function(object,na.rm.mode=TRUE,debugmode=FALSE,...)
 		newdata <- newdata
 		if(is.Raster(newdata))
 		{
-			predict.rasterEngine_function <- function(newdata,object,na.rm.mode,...)
+			predict.rasterEngine_function <- function(newdata,object,na.rm.mode,ncores,...)
 			{
 				
 				# Determine all parameters that are not newdata and object:
 				local_objects <- ls()
-				model_parameters <- setdiff(local_objects,c("newdata","object","na.rm.mode"))
+				model_parameters <- setdiff(local_objects,c("newdata","object","na.rm.mode","ncores"))
+				
+				# Parallel processing 
+				if("rfsrc" %in% class(object) && ncores > 1)
+				{
+					options(rf.cores = ncores)#, mc.cores = x)
+				}
 				
 				newdata_dim <- newdata$dim
 				
@@ -214,12 +222,12 @@ predict_rasterEngine <- function(object,na.rm.mode=TRUE,debugmode=FALSE,...)
 			factor_layers <- is.factor(newdata)
 			
 			additional_args <- list(...)
-			additional_args <- c(list(object=object,na.rm.mode=na.rm.mode),
+			additional_args <- c(list(object=object,na.rm.mode=na.rm.mode,ncores=ncores),
 					unlist(additional_args,recursive=FALSE))
 			additional_args$newdata <- NULL
 			
 			output <- rasterEngine(newdata=newdata,fun=predict.rasterEngine_function,
-					args=additional_args,.packages=(.packages()),debugmode=debugmode,chunk_format="data.frame.dims")
+					args=additional_args,.packages=(.packages()),filename=filename,debugmode=debugmode,chunk_format="data.frame.dims")
 			
 			return(output)
 		}
