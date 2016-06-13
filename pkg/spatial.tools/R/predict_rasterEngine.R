@@ -85,6 +85,8 @@ predict_rasterEngine <- function(object,filename=NULL,na.rm.mode=TRUE,ncores=1,d
 			predict.rasterEngine_function <- function(newdata,object,na.rm.mode,ncores,...)
 			{
 				
+				# browser()
+				
 				# Determine all parameters that are not newdata and object:
 				local_objects <- ls()
 				model_parameters <- setdiff(local_objects,c("newdata","object","na.rm.mode","ncores"))
@@ -166,7 +168,9 @@ predict_rasterEngine <- function(object,filename=NULL,na.rm.mode=TRUE,ncores=1,d
 					predict_output <- predict(object=object,newdata=newdata_df,mget(model_parameters))
 				} else
 				{
+					#	system.time(
 					predict_output <- predict(object=object,newdata=newdata_df)
+					#	)
 				}
 				
 				# This needs to be made more "secure"
@@ -193,18 +197,29 @@ predict_rasterEngine <- function(object,filename=NULL,na.rm.mode=TRUE,ncores=1,d
 				# Mixed class data frame:
 				factor_columns <- sapply(predict_output,class)=="factor"
 				
-				predict_output[,factor_columns] <- as.numeric(predict_output[,factor_columns])
-				
+				if(sum(factor_columns)>0) {
+					predict_output[,factor_columns] <- as.numeric(predict_output[,factor_columns])
+				}
 #				if("factor" %in% class(predict_output))
 #				{
 #					predict_output <- as.numeric(predict_output)
 #				}
 				
+				
+#				print(dim(predict_output))
+#				print(dim(newdata_complete))
+#				if(is.null(dim(newdata_complete))) browser()
 				if(!is.null(newdata_complete))
 				{
 					if(!is.null(dim(predict_output)))
 					{
-						predict_output[!newdata_complete,] <- NA
+						if(length(dim(predict_output))>1)
+						{
+							predict_output[!newdata_complete,] <- NA
+						} else
+						{
+							predict_output[!newdata_complete] <- NA
+						}
 					} else
 					{
 						predict_output[!newdata_complete] <- NA
