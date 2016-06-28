@@ -198,6 +198,7 @@ predict_rasterEngine <- function(object,filename=NULL,na.rm.mode=TRUE,ncores=1,d
 				factor_columns <- sapply(predict_output,class)=="factor"
 				
 				if(sum(factor_columns)>0) {
+#					browser()
 					predict_output[,factor_columns] <- as.numeric(predict_output[,factor_columns])
 				}
 #				if("factor" %in% class(predict_output))
