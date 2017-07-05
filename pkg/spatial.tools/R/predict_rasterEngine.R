@@ -82,6 +82,7 @@ predict_rasterEngine <- function(object,filename=NULL,na.rm.mode=TRUE,ncores=1,d
 		newdata <- newdata
 		if(is.Raster(newdata))
 		{
+			### FUNCTION TO BE PASSED TO RASTERENGINE
 			predict.rasterEngine_function <- function(newdata,object,na.rm.mode,ncores,...)
 			{
 				
