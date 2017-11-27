@@ -8,10 +8,8 @@ Author: Jonathan Asher Greenberg
 Description: Spatial functions meant to enhance the core functionality of the
     package "raster", including a parallel processing engine for use with
     rasters.
-Version: 1.5.2
-Date: 2016-6-27
-URL:
-    http://www.geog.illinois.edu/~jgrn/software-and-datasets/rasterengine-tutorial/
+Version: 1.5.3
+Date: 2017-11-27
 Depends:
     mmap,
     abind,

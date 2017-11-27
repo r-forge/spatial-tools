@@ -86,11 +86,13 @@ predict_rasterEngine <- function(object,filename=NULL,na.rm.mode=TRUE,ncores=1,d
 			predict.rasterEngine_function <- function(newdata,object,na.rm.mode,ncores,...)
 			{
 				
-				# browser()
 				
 				# Determine all parameters that are not newdata and object:
 				local_objects <- ls()
 				model_parameters <- setdiff(local_objects,c("newdata","object","na.rm.mode","ncores"))
+				
+#				browser()
+				
 				
 				# Parallel processing 
 				if("rfsrc" %in% class(object) && ncores > 1)
@@ -180,7 +182,14 @@ predict_rasterEngine <- function(object,filename=NULL,na.rm.mode=TRUE,ncores=1,d
 				{
 					if(predict_output$family != "class")
 					{
-						predict_output <- predict_output$predicted
+						# New fix for multivariate forests:
+						if(predict_output$family == "regr+")
+						{
+							predict_output <- sapply(predict_output$regrOutput,function(x) return(x$predicted)) 
+						}else
+						{
+							predict_output <- predict_output$predicted
+						}
 					} else
 					{
 						predict_output <- predict_output$class	
