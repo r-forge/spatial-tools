@@ -8,17 +8,7 @@ Author: Jonathan Asher Greenberg
 Description: Spatial functions meant to enhance the core functionality of the
     package "raster", including a parallel processing engine for use with
     rasters.
+Imports: compiler,doParallel,foreach,iterators,mmap,raster,rgdal,sp,abind
 Version: 1.5.3
-Date: 2017-11-27
-Depends:
-    mmap,
-    abind,
-    doParallel,
-    compiler,
-    parallel,
-    iterators,
-    foreach,
-    sp,
-	raster,
-	rgdal,
-    R (>= 3.0.0)
+Date: 2018-01-08
+RoxygenNote: 6.0.1
