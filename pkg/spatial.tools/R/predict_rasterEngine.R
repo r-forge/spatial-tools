@@ -18,6 +18,7 @@
 #' with foreach via a do* statement, or if the user uses sfQuickInit().
 #'  
 #' @examples
+#' library("raster")
 #' # This example creates a linear model relating a vegetation
 #' # index (NDVI) to vegetation height, and applies it to a raster
 #' # of NDVI.
@@ -72,6 +73,7 @@
 #' # sfQuickInit()
 #' height_from_ndvi_raster <- predict_rasterEngine(object=height_from_ndvi_model,newdata=tahoe_ndvi)
 #' # sfQuickStop()
+#' @importFrom stats complete.cases
 #' @export
 
 predict_rasterEngine <- function(object,filename=NULL,na.rm.mode=TRUE,ncores=1,debugmode=FALSE,...)
@@ -82,17 +84,12 @@ predict_rasterEngine <- function(object,filename=NULL,na.rm.mode=TRUE,ncores=1,d
 		newdata <- newdata
 		if(is.Raster(newdata))
 		{
-			### FUNCTION TO BE PASSED TO RASTERENGINE
 			predict.rasterEngine_function <- function(newdata,object,na.rm.mode,ncores,...)
 			{
-				
 				
 				# Determine all parameters that are not newdata and object:
 				local_objects <- ls()
 				model_parameters <- setdiff(local_objects,c("newdata","object","na.rm.mode","ncores"))
-				
-#				browser()
-				
 				
 				# Parallel processing 
 				if("rfsrc" %in% class(object) && ncores > 1)
@@ -171,9 +168,7 @@ predict_rasterEngine <- function(object,filename=NULL,na.rm.mode=TRUE,ncores=1,d
 					predict_output <- predict(object=object,newdata=newdata_df,mget(model_parameters))
 				} else
 				{
-					#	system.time(
 					predict_output <- predict(object=object,newdata=newdata_df)
-					#	)
 				}
 				
 				# This needs to be made more "secure"
@@ -182,14 +177,7 @@ predict_rasterEngine <- function(object,filename=NULL,na.rm.mode=TRUE,ncores=1,d
 				{
 					if(predict_output$family != "class")
 					{
-						# New fix for multivariate forests:
-						if(predict_output$family == "regr+")
-						{
-							predict_output <- sapply(predict_output$regrOutput,function(x) return(x$predicted)) 
-						}else
-						{
-							predict_output <- predict_output$predicted
-						}
+						predict_output <- predict_output$predicted
 					} else
 					{
 						predict_output <- predict_output$class	
@@ -207,30 +195,18 @@ predict_rasterEngine <- function(object,filename=NULL,na.rm.mode=TRUE,ncores=1,d
 				# Mixed class data frame:
 				factor_columns <- sapply(predict_output,class)=="factor"
 				
-				if(sum(factor_columns)>0) {
-#					browser()
-					predict_output[,factor_columns] <- as.numeric(predict_output[,factor_columns])
-				}
+				predict_output[,factor_columns] <- as.numeric(predict_output[,factor_columns])
+				
 #				if("factor" %in% class(predict_output))
 #				{
 #					predict_output <- as.numeric(predict_output)
 #				}
 				
-				
-#				print(dim(predict_output))
-#				print(dim(newdata_complete))
-#				if(is.null(dim(newdata_complete))) browser()
 				if(!is.null(newdata_complete))
 				{
 					if(!is.null(dim(predict_output)))
 					{
-						if(length(dim(predict_output))>1)
-						{
-							predict_output[!newdata_complete,] <- NA
-						} else
-						{
-							predict_output[!newdata_complete] <- NA
-						}
+						predict_output[!newdata_complete,] <- NA
 					} else
 					{
 						predict_output[!newdata_complete] <- NA
