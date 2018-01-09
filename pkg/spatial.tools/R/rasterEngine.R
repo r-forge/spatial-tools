@@ -73,6 +73,7 @@
 #' A fuller tutorial is available at \url{http://publish.illinois.edu/jgrn/software-and-datasets/rasterengine-tutorial/}
 #' 
 #' @examples
+#' library("raster")
 #' # Pixel-based processing on one band:
 #'apply_multiplier <- function(inraster,multiplier)
 #'{

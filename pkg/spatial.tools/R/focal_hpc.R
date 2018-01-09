@@ -918,7 +918,7 @@ focal_hpc_pixel_processing <- function(tr,chunkArgs)
 #' will run in sequential mode.
 #' 
 #' @examples
-
+#' library("raster")
 #'  tahoe_highrez <- brick(system.file("external/tahoe_highrez.tif", package="spatial.tools"))
 #' # Pixel-based processing:
 #'ndvi_function <- function(x)

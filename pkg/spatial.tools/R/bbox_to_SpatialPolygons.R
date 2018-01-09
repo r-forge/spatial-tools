@@ -11,6 +11,7 @@
 #' Note that with extent and matrix objects, the CRS will need to be set
 #' manually.
 #' @examples
+#' library("raster")
 #' tahoe_highrez <- brick(system.file("external/tahoe_highrez.tif", package="spatial.tools"))
 #' bbox_to_SpatialPolygons(tahoe_highrez)
 #' tahoe_highrez_extent <- extent(tahoe_highrez)
