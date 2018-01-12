@@ -74,8 +74,10 @@
 #' # sfQuickStop()
 #' @export
 
-predict_rasterEngine <- function(object,filename=NULL,na.rm.mode=TRUE,ncores=1,debugmode=FALSE,...)
+predict_rasterEngine <- function(object,filename=NULL,na.rm.mode=TRUE,ncores=1,debugmode=FALSE,verbose=F,...)
 {
+
+	
 	list2env(list(...),envir=environment())
 	if("newdata" %in% ls())
 	{
@@ -85,7 +87,8 @@ predict_rasterEngine <- function(object,filename=NULL,na.rm.mode=TRUE,ncores=1,d
 			### FUNCTION TO BE PASSED TO RASTERENGINE
 			predict.rasterEngine_function <- function(newdata,object,na.rm.mode,ncores,...)
 			{
-				
+#				browser()
+				# if(sum(newdata$dim[1:2]) > 3) browser()
 				
 				# Determine all parameters that are not newdata and object:
 				local_objects <- ls()
@@ -95,10 +98,13 @@ predict_rasterEngine <- function(object,filename=NULL,na.rm.mode=TRUE,ncores=1,d
 				
 				
 				# Parallel processing 
-				if("rfsrc" %in% class(object) && ncores > 1)
+				if("rfsrc" %in% class(object))
 				{
-					options(rf.cores = ncores)#, mc.cores = x)
+					options(rf.cores = ncores)
+					options(mc.cores = 1)
 				}
+				
+
 				
 				newdata_dim <- newdata$dim
 				
@@ -196,9 +202,10 @@ predict_rasterEngine <- function(object,filename=NULL,na.rm.mode=TRUE,ncores=1,d
 					}
 				}	
 				
-				if(class(predict_output)=="numeric" || class(predict_output)=="factor")
+				# Not sure if this will work with =="array"...
+				if(class(predict_output)=="numeric" || class(predict_output)=="factor" || class(predict_output)=="array")
 				{
-					#	dim(predict_output) <- c(newdata_dim[1:2])
+				#	dim(predict_output) <- c(newdata_dim[1:2])
 					predict_output <- as.data.frame(predict_output)
 				}
 				
@@ -253,7 +260,7 @@ predict_rasterEngine <- function(object,filename=NULL,na.rm.mode=TRUE,ncores=1,d
 			additional_args$newdata <- NULL
 			
 			output <- rasterEngine(newdata=newdata,fun=predict.rasterEngine_function,
-					args=additional_args,.packages=(.packages()),filename=filename,debugmode=debugmode,chunk_format="data.frame.dims")
+					args=additional_args,.packages=(.packages()),filename=filename,debugmode=debugmode,chunk_format="data.frame.dims",verbose=verbose)
 			
 			return(output)
 		}
