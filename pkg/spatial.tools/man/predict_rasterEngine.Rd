@@ -5,7 +5,7 @@
 \title{Model predictions (including Raster* objects)}
 \usage{
 predict_rasterEngine(object, filename = NULL, na.rm.mode = TRUE,
-  ncores = 1, debugmode = FALSE, verbose = F, ...)
+  probs = NULL, ncores = 1, debugmode = FALSE, verbose = F, ...)
 }
 \arguments{
 \item{object}{a model object for which prediction is desired.}

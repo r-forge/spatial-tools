@@ -74,9 +74,11 @@
 #' # sfQuickStop()
 #' @export
 
-predict_rasterEngine <- function(object,filename=NULL,na.rm.mode=TRUE,ncores=1,debugmode=FALSE,verbose=F,...)
+predict_rasterEngine <- function(object,filename=NULL,na.rm.mode=TRUE,
+		probs=NULL,
+		ncores=1,debugmode=FALSE,verbose=F,...)
 {
-
+	
 	
 	list2env(list(...),envir=environment())
 	if("newdata" %in% ls())
@@ -104,7 +106,7 @@ predict_rasterEngine <- function(object,filename=NULL,na.rm.mode=TRUE,ncores=1,d
 					options(mc.cores = 1)
 				}
 				
-
+				
 				
 				newdata_dim <- newdata$dim
 				
@@ -177,9 +179,15 @@ predict_rasterEngine <- function(object,filename=NULL,na.rm.mode=TRUE,ncores=1,d
 					predict_output <- predict(object=object,newdata=newdata_df,mget(model_parameters))
 				} else
 				{
-					#	system.time(
-					predict_output <- predict(object=object,newdata=newdata_df)
-					#	)
+					# Fix for rfsrc quantileReg:
+					if(!is.null(probs))
+					{
+						browser()
+						predict_output <- quantileReg(obj=object,prob=prob,newdata=newdata_df)
+					} else
+					{
+						predict_output <- predict(object=object,newdata=newdata_df)
+					}
 				}
 				
 				# This needs to be made more "secure"
@@ -205,7 +213,7 @@ predict_rasterEngine <- function(object,filename=NULL,na.rm.mode=TRUE,ncores=1,d
 				# Not sure if this will work with =="array"...
 				if(class(predict_output)=="numeric" || class(predict_output)=="factor" || class(predict_output)=="array")
 				{
-				#	dim(predict_output) <- c(newdata_dim[1:2])
+					#	dim(predict_output) <- c(newdata_dim[1:2])
 					predict_output <- as.data.frame(predict_output)
 				}
 				

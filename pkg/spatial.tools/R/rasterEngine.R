@@ -8,7 +8,7 @@
 #' @param overwrite Logical. Allow files to be overwritten? Default is FALSE.
 #' @param outformat Character. Outformat of the raster. Must be a format usable by hdr(). Default is 'raster'. CURRENTLY UNSUPPORTED.
 #' @param processing_unit Character. ("single"|"chunk") Will be auto-set if not specified ("chunk" for pixel-processing, "single" for focal processing).  See Details.
-#' @param chunk_format Character. The format to send the chunk to the function.  Can be "array" (default) or "raster".
+#' @param chunk_format Character. The format to send the chunk to the function.  Can be "array" (default), "raster", or "data.frame".
 #' @param minblocks Numeric. The minimum number of chunks to divide the raster into for processing.  Defaults to 1.
 #' @param blocksize Numeric. The size (in rows) for a block of data.  If unset, rasterEngine will attempt to figure out an optimal blocksize.
 #' @param outbands Numeric. If known, how many bands in each output file?  Assigning this and outfiles will allow focal_hpc to skip the pre-check.

@@ -52,7 +52,7 @@ focal_hpc_test <- function(x,fun,window_center,window_dims,args,
 		processing_mode,processing_unit,chunk_format,
 		verbose)
 {
-
+	
 	window_index <- NULL # Why is this here?
 	
 	if(verbose) { message("Checking the function on a small chunk of data.") }
@@ -201,6 +201,17 @@ focal_hpc_test <- function(x,fun,window_center,window_dims,args,
 	# Coerce to list
 	if(class(r_check_function) != "list") r_check_function <- list(r_check_function)
 	
+#	r_check_function <- lapply(X=r_check_function,FUN=function(X,nrow,ncols)
+#			{
+#				if(is.array(X)) return(r_out)
+#				if(is.data.frame(X))
+#				{
+#					return(array(data.matrix(X), dim=c(nrows,ncols,length(X))))
+#				}
+#				if(is.numeric(X)) return(array(X,),dim=c(nrows,ncols,1))
+#				if(is.matrix(X)) return(array(X,),dim=c(nrows,ncols,1))
+#			},nrows=getvalues_raw_nrows,ncols=getvalues_raw_ncols)
+	
 	r_check_output_classes <- sapply(r_check_function,class)
 	
 	if(processing_unit=="single")
@@ -217,16 +228,25 @@ focal_hpc_test <- function(x,fun,window_center,window_dims,args,
 	
 	if(processing_unit=="chunk")
 	{
-		r_check_output_dims <- sapply(r_check_function,dim)
+		r_check_output_dims <- sapply(r_check_function,FUN=function(X)
+				{
+					if(is.array(X)) return(dim(X))
+					if(is.data.frame(X)) return(c(nrow(X),1,length(X)))
+					if(is.numeric(X)) return(c(length(X),1,1))
+					if(is.matrix(X)) return(c(dim(X)[1],dim(X)[2],1))	
+					if(is.factor(X)) return(c(length(X),1,1))
+				})
+#		browser()
+#		r_check_output_dims <- sapply(r_check_function,dim)
 		r_check_output_dims_col_check <- all(r_check_output_dims[1,]==2)
 		r_check_output_dims_row_check <- all(r_check_output_dims[2,]==1)
-		r_check_output_class_check <- all(r_check_output_classes=="array")
+#		r_check_output_class_check <- all(r_check_output_classes=="array")
 		
 #		if(class(r_check_function)!="array" || 
 #				dim(r_check_function)[1] != 2 ||
 #				dim(r_check_function)[2] != 1)
 		
-		if(!r_check_output_class_check || !r_check_output_dims_col_check || !r_check_output_dims_row_check)
+		if(!r_check_output_dims_col_check || !r_check_output_dims_row_check)
 		{
 			message("chunk processing units require array vector outputs.  Please check your function.")
 			stop(dim(r_check_function))
@@ -544,7 +564,7 @@ focal_hpc_focalChunkFunction <- function(chunk,chunkArgs)
 			filenum=as.list(seq(filename)),
 			outbands=outbands,
 			MoreArgs=list(image_dims=image_dims),SIMPLIFY=FALSE)
-
+	
 	if(!is.list(r_out)) r_out <- list(r_out)
 	
 #	chunk_position=list(
@@ -636,8 +656,8 @@ focal_hpc_focal_processing <- function(tr,texture_tr,chunkArgs)
 		} else
 		{
 			r <- 
-			#		spatial.tools:::
-			focal_hpc_focal_getChunk(x=x,tr=tr,format=chunk_format,i=i,r_old=r_old,
+					#		spatial.tools:::
+					focal_hpc_focal_getChunk(x=x,tr=tr,format=chunk_format,i=i,r_old=r_old,
 							chunkArgs=chunkArgs)
 			
 		}
@@ -656,7 +676,7 @@ focal_hpc_focal_processing <- function(tr,texture_tr,chunkArgs)
 									if(chunk_format=="array")
 									{
 										# Something is wrong with j
-									#	print(j)
+										#	print(j)
 										processing_chunk=X[,texture_tr$row[j]:texture_tr$row2[j],,drop=FALSE]
 									}
 									if(chunk_format=="raster")
@@ -690,9 +710,9 @@ focal_hpc_focal_processing <- function(tr,texture_tr,chunkArgs)
 		
 		foreach(chunk=chunkList, .packages=c("rgdal","raster","spatial.tools","mmap",.packages),
 						.verbose=verbose) %dopar% 
-		#		spatial.tools:::
-		focal_hpc_focalChunkFunction(chunk,chunkArgs)
-
+				#		spatial.tools:::
+				focal_hpc_focalChunkFunction(chunk,chunkArgs)
+		
 		if(i<tr$n && window_dims[2] > 1)
 			if(is.list(r))
 			{
@@ -725,6 +745,13 @@ focal_hpc_pixelChunkFunction <- function(chunkID,tr,x,
 		chunk_format,fun,fun_args,layer_names,outbands,filename,datatype)
 {
 	
+	r1 <- tr$row[chunkID]
+	r2 <- tr$row2[chunkID]
+	c1 <- 1
+	if(is.list(x)) c2 <- ncol(x[[1]]) else c2 <- ncol(x)
+	getvalues_raw_nrows=r2-r1+1
+	getvalues_raw_ncols=c2-c1+1
+	
 	# Seeing some memory creep, hopefully this will help:
 	# gc()
 	# Read the chunk
@@ -736,6 +763,8 @@ focal_hpc_pixelChunkFunction <- function(chunkID,tr,x,
 					getValuesBlock_enhanced(X,r1=tr$row[chunkID],r2=tr$row2[chunkID],
 							c1=1,c2=ncol(X),format=chunk_format)
 				},chunkID=chunkID,chunk_format=chunk_format,simplify = FALSE)
+		
+
 		
 		fun_args$x=r
 		
@@ -767,6 +796,21 @@ focal_hpc_pixelChunkFunction <- function(chunkID,tr,x,
 	
 	if(!is.list(r_out)) r_out <- list(r_out)
 	
+	# If r_out is a data.frame, coerce to the correct format:
+	# array(data.matrix(test_chunk), dim=c(2,3,3))
+	
+#	browser()
+
+	r_out_ <- lapply(X=r_out,FUN=function(X,nrows,ncols)
+			{
+				if(is.array(X)) r_out_temp <- X
+				if(is.data.frame(X)) r_out_temp <- array(data.matrix(X), dim=c(nrows,ncols,length(X),drop=F))
+				if(is.factor(X)) X <- as.numeric(X)
+				if(is.numeric(X)) r_out_temp <- array(X,dim=c(nrows,ncols,1,drop=F))
+				if(is.matrix(X)) r_out_temp <- array(X,dim=c(nrows,ncols,1,drop=F))
+				return(r_out_temp)
+			},nrows=getvalues_raw_nrows,ncols=getvalues_raw_ncols)
+
 	# Write the output
 	
 	
@@ -811,10 +855,13 @@ focal_hpc_pixelChunkFunction <- function(chunkID,tr,x,
 #				print(image_dims)
 #				print(r_out)
 				writeSuccess=FALSE
+				writeCount=1
+				# THIS SHOULD BE A PARAMETER, EVENTUALLY:
+				writeCount_threshold=100
 				
 #				browser()
 				
-				while(!writeSuccess)
+				while(!writeSuccess && writeCount <= writeCount_threshold)
 				{
 					writeSuccess=TRUE
 					tryCatch(
@@ -822,10 +869,12 @@ focal_hpc_pixelChunkFunction <- function(chunkID,tr,x,
 									interleave="BSQ",data=r_out,data_position=chunk_position)
 							,
 							error=function(err) writeSuccess <<- FALSE)	
+					writeCount <- writeCount+1
+					Sys.sleep(1) # Wait one second before trying again...
 				}
+				if(writeCount > writeCount_threshold) stop("Writing failed after 100 tries, exiting.")
 			},filename=as.list(filename),r_out=r_out,chunk_position=chunk_position,MoreArgs=list(image_dims=image_dims)
 	)
-	
 	
 	return(NULL)
 }
@@ -844,9 +893,10 @@ focal_hpc_pixel_processing <- function(tr,chunkArgs)
 	
 	list2env(chunkArgs,envir=environment())
 	chunkID <- seq(tr$n)
-	foreach(chunkID=chunkID, .packages=c("rgdal","raster","spatial.tools","mmap",.packages),.verbose=verbose) %dopar% 
-	#		spatial.tools:::
-	focal_hpc_pixelChunkFunction(chunkID,tr,x,chunk_format,fun,args,layer_names,outbands,
+	foreach(chunkID=chunkID, .packages=c("rgdal","raster","spatial.tools","mmap",.packages),
+					.verbose=verbose) %dopar% 
+			#		spatial.tools:::
+			focal_hpc_pixelChunkFunction(chunkID,tr,x,chunk_format,fun,args,layer_names,outbands,
 					filename,datatype)
 }
 
@@ -1016,8 +1066,8 @@ focal_hpc <- function(x,
 	}
 	# Prechecks.
 	list2env(
-	#		spatial.tools:::
-	focal_hpc_precheck(x,window_dims,window_center,processing_unit,verbose),envir=environment())
+			#		spatial.tools:::
+			focal_hpc_precheck(x,window_dims,window_center,processing_unit,verbose),envir=environment())
 	
 	# Add in new formals to the function if args doesn't match the function:
 	
@@ -1034,7 +1084,7 @@ focal_hpc <- function(x,
 	
 	new_formals <- c(
 			unlist(base_formals[base_formals_names != "..."],recursive=FALSE),
-	#		unlist(missing_formals,recursive=FALSE),
+			#		unlist(missing_formals,recursive=FALSE),
 			missing_formals,
 			alist(...=)
 	)
@@ -1050,8 +1100,8 @@ focal_hpc <- function(x,
 	if(is.null(outbands) || is.null(outfiles))
 	{
 		outbands_and_files <- 
-		#		spatial.tools:::
-		focal_hpc_test(x,fun,window_center,window_dims,args,layer_names,
+				#		spatial.tools:::
+				focal_hpc_test(x,fun,window_center,window_dims,args,layer_names,
 						startrow_offset,endrow_offset,
 						processing_mode,processing_unit,chunk_format,
 						verbose)
@@ -1067,8 +1117,8 @@ focal_hpc <- function(x,
 	
 	# Set up chunking parameters.
 	list2env(
-	#		spatial.tools:::
-	focal_hpc_chunk_setup(
+			#		spatial.tools:::
+			focal_hpc_chunk_setup(
 					x=x,window_dims=window_dims,window_center=window_center,
 					chunk_nrows=chunk_nrows,startrow_offset=startrow_offset,
 					endrow_offset=endrow_offset,
@@ -1123,7 +1173,7 @@ focal_hpc <- function(x,
 # browser()
 	
 # Flush the workers.
-
+	
 	if(clearworkers && getDoParName() != "doSEQ")
 	{
 		cleared <- foreach(nworkers=seq(getDoParWorkers())) %dopar%
@@ -1132,7 +1182,7 @@ focal_hpc <- function(x,
 					return(TRUE)
 				}
 	}
-
+	
 	focal_out <- sapply(X=as.list(out),FUN=function(X,additional_header,setMinMax)
 			{
 				focal_out <- brick(X)
