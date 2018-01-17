@@ -1,16 +1,18 @@
 # Various pre-made rasterEngine functions
 
-predict.rfsrc.rasterEngine <- function(object,newdata,probs,ncores=1,...)
+predict.rfsrc.rasterEngine <- function(object,newdata,prob,ncores=1,...)
 {
 	# For randomForestSRC, set rasterEngine to chunk_format="data.frame"
 	
 	local_objects <- ls()
-	model_parameters <- setdiff(local_objects,c("newdata","object","probs","ncores"))
+	model_parameters <- setdiff(local_objects,c("newdata","object","prob","ncores"))
 	
 	# Parallel processing 
 	
 	options(rf.cores = ncores)
 	options(mc.cores = 1)
+	
+	if(nrow(newdata) > 3) browser()
 	
 	# This could be sped up by removing incomplete cases...
 	newdata_complete <- complete.cases(newdata)
@@ -22,7 +24,7 @@ predict.rfsrc.rasterEngine <- function(object,newdata,probs,ncores=1,...)
 	} else
 	{
 		# Fix for rfsrc quantileReg:
-		if(!missing(probs))
+		if(!missing(prob))
 		{
 			predict_output <- quantileReg(obj=object,prob=prob,newdata=newdata)
 		} else
@@ -32,20 +34,45 @@ predict.rfsrc.rasterEngine <- function(object,newdata,probs,ncores=1,...)
 	}
 	
 	# Get the correct columns...
-	if(predict_output$family != "class")
+	if(is.list(predict_output))
 	{
-		# New fix for multivariate forests:
+		# quantreg
+		predict_output <- predict_output$quantiles
+		colnames(predict_output) <- paste("Q",format(round(prob, 4), nsmall = 4),sep="")
+	} else
+	{
+		
 		if(predict_output$family == "regr+")
 		{
 			predict_output <- sapply(predict_output$regrOutput,function(x) return(x$predicted)) 
-		}else
+		}
+		
+		if(predict_output$family == "regr")
 		{
 			predict_output <- predict_output$predicted
 		}
-	} else
-	{
-		predict_output <- predict_output$class	
+		
+		if(predict_output$family == "class")
+		{
+			predict_output <- predict_output$class	
+		}
 	}
+#	if(predict_output$family != "class")
+#	{
+#		# New fix for multivariate forests:
+#		if(predict_output$family == "regr+")
+#		{
+#			predict_output <- sapply(predict_output$regrOutput,function(x) return(x$predicted)) 
+#		}else
+#		{
+#			predict_output <- predict_output$predicted
+#		}
+#	} else
+#	{
+#		predict_output <- predict_output$class	
+#	}
+	
+	predict_output <- as.data.frame(predict_output)
 	
 	# Fill in nodata locations...
 	if(!is.null(newdata_complete))

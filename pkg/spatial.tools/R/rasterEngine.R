@@ -246,7 +246,7 @@ rasterEngine <- function(x,
 	
 #	browser()
 	# debugmode dies if this isn't set...	
-	options(deparse.max.lines=100)
+#	options(deparse.max.lines=100)
 
 	rasterEngine_out <- focal_hpc(x,fun=focal_hpc_multiRaster_function,
 			args=c(list(fun=fun,debugmode=debugmode),args),
