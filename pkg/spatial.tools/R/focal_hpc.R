@@ -822,6 +822,7 @@ focal_hpc_pixelChunkFunction <- function(chunkID,tr,x,
 	
 	# Write the output
 	
+	browser()
 	
 	if(is.list(x))
 	{
