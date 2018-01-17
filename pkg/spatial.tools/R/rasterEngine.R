@@ -1,5 +1,5 @@
 #' Engine for performing fast, easy-to-develop pixel and focal raster calculations with parallel processing capability.
-#' @param x Raster*. A Raster* used as the input into the function.  This is optional, as long as some Raster* was defined in "..."
+#' @param x Raster*. A Raster* or a list of named Raster* objects used as the input into the function.  This is optional, as long as some Raster* was defined in "..."
 #' @param fun Function. A focal function to be applied to the image. See Details.
 #' @param args List. Arguments to pass to the function (see ?mapply).  Note that the 'fun' should explicitly name the variables.
 #' @param window_dims Vector. The size of a processing window in col x row order.  Be default, a single pixel (c(1,1).
@@ -69,8 +69,6 @@
 #' and may, indeed, be slower than a sequential execution (e.g. with calc() ), 
 #' particularly on smaller files.  Note that by simply running sfQuickStop(), rasterEngine
 #' will run in sequential mode.
-#' 
-#' A fuller tutorial is available at \url{http://publish.illinois.edu/jgrn/software-and-datasets/rasterengine-tutorial/}
 #' 
 #' @examples
 #' library("raster")
@@ -161,10 +159,20 @@ rasterEngine <- function(x,
 	if(debugmode) debugmode <- 2
 	
 	additional_vars <- list(...)
+	
+	if(!missing(x))
+	{
+		if(is.list(x))
+		{
+			additional_vars <- c(additional_vars,x)
+			x <- NULL
+		}
+	}
+	
 	if(length(additional_vars)>0)
 	{
-	additional_vars_isRaster <- sapply(additional_vars,is.Raster)
-	additional_vars_Raster <- additional_vars[additional_vars_isRaster]
+		additional_vars_isRaster <- sapply(additional_vars,is.Raster)
+		additional_vars_Raster <- additional_vars[additional_vars_isRaster]
 	} else
 	{
 		additional_vars_Raster <- NULL
@@ -186,9 +194,15 @@ rasterEngine <- function(x,
 		x <- additional_vars_Raster
 	} else
 	{
+		if(is.null(x))
+		{
+			x <- additional_vars_Raster
+		} else
+		{
 #		if(class(x) != "list")
-		x <- c(x,additional_vars_Raster)
-		names(x)[[1]] <- "x"
+			x <- c(x,additional_vars_Raster)
+			names(x)[[1]] <- "x"
+		}
 	}
 	
 	# Fix missing ellipses in function.  Thanks to Ista Zahn for the solution.
@@ -211,7 +225,7 @@ rasterEngine <- function(x,
 	
 	focal_hpc_multiRaster_function <- function(x,fun,debugmode,...)
 	{
-	#	browser()
+#		browser()
 		local_objects <- ls()
 		function_vars <- setdiff(local_objects,c("x","fun","debugmode"))
 		
@@ -224,7 +238,7 @@ rasterEngine <- function(x,
 	
 	if(compileFunction)
 	{
-	#	library(compiler)
+		#	library(compiler)
 		enableJIT(3)
 		focal_hpc_multiRaster_function <- cmpfun(focal_hpc_multiRaster_function)
 	}

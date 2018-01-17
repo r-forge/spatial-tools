@@ -14,7 +14,7 @@ rasterEngine(x, fun = NULL, args = NULL, window_dims = c(1, 1),
   clearworkers = TRUE, verbose = FALSE, ...)
 }
 \arguments{
-\item{x}{Raster*. A Raster* used as the input into the function.  This is optional, as long as some Raster* was defined in "..."}
+\item{x}{Raster*. A Raster* or a list of named Raster* objects used as the input into the function.  This is optional, as long as some Raster* was defined in "..."}
 
 \item{fun}{Function. A focal function to be applied to the image. See Details.}
 
@@ -109,8 +109,6 @@ The speed of the execution when running in parallel will vary based on the speci
 and may, indeed, be slower than a sequential execution (e.g. with calc() ), 
 particularly on smaller files.  Note that by simply running sfQuickStop(), rasterEngine
 will run in sequential mode.
-
-A fuller tutorial is available at \url{http://publish.illinois.edu/jgrn/software-and-datasets/rasterengine-tutorial/}
 }
 \examples{
 library("raster")
