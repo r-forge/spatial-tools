@@ -803,7 +803,7 @@ focal_hpc_pixelChunkFunction <- function(chunkID,tr,x,
 	
 #	browser()
 
-	r_out_ <- lapply(X=r_out,FUN=function(X,nrows,ncols)
+	r_out <- lapply(X=r_out,FUN=function(X,nrows,ncols)
 			{
 				if(is.array(X)) r_out_temp <- X
 				if(is.data.frame(X)) r_out_temp <- array(data.matrix(X), dim=c(nrows,ncols,length(X),drop=F))
