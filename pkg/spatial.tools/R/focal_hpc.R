@@ -796,12 +796,12 @@ focal_hpc_pixelChunkFunction <- function(chunkID,tr,x,
 	# Execute the function.
 	r_out <- do.call(fun, fun_args)
 	
-	if(!is.list(r_out)) r_out <- list(r_out)
+	if(!is.list(r_out) || is.data.frame(r_out)) r_out <- list(r_out)
 	
 	# If r_out is a data.frame, coerce to the correct format:
 	# array(data.matrix(test_chunk), dim=c(2,3,3))
 	
-	browser()
+#	browser()
 
 	r_out <- lapply(X=r_out,FUN=function(X,nrows,ncols)
 			{
