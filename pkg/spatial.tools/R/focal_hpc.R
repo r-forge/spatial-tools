@@ -766,7 +766,7 @@ focal_hpc_pixelChunkFunction <- function(chunkID,tr,x,
 							c1=1,c2=ncol(X),format=chunk_format)
 				},chunkID=chunkID,chunk_format=chunk_format,simplify = FALSE)
 		
-
+		
 		
 		fun_args$x=r
 		
@@ -801,18 +801,25 @@ focal_hpc_pixelChunkFunction <- function(chunkID,tr,x,
 	# If r_out is a data.frame, coerce to the correct format:
 	# array(data.matrix(test_chunk), dim=c(2,3,3))
 	
-	browser()
-
+#	browser()
+	
 	r_out <- lapply(X=r_out,FUN=function(X,nrows,ncols)
 			{
 				if(is.array(X)) r_out_temp <- X
-				if(is.data.frame(X)) r_out_temp <- array(data.matrix(X), dim=c(nrows,ncols,length(X),drop=F))
-				if(is.factor(X)) X <- as.numeric(X)
-				if(is.numeric(X)) r_out_temp <- array(X,dim=c(nrows,ncols,1,drop=F))
 				if(is.matrix(X)) r_out_temp <- array(X,dim=c(nrows,ncols,1,drop=F))
+				if(is.data.frame(X)) 
+				{
+					nlayers_X <- ncol(X)
+					X <- sapply(X,as.numeric)
+					if(nlayers_X == 1) dropd=F else dropd=T
+					r_out_temp <- array(data=X, 
+							dim=c(nrows,ncols,nlayers_X,drop=dropd))
+				}
+				if(is.factor(X)) X <- as.numeric(X)
+				if(is.vector(X)) r_out_temp <- array(X,dim=c(nrows,ncols,1,drop=F))
 				return(r_out_temp)
 			},nrows=getvalues_raw_nrows,ncols=getvalues_raw_ncols)
-
+	
 	# Write the output
 	
 	
