@@ -1,6 +1,6 @@
 # Various pre-made rasterEngine functions
 
-predict.rfsrc.rasterEngine <- function(newdata,object,probs,ncores,...)
+predict.rfsrc.rasterEngine <- function(object,newdata,probs,ncores=1,...)
 {
 	# For randomForestSRC, set rasterEngine to chunk_format="data.frame"
 	
@@ -22,7 +22,7 @@ predict.rfsrc.rasterEngine <- function(newdata,object,probs,ncores,...)
 	} else
 	{
 		# Fix for rfsrc quantileReg:
-		if(!is.null(probs))
+		if(!missing(probs))
 		{
 			predict_output <- quantileReg(obj=object,prob=prob,newdata=newdata)
 		} else
