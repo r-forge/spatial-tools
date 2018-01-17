@@ -164,6 +164,7 @@ rasterEngine <- function(x,
 	{
 		if(is.list(x))
 		{
+			if(is.null(names(x))) stop("If x is a list, please name the list elements.")
 			additional_vars <- c(additional_vars,x)
 			x <- NULL
 		}
