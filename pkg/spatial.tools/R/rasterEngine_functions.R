@@ -12,7 +12,7 @@ predict.rfsrc.rasterEngine <- function(object,newdata,prob,ncores=1,...)
 	options(rf.cores = ncores)
 	options(mc.cores = 1)
 	
-	if(nrow(newdata) > 3) browser()
+#	if(nrow(newdata) > 3) browser()
 	
 	# This could be sped up by removing incomplete cases...
 	newdata_complete <- complete.cases(newdata)

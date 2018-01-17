@@ -282,12 +282,12 @@ focal_hpc_chunk_setup <- function(x,window_dims,window_center,
 	
 	blocksize_reduction=4
 	
-	browser()
+#	browser()
 	
 	if(is.null(blocksize))
 		tr=blockSize(x,n=nlayers_x*blocksize_reduction,minrows=window_dims[2],minblocks=minblocks)
 	else
-		tr=blockSize(x,chunksize=ncol(x)*blocksize*nlayers_x,
+		tr=blockSize(x,chunksize=ncol(x)*blocksize, # *nlayers_x,
 				n=nlayers_x,minrows=window_dims[2],minblocks=minblocks)
 	
 	if (tr$n < nodes) nodes <- tr$n
