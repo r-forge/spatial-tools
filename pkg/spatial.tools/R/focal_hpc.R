@@ -817,13 +817,15 @@ focal_hpc_pixelChunkFunction <- function(chunkID,tr,x,
 				}
 				if(is.factor(X)) X <- as.numeric(X)
 				if(is.vector(X)) r_out_temp <- array(X,dim=c(nrows,ncols,1,drop=F))
+				dim(r_out_temp) <- dim(r_out_temp)[1:3]
 				return(r_out_temp)
 			},nrows=getvalues_raw_nrows,ncols=getvalues_raw_ncols)
 	
+	# dim problem?
+
+	
 	# Write the output
-	
-	browser()
-	
+		
 	if(is.list(x))
 	{
 		image_dims=dim(x[[1]])
@@ -859,9 +861,12 @@ focal_hpc_pixelChunkFunction <- function(chunkID,tr,x,
 			},
 			x=x,tr=tr)
 	
+	browser()
+	
 	writeMapply <- mapply(function(filename,image_dims,r_out,chunk_position)
 			{
-#				print(filename)
+				browser()
+				print(filename)
 #				print(image_dims)
 #				print(r_out)
 				writeSuccess=FALSE
