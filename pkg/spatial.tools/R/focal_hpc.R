@@ -817,7 +817,7 @@ focal_hpc_pixelChunkFunction <- function(chunkID,tr,x,
 				}
 				if(is.factor(X)) X <- as.numeric(X)
 				if(is.vector(X)) r_out_temp <- array(X,dim=c(nrows,ncols,1,drop=F))
-				dim(r_out_temp) <- dim(r_out_temp)[1:3]
+#				dim(r_out_temp) <- dim(r_out_temp)[1:3]
 				return(r_out_temp)
 			},nrows=getvalues_raw_nrows,ncols=getvalues_raw_ncols)
 	
