@@ -865,7 +865,7 @@ focal_hpc_pixelChunkFunction <- function(chunkID,tr,x,
 	
 	writeMapply <- mapply(function(filename,image_dims,r_out,chunk_position)
 			{
-				browser()
+#				browser()
 				print(filename)
 #				print(image_dims)
 #				print(r_out)
