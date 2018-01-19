@@ -15,7 +15,7 @@ predict.rfsrc.rasterEngine <- function(object,newdata,prob,ncores=1,verbose=F,..
 	
 	# newdata_nrow <- nrow(newdata)
 	
-#	
+	# if(nrow(newdata) > 3) browser()
 	
 	if(verbose) message("Checking for complete cases...")
 	# This could be sped up by removing incomplete cases...
@@ -29,6 +29,7 @@ predict.rfsrc.rasterEngine <- function(object,newdata,prob,ncores=1,verbose=F,..
 		newdata[,] <- 1
 	}
 #	newdata[is.na(newdata)] <- 1
+
 	
 	
 	if(verbose) message("Predicting...")
@@ -51,6 +52,7 @@ predict.rfsrc.rasterEngine <- function(object,newdata,prob,ncores=1,verbose=F,..
 	if(!("family" %in% names(predict_output)))
 	{
 		# quantreg
+		
 		predict_output <- predict_output$quantiles
 		colnames(predict_output) <- paste("Q",format(round(prob, 4), nsmall = 4),sep="")
 	} else
