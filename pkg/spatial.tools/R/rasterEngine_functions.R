@@ -76,7 +76,7 @@ predict.rfsrc.rasterEngine <- function(object,newdata,prob,ncores=1,verbose=F,..
 	}
 
 	if(verbose) message("Fixing output...")
-	if(nrow(newdata) > 3) browser()
+#	if(nrow(newdata) > 3) browser()
 #	predict_output <- as.matrix(predict_output)
 	
 	# Create a blank matrix to fill in value:

@@ -795,7 +795,7 @@ focal_hpc_pixelChunkFunction <- function(chunkID,tr,x,
 	
 	# Execute the function.
 	r_out <- do.call(fun, fun_args)
-	browser()
+#	browser()
 	if(!is.list(r_out) || is.data.frame(r_out)) r_out <- list(r_out)
 	
 	# If r_out is a data.frame, coerce to the correct format:
@@ -811,9 +811,9 @@ focal_hpc_pixelChunkFunction <- function(chunkID,tr,x,
 				{
 					nlayers_X <- ncol(X)
 					X <- sapply(X,as.numeric)
-					if(nlayers_X == 1) dropd=F else dropd=T
+					# if(nlayers_X == 1) { dropd=F } else { dropd=T }
 					r_out_temp <- array(data=X, 
-							dim=c(nrows,ncols,nlayers_X,drop=dropd))
+							dim=c(nrows,ncols,nlayers_X))
 				}
 				if(is.factor(X)) X <- as.numeric(X)
 				if(is.vector(X)) r_out_temp <- array(X,dim=c(nrows,ncols,1,drop=F))
