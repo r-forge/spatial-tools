@@ -795,7 +795,7 @@ focal_hpc_pixelChunkFunction <- function(chunkID,tr,x,
 	
 	# Execute the function.
 	r_out <- do.call(fun, fun_args)
-	
+	browser()
 	if(!is.list(r_out) || is.data.frame(r_out)) r_out <- list(r_out)
 	
 	# If r_out is a data.frame, coerce to the correct format:
