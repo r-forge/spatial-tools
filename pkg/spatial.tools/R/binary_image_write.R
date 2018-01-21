@@ -37,7 +37,7 @@
 binary_image_write=function(filename,mode=real64(),image_dims,interleave="BSQ",
 	data,data_position)
 {
-#	browser()
+	browser()
 	
 #	if(is.character(mode))
 #	{

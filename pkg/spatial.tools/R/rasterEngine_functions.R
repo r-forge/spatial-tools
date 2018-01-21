@@ -4,6 +4,7 @@ predict.rfsrc.rasterEngine <- function(object,newdata,prob,ncores=1,verbose=F,..
 {
 	# For randomForestSRC, set rasterEngine to chunk_format="data.frame"
 #	if(nrow(newdata) > 2) browser()
+	if(verbose) message(print(getOption("rf.cores")))
 	
 	local_objects <- ls()
 	model_parameters <- setdiff(local_objects,c("newdata","object","prob","ncores","verbose"))
@@ -12,6 +13,8 @@ predict.rfsrc.rasterEngine <- function(object,newdata,prob,ncores=1,verbose=F,..
 	
 	options(rf.cores = ncores)
 	options(mc.cores = 1)
+	
+	if(verbose) message(print(getOption("rf.cores")))
 	
 	# newdata_nrow <- nrow(newdata)
 	
