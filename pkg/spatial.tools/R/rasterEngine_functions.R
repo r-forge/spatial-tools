@@ -4,7 +4,7 @@ predict.rfsrc.rasterEngine <- function(object,newdata,prob,ncores=1,verbose=F,..
 {
 	# For randomForestSRC, set rasterEngine to chunk_format="data.frame"
 #	if(nrow(newdata) > 2) browser()
-	if(verbose) message(print(getOption("rf.cores")))
+#	if(verbose) message(print(getOption("rf.cores")))
 	
 	local_objects <- ls()
 	model_parameters <- setdiff(local_objects,c("newdata","object","prob","ncores","verbose"))
@@ -14,7 +14,7 @@ predict.rfsrc.rasterEngine <- function(object,newdata,prob,ncores=1,verbose=F,..
 	options(rf.cores = ncores)
 	options(mc.cores = 1)
 	
-	if(verbose) message(print(getOption("rf.cores")))
+#	if(verbose) message(print(getOption("rf.cores")))
 	
 	# newdata_nrow <- nrow(newdata)
 	
@@ -33,7 +33,7 @@ predict.rfsrc.rasterEngine <- function(object,newdata,prob,ncores=1,verbose=F,..
 	}
 #	newdata[is.na(newdata)] <- 1
 
-	
+#	browser()
 	
 	if(verbose) message("Predicting...")
 	if(length(model_parameters)>0)
@@ -86,7 +86,7 @@ predict.rfsrc.rasterEngine <- function(object,newdata,prob,ncores=1,verbose=F,..
 	
 	# Create a blank matrix to fill in value:
 	predict_output_matrix <- matrix(nrow=length(newdata_complete_index),ncol=ncol(predict_output))
-	colnames(predict_output_matrix) <- names(predict_output)
+	colnames(predict_output_matrix) <- colnames(predict_output)
 	if(sum(newdata_complete_index) > 0) predict_output_matrix[newdata_complete_index,] <- predict_output
 	
 	predict_output <- as.data.frame(predict_output_matrix)
@@ -109,7 +109,11 @@ predict.rfsrc.rasterEngine <- function(object,newdata,prob,ncores=1,verbose=F,..
 #		}
 #		
 #	}
+#	predict_output <- as.data.frame(predict_output_matrix)
 	if(verbose) message(dim(predict_output))
 
+#	browser()
+	
+	
 	return(predict_output)
 }
