@@ -82,18 +82,18 @@ Pixel based processing:
 
 1) If chunk_format=="array" (default), the input to the function should assume an array of dimensions 
 x,y,z where x = the number of columns in a chunk, y = the number of rows in the chunk, and 
-z = the number of bands in the chunk.  If chunk_format=="raster", the input to the function
-will be a raster subset.
+z = the number of bands in the chunk.  If chunk_format=="data.frame", the function receives a data.frame
+where each column of the data.frame is a single layer from the input raster(s).  If chunk_format=="raster", 
+the input to the function will be a raster subset.
+
 Note that we are ordering the array using standards for geographic data, (columns, rows, bands), 
 not how R usually thinks of arrays (rows, columns, bands).
 
-2) If a single file is to be output from rasterEngine, the output of the function should 
-always be an array with the x and y dimensions matching the input, and an arbitrary number 
+2) The output of the function can be as follows:
+- A data.frame where each column is assumed to be a single layer in the output raster
+- An array with the x and y dimensions matching the input, and an arbitrary number 
 of band outputs.  Remember to order the dimensions as columns, rows, bands (x,y,z).
-
-If a multiple file output is required, the output of the function should return a list of arrays 
-each with an equivalent number of columns and rows.  The first element of the list will be assigned to
-the first filename (if provided).  
+- A numeric vector, where the output is assumed to be a single layer (similar to calc() ).
 
 Local window processing:
 

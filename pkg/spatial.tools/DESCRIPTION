@@ -9,6 +9,7 @@ Description: Spatial functions meant to enhance the core functionality of the
     package "raster", including a parallel processing engine for use with
     rasters.
 Imports: compiler,doParallel,foreach,iterators,mmap,raster,rgdal,sp,abind
-Version: 1.5.9
-Date: 2018-01-19
-RoxygenNote: 6.0.1
+Suggests: randomForestSRC,randomForest 
+Version: 1.6.0
+Date: 2018-04-22
+RoxygenNote: 6.0.1.9000

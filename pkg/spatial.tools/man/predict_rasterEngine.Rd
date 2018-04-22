@@ -5,7 +5,7 @@
 \title{Model predictions (including Raster* objects)}
 \usage{
 predict_rasterEngine(object, filename = NULL, na.rm.mode = TRUE,
-  probs = NULL, ncores = 1, debugmode = FALSE, verbose = F, ...)
+  ncores = 1, debugmode = FALSE, verbose = F, ...)
 }
 \arguments{
 \item{object}{a model object for which prediction is desired.}
@@ -17,6 +17,8 @@ predict_rasterEngine(object, filename = NULL, na.rm.mode = TRUE,
 \item{ncores}{Numeric. Number of cores to use when predicting.  Only used with randomForestSRC for now.  Do not combine with foreach registered parallel engines (e.g. sfQuickInit())}
 
 \item{debugmode}{Logical. Internal debugging for the code, will be removed eventually. Default is FALSE.}
+
+\item{verbose}{Logical. Enable verbose execution? Default is FALSE.}
 
 \item{...}{additional arguments affecting the predictions produced.}
 }
@@ -35,6 +37,7 @@ predict will run in parallel if a cluster is registered
 with foreach via a do* statement, or if the user uses sfQuickInit().
 }
 \examples{
+library("raster")
 # This example creates a linear model relating a vegetation
 # index (NDVI) to vegetation height, and applies it to a raster
 # of NDVI.

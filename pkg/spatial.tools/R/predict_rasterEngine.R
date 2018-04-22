@@ -4,6 +4,7 @@
 #' @param na.rm.mode Logical. Attempt to fix missing data, even if the model object doesn't support na.rm?  Default is TRUE.
 #' @param ncores Numeric. Number of cores to use when predicting.  Only used with randomForestSRC for now.  Do not combine with foreach registered parallel engines (e.g. sfQuickInit())
 #' @param debugmode Logical. Internal debugging for the code, will be removed eventually. Default is FALSE.
+#' @param verbose Logical. Enable verbose execution? Default is FALSE.  
 #' @param ... additional arguments affecting the predictions produced.
 #' @author Jonathan A. Greenberg (\email{spatial.tools@@estarcion.net})
 #' @seealso \code{\link{predict}}
@@ -18,6 +19,7 @@
 #' with foreach via a do* statement, or if the user uses sfQuickInit().
 #'  
 #' @examples
+#' library("raster")
 #' # This example creates a linear model relating a vegetation
 #' # index (NDVI) to vegetation height, and applies it to a raster
 #' # of NDVI.
@@ -72,13 +74,15 @@
 #' # sfQuickInit()
 #' height_from_ndvi_raster <- predict_rasterEngine(object=height_from_ndvi_model,newdata=tahoe_ndvi)
 #' # sfQuickStop()
+#' @importFrom stats complete.cases
 #' @export
 
 predict_rasterEngine <- function(object,filename=NULL,na.rm.mode=TRUE,
-		probs=NULL,
+#		prob=NULL,
 		ncores=1,debugmode=FALSE,verbose=F,...)
 {
 	
+	prob <- NULL
 	
 	list2env(list(...),envir=environment())
 	if("newdata" %in% ls())
@@ -180,10 +184,10 @@ predict_rasterEngine <- function(object,filename=NULL,na.rm.mode=TRUE,
 				} else
 				{
 					# Fix for rfsrc quantileReg:
-					if(!is.null(probs))
+					if(!is.null(prob))
 					{
-						browser()
-						predict_output <- quantileReg(obj=object,prob=prob,newdata=newdata_df)
+#						browser()
+						predict_output <- randomForestSRC::quantileReg(obj=object,prob=prob,newdata=newdata_df)
 					} else
 					{
 						predict_output <- predict(object=object,newdata=newdata_df)
