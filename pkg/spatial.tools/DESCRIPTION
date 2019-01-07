@@ -10,6 +10,6 @@ Description: Spatial functions meant to enhance the core functionality of the
     rasters.
 Imports: compiler,doParallel,foreach,iterators,mmap,raster,rgdal,sp,abind
 Suggests: randomForestSRC,randomForest 
-Version: 1.6.0
-Date: 2018-04-22
-RoxygenNote: 6.0.1.9000
+Version: 1.6.1
+Date: 2019-01-07
+RoxygenNote: 6.1.1
